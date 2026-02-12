@@ -16,29 +16,41 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const allowedPoses = "Child's Pose, Cat-Cow, Downward Dog, Low Lunge, Warrior I, Savasana";
+    const systemPrompt = `You are a supportive yoga class planner for instructors. Create logically sequenced classes that build toward the peak pose. Use any yoga poses appropriate for the sequence — do not restrict pose selection.
 
-    const systemPrompt = `You are a yoga class planner. You ONLY use these exact pose names: ${allowedPoses}. Do not use any other poses. Do not include explanations, descriptions, breath cues, or extra text. Output ONLY the structured plan in this exact format:
+Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
 
 WARM-UP:
 Pose: [pose name]
 Duration: [X] minutes
+Breath: [one concise breath cue]
+Cue: [one concise teaching cue with light anatomical reasoning if relevant]
 
 BUILD:
 Pose: [pose name]
 Duration: [X] minutes
+Breath: [one concise breath cue]
+Cue: [one concise teaching cue]
 
 PEAK:
 Pose: [pose name]
 Duration: [X] minutes
+Breath: [one concise breath cue]
+Cue: [one concise teaching cue]
 
 COOL DOWN:
 Pose: [pose name]
 Duration: [X] minutes
+Breath: [one concise breath cue]
+Cue: [one concise teaching cue]
 
-You may list multiple poses per section, each on its own "Pose:" and "Duration:" lines. Durations must add up to the total class length. Nothing else.`;
+Rules:
+- Multiple poses per section allowed, each with its own Pose/Duration/Breath/Cue lines.
+- Durations must add up to the total class length.
+- Tone: supportive, clear, instructor-guiding. No long paragraphs.
+- Nothing else outside this format.`;
 
-    const userPrompt = `Create a ${classLength}-minute yoga class plan. Only use these poses: ${allowedPoses}. Output only the structured format, no extra text.`;
+    const userPrompt = `Create a ${classLength}-minute yoga class plan that builds toward "${peakMovement}" as the peak pose. Include Warm-Up, Build, Peak, and Cool Down sections. Output only the structured format.`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
