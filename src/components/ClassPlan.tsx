@@ -1,28 +1,126 @@
-import ReactMarkdown from "react-markdown";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ClassPlanProps {
   content: string;
   isLoading: boolean;
 }
 
+interface PoseMedia {
+  pose_name: string;
+  image_url: string;
+}
+
+interface PoseEntry {
+  name: string;
+  duration: string;
+  imageUrl?: string;
+}
+
+interface Section {
+  title: string;
+  poses: PoseEntry[];
+}
+
+function parsePlan(raw: string, media: PoseMedia[]): Section[] {
+  const sections: Section[] = [];
+  let current: Section | null = null;
+
+  for (const line of raw.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    const sectionMatch = trimmed.match(/^(WARM-UP|BUILD|PEAK|COOL DOWN):?$/i);
+    if (sectionMatch) {
+      current = { title: sectionMatch[1].toUpperCase(), poses: [] };
+      sections.push(current);
+      continue;
+    }
+
+    if (current) {
+      const poseMatch = trimmed.match(/^Pose:\s*(.+)/i);
+      if (poseMatch) {
+        const name = poseMatch[1].trim();
+        const img = media.find(
+          (m) => m.pose_name.toLowerCase() === name.toLowerCase()
+        );
+        current.poses.push({ name, duration: "", imageUrl: img?.image_url });
+        continue;
+      }
+
+      const durMatch = trimmed.match(/^Duration:\s*(.+)/i);
+      if (durMatch && current.poses.length > 0) {
+        current.poses[current.poses.length - 1].duration = durMatch[1].trim();
+      }
+    }
+  }
+
+  return sections;
+}
+
 const ClassPlan = ({ content, isLoading }: ClassPlanProps) => {
+  const [media, setMedia] = useState<PoseMedia[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("pose_media")
+      .select("pose_name, image_url")
+      .then(({ data }) => {
+        if (data) setMedia(data);
+      });
+  }, []);
+
+  const sections = parsePlan(content, media);
+
   return (
-    <div className="mt-12 border-t border-border pt-10">
-      <div className="prose prose-stone max-w-none font-body text-foreground
-        prose-headings:font-heading prose-headings:font-normal prose-headings:tracking-tight prose-headings:text-foreground
-        prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-3 prose-h2:border-b prose-h2:border-border prose-h2:pb-2
-        prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 prose-h3:text-muted-foreground
-        prose-p:text-sm prose-p:leading-relaxed prose-p:text-foreground/80
-        prose-li:text-sm prose-li:text-foreground/80
-        prose-ul:my-2 prose-ol:my-2
-        prose-strong:text-foreground prose-strong:font-medium
-      ">
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </div>
+    <div className="mt-12 border-t border-border pt-10 space-y-10">
+      {sections.map((section) => (
+        <div key={section.title}>
+          <h2 className="font-heading text-2xl tracking-tight text-foreground border-b border-border pb-2 mb-4">
+            {section.title}
+          </h2>
+          <div className="space-y-3">
+            {section.poses.map((pose, i) => (
+              <div
+                key={`${section.title}-${i}`}
+                className="flex items-center gap-4 rounded-lg border border-border bg-card p-3"
+              >
+                {pose.imageUrl && (
+                  <img
+                    src={pose.imageUrl}
+                    alt={pose.name}
+                    className="h-14 w-14 rounded-md object-cover flex-shrink-0"
+                  />
+                )}
+                <div className="min-w-0">
+                  <p className="font-body text-sm font-medium text-foreground">
+                    {pose.name}
+                  </p>
+                  {pose.duration && (
+                    <p className="font-body text-xs text-muted-foreground">
+                      {pose.duration}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* Show raw text while streaming before sections are parseable */}
+      {sections.length === 0 && content && (
+        <pre className="font-body text-sm text-foreground/80 whitespace-pre-wrap">
+          {content}
+        </pre>
+      )}
+
       {isLoading && (
-        <div className="mt-4 flex items-center gap-2 text-muted-foreground">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-          <span className="font-body text-xs tracking-wide uppercase">Generating…</span>
+          <span className="font-body text-xs tracking-wide uppercase">
+            Generating…
+          </span>
         </div>
       )}
     </div>
