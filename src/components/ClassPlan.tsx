@@ -14,6 +14,8 @@ interface PoseMedia {
 interface PoseEntry {
   name: string;
   duration: string;
+  breath: string;
+  cue: string;
   imageUrl?: string;
 }
 
@@ -44,14 +46,21 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
         const img = media.find(
           (m) => m.pose_name.toLowerCase() === name.toLowerCase()
         );
-        current.poses.push({ name, duration: "", imageUrl: img?.image_url });
+        current.poses.push({ name, duration: "", breath: "", cue: "", imageUrl: img?.image_url });
         continue;
       }
 
+      const last = current.poses[current.poses.length - 1];
+      if (!last) continue;
+
       const durMatch = trimmed.match(/^Duration:\s*(.+)/i);
-      if (durMatch && current.poses.length > 0) {
-        current.poses[current.poses.length - 1].duration = durMatch[1].trim();
-      }
+      if (durMatch) { last.duration = durMatch[1].trim(); continue; }
+
+      const breathMatch = trimmed.match(/^Breath:\s*(.+)/i);
+      if (breathMatch) { last.breath = breathMatch[1].trim(); continue; }
+
+      const cueMatch = trimmed.match(/^Cue:\s*(.+)/i);
+      if (cueMatch) { last.cue = cueMatch[1].trim(); continue; }
     }
   }
 
@@ -76,29 +85,43 @@ const ClassPlan = ({ content, isLoading }: ClassPlanProps) => {
     <div className="mt-12 border-t border-border pt-10 space-y-10">
       {sections.map((section) => (
         <div key={section.title}>
-          <h2 className="font-heading text-2xl tracking-tight text-foreground border-b border-border pb-2 mb-4">
+          <h2 className="font-heading text-2xl tracking-tight text-foreground border-b border-border pb-2 mb-5">
             {section.title}
           </h2>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {section.poses.map((pose, i) => (
               <div
                 key={`${section.title}-${i}`}
-                className="flex items-center gap-4 rounded-lg border border-border bg-card p-3"
+                className="rounded-lg border border-border bg-card overflow-hidden"
               >
                 {pose.imageUrl && (
                   <img
                     src={pose.imageUrl}
                     alt={pose.name}
-                    className="h-14 w-14 rounded-md object-cover flex-shrink-0"
+                    className="w-full h-36 object-cover"
                   />
                 )}
-                <div className="min-w-0">
-                  <p className="font-body text-sm font-medium text-foreground">
-                    {pose.name}
-                  </p>
-                  {pose.duration && (
-                    <p className="font-body text-xs text-muted-foreground">
-                      {pose.duration}
+                <div className="p-4 space-y-1.5">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="font-body text-base font-medium text-foreground">
+                      {pose.name}
+                    </p>
+                    {pose.duration && (
+                      <span className="font-body text-xs text-muted-foreground whitespace-nowrap">
+                        {pose.duration}
+                      </span>
+                    )}
+                  </div>
+                  {pose.breath && (
+                    <p className="font-body text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground/70">Breath:</span>{" "}
+                      {pose.breath}
+                    </p>
+                  )}
+                  {pose.cue && (
+                    <p className="font-body text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground/70">Cue:</span>{" "}
+                      {pose.cue}
                     </p>
                   )}
                 </div>
@@ -108,7 +131,6 @@ const ClassPlan = ({ content, isLoading }: ClassPlanProps) => {
         </div>
       ))}
 
-      {/* Show raw text while streaming before sections are parseable */}
       {sections.length === 0 && content && (
         <pre className="font-body text-sm text-foreground/80 whitespace-pre-wrap">
           {content}
