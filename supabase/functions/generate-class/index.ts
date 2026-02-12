@@ -16,26 +16,29 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are an expert yoga instructor and class planner. You create detailed, well-structured yoga class plans. Always respond with a structured class plan in the following format using markdown:
+    const allowedPoses = "Child's Pose, Cat-Cow, Downward Dog, Low Lunge, Warrior I, Savasana";
 
-## Warm-Up (X minutes)
-List specific poses and movements with breath cues.
+    const systemPrompt = `You are a yoga class planner. You ONLY use these exact pose names: ${allowedPoses}. Do not use any other poses. Do not include explanations, descriptions, breath cues, or extra text. Output ONLY the structured plan in this exact format:
 
-## Build (X minutes)
-List progressive poses that build toward the peak, with transitions.
+WARM-UP:
+Pose: [pose name]
+Duration: [X] minutes
 
-## Peak (X minutes)
-### Beginner Option
-Describe the accessible version of the peak movement.
-### Advanced Option
-Describe the full expression of the peak movement with any variations.
+BUILD:
+Pose: [pose name]
+Duration: [X] minutes
 
-## Cool Down (X minutes)
-List restorative poses and final relaxation.
+PEAK:
+Pose: [pose name]
+Duration: [X] minutes
 
-Keep instructions clear, concise, and practical for a teacher to follow in real-time. Include timing for each section that adds up to the total class length. Use proper yoga pose names (Sanskrit in parentheses where helpful).`;
+COOL DOWN:
+Pose: [pose name]
+Duration: [X] minutes
 
-    const userPrompt = `Create a ${classLength}-minute yoga class plan that builds toward "${peakMovement}" as the peak movement. Include Warm-Up, Build, Peak (with beginner and advanced options), and Cool Down sections.`;
+You may list multiple poses per section, each on its own "Pose:" and "Duration:" lines. Durations must add up to the total class length. Nothing else.`;
+
+    const userPrompt = `Create a ${classLength}-minute yoga class plan. Only use these poses: ${allowedPoses}. Output only the structured format, no extra text.`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
