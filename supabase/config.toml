@@ -1,0 +1,4 @@
+project_id = "xuxzhkcjdexcynvcpjka"
+
+[functions.generate-class]
+verify_jwt = false
