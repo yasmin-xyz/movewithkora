@@ -43,8 +43,9 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
       const poseMatch = trimmed.match(/^Pose:\s*(.+)/i);
       if (poseMatch) {
         const name = poseMatch[1].trim();
+        const baseName = name.replace(/\s*\(.*\)/, "").trim().toLowerCase();
         const img = media.find(
-          (m) => m.pose_name.toLowerCase() === name.toLowerCase()
+          (m) => baseName.includes(m.pose_name.toLowerCase()) || m.pose_name.toLowerCase().includes(baseName)
         );
         current.poses.push({ name, duration: "", breath: "", cue: "", imageUrl: img?.image_url });
         continue;
