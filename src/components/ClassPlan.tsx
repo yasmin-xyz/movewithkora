@@ -92,16 +92,16 @@ const ClassPlan = ({ content, isLoading }: ClassPlanProps) => {
             {section.poses.map((pose, i) => (
               <div
                 key={`${section.title}-${i}`}
-                className="rounded-lg border border-border bg-card overflow-hidden"
+                className="rounded-lg border border-border bg-card overflow-hidden flex items-center gap-4 p-3"
               >
                 {pose.imageUrl && (
                   <img
                     src={pose.imageUrl}
                     alt={pose.name}
-                    className="w-full h-36 object-cover"
+                    className="w-[72px] h-[72px] rounded-md object-cover flex-shrink-0"
                   />
                 )}
-                <div className="p-4 space-y-1.5">
+                <div className="space-y-1 min-w-0">
                   <div className="flex items-baseline justify-between gap-2">
                     <p className="font-body text-base font-medium text-foreground">
                       {pose.name}
