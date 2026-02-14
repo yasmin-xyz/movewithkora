@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import ClassForm from "@/components/ClassForm";
 import ClassPlan from "@/components/ClassPlan";
+import SavedClasses from "@/components/SavedClasses";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
@@ -138,6 +139,8 @@ const Index = () => {
             </Button>
           </div>
         )}
+
+        <SavedClasses />
       </div>
     </div>
   );
