@@ -1,13 +1,16 @@
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import ClassForm from "@/components/ClassForm";
 import ClassPlan from "@/components/ClassPlan";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [classLength, setClassLength] = useState("60");
   const [peakMovement, setPeakMovement] = useState("");
   const [classPlan, setClassPlan] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   const handleGenerate = async () => {
@@ -84,6 +87,22 @@ const Index = () => {
     }
   };
 
+  const handleSave = async () => {
+    setIsSaving(true);
+    const { error } = await supabase.from("saved_classes").insert({
+      peak_pose: peakMovement.trim(),
+      class_length: parseInt(classLength),
+      class_content: classPlan,
+    });
+    setIsSaving(false);
+
+    if (error) {
+      toast.error("Failed to save class.");
+    } else {
+      toast.success("Class saved successfully.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-2xl px-6 py-16 sm:py-24">
@@ -106,6 +125,19 @@ const Index = () => {
         />
 
         {classPlan && <ClassPlan content={classPlan} isLoading={isLoading} />}
+
+        {classPlan && !isLoading && (
+          <div className="mt-8">
+            <Button
+              variant="outline"
+              className="w-full h-12 font-body text-sm font-medium tracking-wide uppercase"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving…" : "Save Class"}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
