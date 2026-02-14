@@ -11,7 +11,11 @@ interface SavedClass {
   created_at: string | null;
 }
 
-const SavedClasses = () => {
+interface SavedClassesProps {
+  onLoadClass?: (peakPose: string, length: number, content: string) => void;
+}
+
+const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
   const [classes, setClasses] = useState<SavedClass[]>([]);
   const [viewingId, setViewingId] = useState<string | null>(null);
 
@@ -66,16 +70,32 @@ const SavedClasses = () => {
                 {cls.class_length} min · {formatDate(cls.created_at)}
               </p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="font-body text-xs tracking-wide uppercase flex-shrink-0"
-              onClick={() =>
-                setViewingId(viewingId === cls.id ? null : cls.id)
-              }
-            >
-              {viewingId === cls.id ? "Hide" : "View"}
-            </Button>
+            <div className="flex gap-2 flex-shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-body text-xs tracking-wide uppercase"
+                onClick={() =>
+                  setViewingId(viewingId === cls.id ? null : cls.id)
+                }
+              >
+                {viewingId === cls.id ? "Hide" : "View"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-body text-xs tracking-wide uppercase"
+                onClick={() =>
+                  onLoadClass?.(
+                    cls.peak_pose || "",
+                    cls.class_length || 60,
+                    cls.class_content || ""
+                  )
+                }
+              >
+                Load
+              </Button>
+            </div>
           </div>
         ))}
       </div>

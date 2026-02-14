@@ -13,6 +13,14 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const headerRef = useRef<HTMLElement>(null);
+
+  const handleLoadClass = (peakPose: string, length: number, content: string) => {
+    setClassLength(String(length));
+    setPeakMovement(peakPose);
+    setClassPlan(content);
+    headerRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleGenerate = async () => {
     if (!peakMovement.trim()) {
@@ -107,7 +115,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-2xl px-6 py-16 sm:py-24">
-        <header className="mb-16 text-center">
+        <header ref={headerRef} className="mb-16 text-center">
           <h1 className="font-heading text-6xl font-light tracking-tight text-foreground sm:text-7xl">
             Kora
           </h1>
@@ -140,7 +148,7 @@ const Index = () => {
           </div>
         )}
 
-        <SavedClasses />
+        <SavedClasses onLoadClass={handleLoadClass} />
       </div>
     </div>
   );

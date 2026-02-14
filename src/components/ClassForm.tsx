@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -42,6 +42,19 @@ const ClassForm = ({
   const [customValue, setCustomValue] = useState(
     PEAK_OPTIONS.includes(peakMovement) ? "" : peakMovement
   );
+
+  useEffect(() => {
+    if (PEAK_OPTIONS.includes(peakMovement)) {
+      setPeakSelect(peakMovement);
+      setCustomValue("");
+    } else if (peakMovement) {
+      setPeakSelect("Custom");
+      setCustomValue(peakMovement);
+    } else {
+      setPeakSelect("");
+      setCustomValue("");
+    }
+  }, [peakMovement]);
 
   const handleSelectChange = (value: string) => {
     setPeakSelect(value);
