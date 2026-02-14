@@ -24,6 +24,8 @@ interface ClassFormProps {
   onClassLengthChange: (v: string) => void;
   peakMovement: string;
   onPeakMovementChange: (v: string) => void;
+  skillLevel: string;
+  onSkillLevelChange: (v: string) => void;
   onGenerate: () => void;
   isLoading: boolean;
 }
@@ -33,6 +35,8 @@ const ClassForm = ({
   onClassLengthChange,
   peakMovement,
   onPeakMovementChange,
+  skillLevel,
+  onSkillLevelChange,
   onGenerate,
   isLoading,
 }: ClassFormProps) => {
@@ -114,6 +118,22 @@ const ClassForm = ({
             onKeyDown={(e) => e.key === "Enter" && !isLoading && onGenerate()}
           />
         )}
+      </div>
+
+      <div className="space-y-2">
+        <label className="font-body text-sm font-medium text-foreground tracking-wide uppercase">
+          Skill Level
+        </label>
+        <Select value={skillLevel} onValueChange={onSkillLevelChange}>
+          <SelectTrigger className="h-12 bg-card border-border font-body text-foreground">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Beginner">Beginner</SelectItem>
+            <SelectItem value="Intermediate">Intermediate</SelectItem>
+            <SelectItem value="Advanced">Advanced</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Button

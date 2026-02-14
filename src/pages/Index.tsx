@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 const Index = () => {
   const [classLength, setClassLength] = useState("60");
   const [peakMovement, setPeakMovement] = useState("");
+  const [skillLevel, setSkillLevel] = useState("Intermediate");
   const [classPlan, setClassPlan] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -44,6 +45,7 @@ const Index = () => {
           body: JSON.stringify({
             classLength: parseInt(classLength),
             peakMovement: peakMovement.trim(),
+            skillLevel,
           }),
           signal: abortRef.current.signal,
         }
@@ -129,6 +131,8 @@ const Index = () => {
           onClassLengthChange={setClassLength}
           peakMovement={peakMovement}
           onPeakMovementChange={setPeakMovement}
+          skillLevel={skillLevel}
+          onSkillLevelChange={setSkillLevel}
           onGenerate={handleGenerate}
           isLoading={isLoading}
         />

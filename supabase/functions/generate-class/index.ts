@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { classLength, peakMovement } = await req.json();
+    const { classLength, peakMovement, skillLevel = "Intermediate" } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -50,7 +50,7 @@ Rules:
 - Tone: supportive, clear, instructor-guiding. No long paragraphs.
 - Nothing else outside this format.`;
 
-    const userPrompt = `Create a ${classLength}-minute yoga class plan that builds toward "${peakMovement}" as the peak pose. Include Warm-Up, Build, Peak, and Cool Down sections. Output only the structured format.`;
+    const userPrompt = `Create a ${classLength}-minute yoga class plan for a ${skillLevel.toLowerCase()}-level practitioner that builds toward "${peakMovement}" as the peak pose. Adjust pose complexity and cues to match the ${skillLevel.toLowerCase()} skill level. Include Warm-Up, Build, Peak, and Cool Down sections. Output only the structured format.`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
