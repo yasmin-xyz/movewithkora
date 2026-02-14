@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -8,6 +9,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+
+const PEAK_OPTIONS = [
+  "Bird of Paradise",
+  "Handstand",
+  "Crow Pose",
+  "Side Crow",
+  "King Pigeon",
+  "Custom",
+];
 
 interface ClassFormProps {
   classLength: string;
@@ -26,6 +36,28 @@ const ClassForm = ({
   onGenerate,
   isLoading,
 }: ClassFormProps) => {
+  const [peakSelect, setPeakSelect] = useState(
+    PEAK_OPTIONS.includes(peakMovement) ? peakMovement : peakMovement ? "Custom" : ""
+  );
+  const [customValue, setCustomValue] = useState(
+    PEAK_OPTIONS.includes(peakMovement) ? "" : peakMovement
+  );
+
+  const handleSelectChange = (value: string) => {
+    setPeakSelect(value);
+    if (value !== "Custom") {
+      setCustomValue("");
+      onPeakMovementChange(value);
+    } else {
+      onPeakMovementChange(customValue);
+    }
+  };
+
+  const handleCustomChange = (value: string) => {
+    setCustomValue(value);
+    onPeakMovementChange(value);
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -48,13 +80,27 @@ const ClassForm = ({
         <label className="font-body text-sm font-medium text-foreground tracking-wide uppercase">
           Peak Movement or Focus
         </label>
-        <Input
-          className="h-12 bg-card border-border font-body text-foreground placeholder:text-muted-foreground"
-          placeholder="Example: Bird of Paradise"
-          value={peakMovement}
-          onChange={(e) => onPeakMovementChange(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && !isLoading && onGenerate()}
-        />
+        <Select value={peakSelect} onValueChange={handleSelectChange}>
+          <SelectTrigger className="h-12 bg-card border-border font-body text-foreground">
+            <SelectValue placeholder="Select a peak pose" />
+          </SelectTrigger>
+          <SelectContent>
+            {PEAK_OPTIONS.map((opt) => (
+              <SelectItem key={opt} value={opt}>
+                {opt}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {peakSelect === "Custom" && (
+          <Input
+            className="h-12 bg-card border-border font-body text-foreground placeholder:text-muted-foreground"
+            placeholder="Enter your peak pose"
+            value={customValue}
+            onChange={(e) => handleCustomChange(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && !isLoading && onGenerate()}
+          />
+        )}
       </div>
 
       <Button
