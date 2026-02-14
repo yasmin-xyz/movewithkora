@@ -32,6 +32,30 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_classes: {
+        Row: {
+          class_content: string | null
+          class_length: number | null
+          created_at: string | null
+          id: string
+          peak_pose: string | null
+        }
+        Insert: {
+          class_content?: string | null
+          class_length?: number | null
+          created_at?: string | null
+          id?: string
+          peak_pose?: string | null
+        }
+        Update: {
+          class_content?: string | null
+          class_length?: number | null
+          created_at?: string | null
+          id?: string
+          peak_pose?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
