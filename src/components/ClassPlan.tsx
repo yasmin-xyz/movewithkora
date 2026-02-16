@@ -19,6 +19,7 @@ interface PoseEntry {
   breath: string;
   cue: string;
   imageUrl?: string;
+  modifications: string[];
 }
 
 interface Section {
@@ -49,7 +50,7 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
         const img = media.find(
           (m) => baseName.includes(m.pose_name.toLowerCase()) || m.pose_name.toLowerCase().includes(baseName)
         );
-        current.poses.push({ name, duration: "", breath: "", cue: "", imageUrl: img?.image_url });
+        current.poses.push({ name, duration: "", breath: "", cue: "", modifications: [], imageUrl: img?.image_url });
         continue;
       }
 
@@ -64,6 +65,11 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
 
       const cueMatch = trimmed.match(/^Cue:\s*(.+)/i);
       if (cueMatch) { last.cue = cueMatch[1].trim(); continue; }
+
+      if (/^Modifications:\s*$/i.test(trimmed)) continue;
+
+      const modMatch = trimmed.match(/^-\s*(.+)/);
+      if (modMatch) { last.modifications.push(modMatch[1].trim()); continue; }
     }
   }
 
@@ -140,10 +146,21 @@ const ClassPlan = ({ content, isLoading }: ClassPlanProps) => {
                     </div>
                   </div>
                   <CollapsibleContent>
-                    <div className="border-t border-border px-4 py-3 bg-muted/30">
-                      <p className="font-body text-xs text-muted-foreground">
-                        Modification panel — coming soon.
-                      </p>
+                    <div className="border-t border-border px-4 py-3 bg-muted/30 space-y-1">
+                      {pose.modifications.length > 0 ? (
+                        <>
+                          <p className="font-body text-xs font-medium text-foreground/70 uppercase tracking-wide mb-1">Modifications</p>
+                          {pose.modifications.map((mod, mi) => (
+                            <p key={mi} className="font-body text-sm text-muted-foreground">
+                              • {mod}
+                            </p>
+                          ))}
+                        </>
+                      ) : (
+                        <p className="font-body text-xs text-muted-foreground">
+                          No modifications available.
+                        </p>
+                      )}
                     </div>
                   </CollapsibleContent>
                 </div>
