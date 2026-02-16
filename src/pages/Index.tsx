@@ -137,7 +137,7 @@ const Index = () => {
           isLoading={isLoading}
         />
 
-        {classPlan && <ClassPlan content={classPlan} isLoading={isLoading} />}
+        {classPlan && <ClassPlan content={classPlan} isLoading={isLoading} onContentChange={setClassPlan} />}
 
         {classPlan && !isLoading && (
           <div className="mt-8">
