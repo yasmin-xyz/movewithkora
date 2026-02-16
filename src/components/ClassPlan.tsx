@@ -249,10 +249,10 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
                                 key={mi}
                                 onClick={() => handleModClick(si, i, mod)}
                                 aria-label={`Swap with ${parseModification(mod).name}`}
-                                className="group w-full text-left rounded-md px-2.5 py-1.5 font-body text-sm text-muted-foreground hover:bg-accent/60 transition-colors duration-150 cursor-pointer flex items-center justify-between"
+                                className="group w-full rounded-md px-2.5 py-1.5 font-body text-sm text-muted-foreground hover:bg-secondary/60 transition-all duration-150 cursor-pointer flex items-center justify-between"
                               >
-                                <span>• {mod}</span>
-                                <span className="font-body text-[10px] uppercase tracking-wider text-accent-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                                <span className="text-left">• {mod}</span>
+                                <span className="font-body text-[11px] font-medium text-muted-foreground/70 group-hover:text-muted-foreground transition-opacity duration-150 shrink-0 ml-3">
                                   Swap
                                 </span>
                               </button>
