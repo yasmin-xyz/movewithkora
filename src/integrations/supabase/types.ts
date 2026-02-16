@@ -39,6 +39,7 @@ export type Database = {
           created_at: string | null
           id: string
           peak_pose: string | null
+          skill_level: string | null
         }
         Insert: {
           class_content?: string | null
@@ -46,6 +47,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           peak_pose?: string | null
+          skill_level?: string | null
         }
         Update: {
           class_content?: string | null
@@ -53,6 +55,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           peak_pose?: string | null
+          skill_level?: string | null
         }
         Relationships: []
       }

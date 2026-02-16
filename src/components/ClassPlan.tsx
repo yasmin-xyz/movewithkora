@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
 
 interface ClassPlanProps {
   content: string;
@@ -91,42 +93,61 @@ const ClassPlan = ({ content, isLoading }: ClassPlanProps) => {
           </h2>
           <div className="space-y-4">
             {section.poses.map((pose, i) => (
-              <div
-                key={`${section.title}-${i}`}
-                className="rounded-lg border border-border bg-card overflow-hidden flex items-center gap-4 p-3"
-              >
-                {pose.imageUrl && (
-                  <img
-                    src={pose.imageUrl}
-                    alt={pose.name}
-                    className="w-[72px] h-[72px] rounded-md object-cover flex-shrink-0"
-                  />
-                )}
-                <div className="space-y-1 min-w-0">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <p className="font-body text-base font-medium text-foreground">
-                      {pose.name}
-                    </p>
-                    {pose.duration && (
-                      <span className="font-body text-xs text-muted-foreground whitespace-nowrap">
-                        {pose.duration}
-                      </span>
+              <Collapsible key={`${section.title}-${i}`}>
+                <div className="rounded-lg border border-border bg-card overflow-hidden">
+                  <div className="flex items-center gap-4 p-3">
+                    {pose.imageUrl && (
+                      <img
+                        src={pose.imageUrl}
+                        alt={pose.name}
+                        className="w-[72px] h-[72px] rounded-md object-cover flex-shrink-0"
+                      />
                     )}
+                    <div className="space-y-1 min-w-0 flex-1">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <p className="font-body text-base font-medium text-foreground">
+                          {pose.name}
+                        </p>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {pose.duration && (
+                            <span className="font-body text-xs text-muted-foreground whitespace-nowrap">
+                              {pose.duration}
+                            </span>
+                          )}
+                          <CollapsibleTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
+                            >
+                              Modify
+                            </Button>
+                          </CollapsibleTrigger>
+                        </div>
+                      </div>
+                      {pose.breath && (
+                        <p className="font-body text-sm text-muted-foreground">
+                          <span className="font-medium text-foreground/70">Breath:</span>{" "}
+                          {pose.breath}
+                        </p>
+                      )}
+                      {pose.cue && (
+                        <p className="font-body text-sm text-muted-foreground">
+                          <span className="font-medium text-foreground/70">Cue:</span>{" "}
+                          {pose.cue}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  {pose.breath && (
-                    <p className="font-body text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground/70">Breath:</span>{" "}
-                      {pose.breath}
-                    </p>
-                  )}
-                  {pose.cue && (
-                    <p className="font-body text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground/70">Cue:</span>{" "}
-                      {pose.cue}
-                    </p>
-                  )}
+                  <CollapsibleContent>
+                    <div className="border-t border-border px-4 py-3 bg-muted/30">
+                      <p className="font-body text-xs text-muted-foreground">
+                        Modification panel — coming soon.
+                      </p>
+                    </div>
+                  </CollapsibleContent>
                 </div>
-              </div>
+              </Collapsible>
             ))}
           </div>
         </div>
