@@ -25,24 +25,40 @@ Pose: [pose name]
 Duration: [X] minutes
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue with light anatomical reasoning if relevant]
+Modifications:
+- [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 BUILD:
 Pose: [pose name]
 Duration: [X] minutes
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
+Modifications:
+- [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 PEAK:
 Pose: [pose name]
 Duration: [X] minutes
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
+Modifications:
+- [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 COOL DOWN:
 Pose: [pose name]
 Duration: [X] minutes
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
+Modifications:
+- [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 Rules:
 - Multiple poses per section allowed, each with its own Pose/Duration/Breath/Cue lines.
