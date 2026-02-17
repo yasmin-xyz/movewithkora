@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 
 interface ClassPlanProps {
   content: string;
@@ -206,9 +206,9 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
                               {pose.name}
                             </p>
                             {pose.modified && (
-                               <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 font-body font-medium shrink-0 border-0 bg-primary/10 text-primary">
+                               <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
                                  Selected
-                               </Badge>
+                               </span>
                              )}
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
