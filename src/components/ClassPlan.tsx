@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ interface PoseEntry {
   cue: string;
   imageUrl?: string;
   modifications: string[];
-  modified: boolean;
+  isSelected: boolean;
 }
 
 interface Section {
@@ -53,7 +53,7 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
         const img = media.find(
           (m) => baseName.includes(m.pose_name.toLowerCase()) || m.pose_name.toLowerCase().includes(baseName)
         );
-        current.poses.push({ name, duration: "", breath: "", cue: "", modifications: [], modified: false, imageUrl: img?.image_url });
+        current.poses.push({ name, duration: "", breath: "", cue: "", modifications: [], isSelected: false, imageUrl: img?.image_url });
         continue;
       }
 
@@ -126,9 +126,13 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
       });
   }, []);
 
+  // Only re-parse when content changes from outside (not from our own edits)
+  const lastSerializedRef = useRef("");
   useEffect(() => {
-    setSections(parsePlan(content, media));
-    setOpenKeys(new Set());
+    if (content !== lastSerializedRef.current) {
+      setSections(parsePlan(content, media));
+      setOpenKeys(new Set());
+    }
   }, [content, media]);
 
   const handleModClick = useCallback((sectionIdx: number, poseIdx: number, mod: string) => {
@@ -150,12 +154,14 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
                   name,
                   cue: description || p.cue,
                   modifications: newMods,
-                  modified: true,
+                  isSelected: true,
                 };
               }),
             }
       );
-      onContentChange?.(serializeSections(next));
+      const serialized = serializeSections(next);
+      lastSerializedRef.current = serialized;
+      onContentChange?.(serialized);
       return next;
     });
     setOpenKeys((prev) => {
@@ -205,7 +211,7 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
                             <p className="font-body text-base font-medium text-foreground truncate">
                               {pose.name}
                             </p>
-                            {pose.modified && (
+                            {pose.isSelected && (
                                <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
                                  Selected
                                </span>
