@@ -266,6 +266,14 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
                                 Modify
                               </Button>
                             </CollapsibleTrigger>
+                            {pose.isSelected && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleReset(si, i); }}
+                                className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
+                              >
+                                Reset
+                              </button>
+                            )}
                           </div>
                         </div>
                         {pose.breath && (
@@ -283,25 +291,9 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
                       </div>
                     </div>
                     <CollapsibleContent>
-                      <div className="border-t border-border px-4 py-3 bg-muted/30 space-y-2">
-                        {pose.isSelected && (
-                          <div className="space-y-0.5 mb-2">
-                            <p className="font-body text-xs text-muted-foreground">
-                              Current selection: <span className="font-medium text-foreground/80">{pose.name}</span>
-                            </p>
-                            <button
-                              onClick={() => handleReset(si, i)}
-                              className="font-body text-[11px] text-muted-foreground/70 hover:text-foreground/80 underline underline-offset-2 transition-colors duration-150"
-                            >
-                              Reset to AI suggestion
-                            </button>
-                          </div>
-                        )}
+                      <div className="border-t border-border px-4 py-2 bg-muted/30 space-y-0.5">
                         {pose.modifications.length > 0 ? (
                           <>
-                            <p className="font-body text-xs font-medium text-foreground/70 uppercase tracking-wide mb-1.5">
-                              Modifications
-                            </p>
                             {pose.modifications.map((mod, mi) => (
                               <button
                                 key={mi}
