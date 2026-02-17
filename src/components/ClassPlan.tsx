@@ -141,10 +141,15 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
               poses: s.poses.map((p, pi) => {
                 if (pi !== poseIdx) return p;
                 const { name, description } = parseModification(mod);
+                // Build a label for the old pose to add back into modifications
+                const oldLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
+                const newMods = p.modifications.filter((m) => m !== mod);
+                newMods.push(oldLabel);
                 return {
                   ...p,
                   name,
                   cue: description || p.cue,
+                  modifications: newMods,
                   modified: true,
                 };
               }),
@@ -201,10 +206,10 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
                               {pose.name}
                             </p>
                             {pose.modified && (
-                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-body font-normal shrink-0">
-                                Modified
-                              </Badge>
-                            )}
+                               <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 font-body font-medium shrink-0 border-0 bg-primary/10 text-primary">
+                                 Selected
+                               </Badge>
+                             )}
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             {pose.duration && (
