@@ -23,6 +23,8 @@ interface PoseEntry {
   imageUrl?: string;
   modifications: string[];
   isSelected: boolean;
+  originalName?: string;
+  originalCue?: string;
 }
 
 interface Section {
@@ -145,7 +147,6 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
               poses: s.poses.map((p, pi) => {
                 if (pi !== poseIdx) return p;
                 const { name, description } = parseModification(mod);
-                // Build a label for the old pose to add back into modifications
                 const oldLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
                 const newMods = p.modifications.filter((m) => m !== mod);
                 newMods.push(oldLabel);
@@ -155,6 +156,8 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
                   cue: description || p.cue,
                   modifications: newMods,
                   isSelected: true,
+                  originalName: p.originalName || p.name,
+                  originalCue: p.originalCue ?? p.cue,
                 };
               }),
             }
@@ -168,6 +171,37 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
       const key = `${sectionIdx}-${poseIdx}`;
       const next = new Set(prev);
       next.delete(key);
+      return next;
+    });
+  }, [onContentChange]);
+
+  const handleReset = useCallback((sectionIdx: number, poseIdx: number) => {
+    setSections((prev) => {
+      const next = prev.map((s, si) =>
+        si !== sectionIdx
+          ? s
+          : {
+              ...s,
+              poses: s.poses.map((p, pi) => {
+                if (pi !== poseIdx || !p.originalName) return p;
+                const currentLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
+                const newMods = p.modifications.filter((m) => m !== (p.originalCue ? `${p.originalName} – ${p.originalCue}` : p.originalName));
+                newMods.push(currentLabel);
+                return {
+                  ...p,
+                  name: p.originalName,
+                  cue: p.originalCue || "",
+                  modifications: newMods,
+                  isSelected: false,
+                  originalName: undefined,
+                  originalCue: undefined,
+                };
+              }),
+            }
+      );
+      const serialized = serializeSections(next);
+      lastSerializedRef.current = serialized;
+      onContentChange?.(serialized);
       return next;
     });
   }, [onContentChange]);
@@ -249,7 +283,20 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
                       </div>
                     </div>
                     <CollapsibleContent>
-                      <div className="border-t border-border px-4 py-3 bg-muted/30 space-y-1">
+                      <div className="border-t border-border px-4 py-3 bg-muted/30 space-y-2">
+                        {pose.isSelected && (
+                          <div className="space-y-0.5 mb-2">
+                            <p className="font-body text-xs text-muted-foreground">
+                              Current selection: <span className="font-medium text-foreground/80">{pose.name}</span>
+                            </p>
+                            <button
+                              onClick={() => handleReset(si, i)}
+                              className="font-body text-[11px] text-muted-foreground/70 hover:text-foreground/80 underline underline-offset-2 transition-colors duration-150"
+                            >
+                              Reset to AI suggestion
+                            </button>
+                          </div>
+                        )}
                         {pose.modifications.length > 0 ? (
                           <>
                             <p className="font-body text-xs font-medium text-foreground/70 uppercase tracking-wide mb-1.5">
