@@ -13,6 +13,7 @@ const Index = () => {
   const [classPlan, setClassPlan] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isViewingLoaded, setIsViewingLoaded] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
@@ -20,7 +21,13 @@ const Index = () => {
     setClassLength(String(length));
     setPeakMovement(peakPose);
     setClassPlan(content);
+    setIsViewingLoaded(true);
     headerRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleBackToLibrary = () => {
+    setIsViewingLoaded(false);
+    setClassPlan("");
   };
 
   const handleGenerate = async () => {
@@ -126,33 +133,47 @@ const Index = () => {
           </p>
         </header>
 
-        <ClassForm
-          classLength={classLength}
-          onClassLengthChange={setClassLength}
-          peakMovement={peakMovement}
-          onPeakMovementChange={setPeakMovement}
-          skillLevel={skillLevel}
-          onSkillLevelChange={setSkillLevel}
-          onGenerate={handleGenerate}
-          isLoading={isLoading}
-        />
-
-        {classPlan && <ClassPlan content={classPlan} isLoading={isLoading} onContentChange={setClassPlan} />}
-
-        {classPlan && !isLoading && (
-          <div className="mt-8">
-            <Button
-              variant="outline"
-              className="w-full h-12 font-body text-sm font-medium tracking-wide uppercase"
-              onClick={handleSave}
-              disabled={isSaving}
+        {isViewingLoaded ? (
+          <>
+            <button
+              onClick={handleBackToLibrary}
+              className="font-body text-xs text-muted-foreground hover:text-foreground transition-colors duration-150 mb-6 flex items-center gap-1"
             >
-              {isSaving ? "Saving…" : "Save Class"}
-            </Button>
-          </div>
-        )}
+              ← Back to Saved Classes
+            </button>
+            <ClassPlan content={classPlan} isLoading={false} onContentChange={setClassPlan} />
+          </>
+        ) : (
+          <>
+            <ClassForm
+              classLength={classLength}
+              onClassLengthChange={setClassLength}
+              peakMovement={peakMovement}
+              onPeakMovementChange={setPeakMovement}
+              skillLevel={skillLevel}
+              onSkillLevelChange={setSkillLevel}
+              onGenerate={handleGenerate}
+              isLoading={isLoading}
+            />
 
-        <SavedClasses onLoadClass={handleLoadClass} />
+            {classPlan && <ClassPlan content={classPlan} isLoading={isLoading} onContentChange={setClassPlan} />}
+
+            {classPlan && !isLoading && (
+              <div className="mt-8">
+                <Button
+                  variant="outline"
+                  className="w-full h-12 font-body text-sm font-medium tracking-wide uppercase"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving…" : "Save Class"}
+                </Button>
+              </div>
+            )}
+
+            <SavedClasses onLoadClass={handleLoadClass} />
+          </>
+        )}
       </div>
     </div>
   );
