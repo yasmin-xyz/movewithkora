@@ -103,7 +103,7 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                   className="font-body text-xs tracking-wide uppercase"
                   onClick={() => setViewingId(cls.id)}
                 >
-                  View
+                  Preview
                 </Button>
                 {!showArchived && (
                   <Button
@@ -135,16 +135,21 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
       </div>
 
       <Dialog open={!!viewedClass} onOpenChange={(open) => { if (!open) setViewingId(null); }}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto p-0">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto p-0 shadow-2xl rounded-xl">
           {viewedClass && (
             <div className="p-6">
-              <div className="mb-6 space-y-1">
-                <h3 className="font-heading text-xl tracking-tight text-foreground">
-                  {viewedClass.peak_pose || "Untitled"}
-                </h3>
-                <p className="font-body text-xs text-muted-foreground">
-                  {viewedClass.class_length} min · {formatDate(viewedClass.created_at)}
-                </p>
+              <div className="flex items-start justify-between mb-6">
+                <div className="space-y-1">
+                  <h3 className="font-heading text-2xl tracking-tight text-foreground">
+                    {viewedClass.peak_pose || "Untitled"}
+                  </h3>
+                  <p className="font-body text-xs text-muted-foreground">
+                    {viewedClass.class_length} min · {formatDate(viewedClass.created_at)}
+                  </p>
+                </div>
+                <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2.5 py-0.5 shrink-0 mt-1">
+                  Preview Mode
+                </span>
               </div>
               {viewedClass.class_content && (
                 <ClassPlan content={viewedClass.class_content} isLoading={false} />
