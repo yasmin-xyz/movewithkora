@@ -34,6 +34,7 @@ export type Database = {
       }
       saved_classes: {
         Row: {
+          archived: boolean | null
           class_content: string | null
           class_length: number | null
           created_at: string | null
@@ -42,6 +43,7 @@ export type Database = {
           skill_level: string | null
         }
         Insert: {
+          archived?: boolean | null
           class_content?: string | null
           class_length?: number | null
           created_at?: string | null
@@ -50,6 +52,7 @@ export type Database = {
           skill_level?: string | null
         }
         Update: {
+          archived?: boolean | null
           class_content?: string | null
           class_length?: number | null
           created_at?: string | null
