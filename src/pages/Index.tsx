@@ -14,13 +14,15 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isViewingLoaded, setIsViewingLoaded] = useState(false);
+  const [loadedDate, setLoadedDate] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
-  const handleLoadClass = (peakPose: string, length: number, content: string) => {
+  const handleLoadClass = (peakPose: string, length: number, content: string, date: string | null) => {
     setClassLength(String(length));
     setPeakMovement(peakPose);
     setClassPlan(content);
+    setLoadedDate(date);
     setIsViewingLoaded(true);
     headerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -28,6 +30,16 @@ const Index = () => {
   const handleBackToLibrary = () => {
     setIsViewingLoaded(false);
     setClassPlan("");
+    setLoadedDate(null);
+  };
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   const handleGenerate = async () => {
@@ -141,6 +153,14 @@ const Index = () => {
             >
               ← Back to Saved Classes
             </button>
+            <div className="mb-8 space-y-1">
+              <h2 className="font-heading text-3xl tracking-tight text-foreground">
+                {peakMovement || "Untitled"}
+              </h2>
+              <p className="font-body text-sm text-muted-foreground">
+                {classLength} min{loadedDate ? ` · Saved ${formatDate(loadedDate)}` : ""}
+              </p>
+            </div>
             <ClassPlan content={classPlan} isLoading={false} onContentChange={setClassPlan} />
           </>
         ) : (

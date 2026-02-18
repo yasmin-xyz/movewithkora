@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ClassPlan from "@/components/ClassPlan";
 
 interface SavedClass {
@@ -14,7 +15,7 @@ interface SavedClass {
 }
 
 interface SavedClassesProps {
-  onLoadClass?: (peakPose: string, length: number, content: string) => void;
+  onLoadClass?: (peakPose: string, length: number, content: string, date: string | null) => void;
 }
 
 const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
@@ -60,9 +61,7 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
     });
   };
 
-  const viewedClass = viewingId
-    ? classes.find((c) => c.id === viewingId)
-    : null;
+  const viewedClass = viewingId ? classes.find((c) => c.id === viewingId) : null;
 
   return (
     <div className="mt-16 border-t border-border pt-10">
@@ -102,11 +101,9 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                   variant="outline"
                   size="sm"
                   className="font-body text-xs tracking-wide uppercase"
-                  onClick={() =>
-                    setViewingId(viewingId === cls.id ? null : cls.id)
-                  }
+                  onClick={() => setViewingId(cls.id)}
                 >
-                  {viewingId === cls.id ? "Hide" : "View"}
+                  View
                 </Button>
                 {!showArchived && (
                   <Button
@@ -117,7 +114,8 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                       onLoadClass?.(
                         cls.peak_pose || "",
                         cls.class_length || 60,
-                        cls.class_content || ""
+                        cls.class_content || "",
+                        cls.created_at
                       )
                     }
                   >
@@ -136,9 +134,25 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
         ))}
       </div>
 
-      {viewedClass?.class_content && (
-        <ClassPlan content={viewedClass.class_content} isLoading={false} />
-      )}
+      <Dialog open={!!viewedClass} onOpenChange={(open) => { if (!open) setViewingId(null); }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto p-0">
+          {viewedClass && (
+            <div className="p-6">
+              <div className="mb-6 space-y-1">
+                <h3 className="font-heading text-xl tracking-tight text-foreground">
+                  {viewedClass.peak_pose || "Untitled"}
+                </h3>
+                <p className="font-body text-xs text-muted-foreground">
+                  {viewedClass.class_length} min · {formatDate(viewedClass.created_at)}
+                </p>
+              </div>
+              {viewedClass.class_content && (
+                <ClassPlan content={viewedClass.class_content} isLoading={false} />
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
