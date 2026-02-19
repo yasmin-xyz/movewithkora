@@ -33,6 +33,43 @@ interface Section {
   poses: PoseEntry[];
 }
 
+function normalizeForMatch(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
+}
+
+function wordsOf(s: string): string[] {
+  return s.split(/\s+/).filter(Boolean);
+}
+
+function poseMatchScore(a: string, b: string): number {
+  const na = normalizeForMatch(a);
+  const nb = normalizeForMatch(b);
+  if (na === nb) return 3;
+  if (na.includes(nb) || nb.includes(na)) return 2;
+  const wa = wordsOf(na);
+  const wb = wordsOf(nb);
+  const shorter = wa.length <= wb.length ? wa : wb;
+  const longer = wa.length <= wb.length ? wb : wa;
+  const matched = shorter.filter((w) => longer.includes(w)).length;
+  if (matched >= shorter.length) return 2;
+  if (matched >= 2) return 1;
+  return 0;
+}
+
+function findPoseImage(name: string, media: PoseMedia[]): string | undefined {
+  const baseName = name.replace(/\s*\(.*\)/, "").trim();
+  let best: PoseMedia | undefined;
+  let bestScore = 0;
+  for (const m of media) {
+    const score = poseMatchScore(baseName, m.pose_name);
+    if (score > bestScore) {
+      bestScore = score;
+      best = m;
+    }
+  }
+  return best?.image_url;
+}
+
 function parsePlan(raw: string, media: PoseMedia[]): Section[] {
   const sections: Section[] = [];
   let current: Section | null = null;
@@ -52,11 +89,8 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
       const poseMatch = trimmed.match(/^Pose:\s*(.+)/i);
       if (poseMatch) {
         const name = poseMatch[1].trim();
-        const baseName = name.replace(/\s*\(.*\)/, "").trim().toLowerCase();
-        const img = media.find(
-          (m) => baseName.includes(m.pose_name.toLowerCase()) || m.pose_name.toLowerCase().includes(baseName)
-        );
-        current.poses.push({ name, duration: "", breath: "", cue: "", modifications: [], isSelected: false, imageUrl: img?.image_url });
+        const imageUrl = findPoseImage(name, media);
+        current.poses.push({ name, duration: "", breath: "", cue: "", modifications: [], isSelected: false, imageUrl });
         continue;
       }
 
