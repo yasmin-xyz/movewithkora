@@ -150,12 +150,17 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                     Saved {formatDate(viewedClass.created_at)}
                   </p>
                 </div>
-                <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2.5 py-0.5 shrink-0 mt-1">
-                  Preview Mode
-                </span>
+                <div className="flex flex-col items-end shrink-0 mt-1">
+                  <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2.5 py-0.5">
+                    Preview Mode
+                  </span>
+                  <span className="font-body text-[10px] text-muted-foreground/60 mt-1">
+                    Read-only view
+                  </span>
+                </div>
               </div>
               {viewedClass.class_content && (
-                <ClassPlan content={viewedClass.class_content} isLoading={false} />
+                <ClassPlan content={viewedClass.class_content} isLoading={false} readOnly />
               )}
             </div>
           )}
