@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 interface ClassPlanProps {
   content: string;
   isLoading: boolean;
+  readOnly?: boolean;
   onContentChange?: (content: string) => void;
 }
 
@@ -114,7 +115,7 @@ function parseModification(mod: string): { name: string; description: string } {
   return { name: mod, description: "" };
 }
 
-const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
+const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: ClassPlanProps) => {
   const [media, setMedia] = useState<PoseMedia[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const [openKeys, setOpenKeys] = useState<Set<string>>(new Set());
@@ -257,22 +258,26 @@ const ClassPlan = ({ content, isLoading, onContentChange }: ClassPlanProps) => {
                                 {pose.duration}
                               </span>
                             )}
-                            <CollapsibleTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
-                              >
-                                Modify
-                              </Button>
-                            </CollapsibleTrigger>
-                            {pose.isSelected && (
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleReset(si, i); }}
-                                className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
-                              >
-                                Reset
-                              </button>
+                            {!readOnly && (
+                              <>
+                                <CollapsibleTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
+                                  >
+                                    Modify
+                                  </Button>
+                                </CollapsibleTrigger>
+                                {pose.isSelected && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleReset(si, i); }}
+                                    className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
+                                  >
+                                    Reset
+                                  </button>
+                                )}
+                              </>
                             )}
                           </div>
                         </div>
