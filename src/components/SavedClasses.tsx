@@ -139,12 +139,15 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
           {viewedClass && (
             <div className="p-6">
               <div className="flex items-start justify-between mb-6">
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <h3 className="font-heading text-2xl tracking-tight text-foreground">
                     {viewedClass.peak_pose || "Untitled"}
                   </h3>
-                  <p className="font-body text-xs text-muted-foreground">
-                    {viewedClass.class_length} min · {formatDate(viewedClass.created_at)}
+                  <p className="font-body text-sm text-foreground/80">
+                    {viewedClass.class_length} minutes
+                  </p>
+                  <p className="font-body text-[11px] font-light text-muted-foreground/70">
+                    Saved {formatDate(viewedClass.created_at)}
                   </p>
                 </div>
                 <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2.5 py-0.5 shrink-0 mt-1">
