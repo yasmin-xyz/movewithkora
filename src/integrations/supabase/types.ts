@@ -21,6 +21,7 @@ export type Database = {
           difficulty_level: string | null
           family: string | null
           id: string
+          intensity_level: number | null
           orientation: string | null
           pose_name: string
           symmetry: string | null
@@ -32,6 +33,7 @@ export type Database = {
           difficulty_level?: string | null
           family?: string | null
           id?: string
+          intensity_level?: number | null
           orientation?: string | null
           pose_name: string
           symmetry?: string | null
@@ -43,6 +45,7 @@ export type Database = {
           difficulty_level?: string | null
           family?: string | null
           id?: string
+          intensity_level?: number | null
           orientation?: string | null
           pose_name?: string
           symmetry?: string | null
