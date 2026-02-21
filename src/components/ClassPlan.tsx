@@ -33,6 +33,71 @@ interface Section {
   poses: PoseEntry[];
 }
 
+const TYPO_CORRECTIONS: Record<string, string> = {
+  "linge": "Lunge",
+  "lunger": "Lunge",
+  "warrior 1": "Warrior I",
+  "warrior 2": "Warrior II",
+  "warrior 3": "Warrior III",
+  "downward dogg": "Downward Dog",
+  "downward-facing dogg": "Downward-Facing Dog",
+  "chatarunga": "Chaturanga",
+  "chataranga": "Chaturanga",
+  "chaturunga": "Chaturanga",
+  "savasanna": "Savasana",
+  "shavasana": "Savasana",
+  "triange": "Triangle",
+  "plank pose": "Plank",
+  "mountian": "Mountain",
+  "moutain": "Mountain",
+};
+
+function correctPoseName(name: string, media: PoseMedia[]): string {
+  const lower = name.toLowerCase().trim();
+
+  // 1. Static typo map
+  if (TYPO_CORRECTIONS[lower]) return TYPO_CORRECTIONS[lower];
+
+  // 2. Check if it already matches a known pose well
+  const normalizedLower = lower.replace(/[^a-z0-9\s]/g, "");
+  for (const m of media) {
+    if (m.pose_name.toLowerCase().replace(/[^a-z0-9\s]/g, "") === normalizedLower) {
+      return m.pose_name; // Use canonical casing from DB
+    }
+  }
+
+  // 3. Fuzzy: Levenshtein-based correction for close matches
+  let bestMedia: PoseMedia | undefined;
+  let bestDist = Infinity;
+  for (const m of media) {
+    const dist = levenshtein(normalizedLower, m.pose_name.toLowerCase().replace(/[^a-z0-9\s]/g, ""));
+    const maxLen = Math.max(normalizedLower.length, m.pose_name.length);
+    // Only correct if edit distance is ≤ 25% of the longer string and at most 3
+    if (dist <= Math.min(3, Math.floor(maxLen * 0.25)) && dist < bestDist) {
+      bestDist = dist;
+      bestMedia = m;
+    }
+  }
+  if (bestMedia) return bestMedia.pose_name;
+
+  return name; // No correction needed
+}
+
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[] = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i++) {
+    let prev = i - 1;
+    dp[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const temp = dp[j];
+      dp[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[j], dp[j - 1]);
+      prev = temp;
+    }
+  }
+  return dp[n];
+}
+
 function normalizeForMatch(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
 }
@@ -88,7 +153,8 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
     if (current) {
       const poseMatch = trimmed.match(/^Pose:\s*(.+)/i);
       if (poseMatch) {
-        const name = poseMatch[1].trim();
+        const rawName = poseMatch[1].trim();
+        const name = correctPoseName(rawName, media);
         const imageUrl = findPoseImage(name, media);
         current.poses.push({ name, duration: "", breath: "", cue: "", modifications: [], isSelected: false, imageUrl });
         continue;
