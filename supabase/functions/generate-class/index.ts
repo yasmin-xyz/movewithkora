@@ -24,7 +24,7 @@ serve(async (req) => {
 
     const { data: poses, error: posesError } = await supabase
       .from("pose_library")
-      .select("pose_name, orientation, base, symmetry, weight_bearing, family, difficulty_level");
+      .select("pose_name, orientation, base, symmetry, weight_bearing, family, difficulty_level, intensity_level");
 
     if (posesError) {
       console.error("Failed to fetch pose library:", posesError);
@@ -32,7 +32,7 @@ serve(async (req) => {
     }
 
     const poseListFormatted = (poses || [])
-      .map((p: any) => `- ${p.pose_name} | base: ${p.base} | orientation: ${p.orientation} | family: ${p.family} | difficulty: ${p.difficulty_level} | symmetry: ${p.symmetry} | weight_bearing: ${p.weight_bearing}`)
+      .map((p: any) => `- ${p.pose_name} | base: ${p.base} | orientation: ${p.orientation} | family: ${p.family} | difficulty: ${p.difficulty_level} | symmetry: ${p.symmetry} | weight_bearing: ${p.weight_bearing} | intensity: ${p.intensity_level}`)
       .join("\n");
 
     const systemPrompt = `You are a supportive yoga class planner for instructors. Create logically sequenced classes that build toward the peak pose.
@@ -43,12 +43,27 @@ AVAILABLE POSES:
 ${poseListFormatted}
 
 METADATA-BASED SEQUENCING RULES (critical):
-- Use the metadata (orientation, base, family, difficulty_level, symmetry, weight_bearing) to guide pose order.
+- Use the metadata (orientation, base, family, difficulty_level, symmetry, weight_bearing, intensity_level) to guide pose order.
 - Do NOT change orientation (e.g. front ↔ long_edge ↔ neutral) without inserting a logical bridge pose that shares one orientation.
 - Do NOT change base (e.g. standing ↔ kneeling ↔ prone ↔ seated) without a transition pose that connects the two bases.
 - Stay within the same family for at least two consecutive poses before switching to a different family theme.
 - In the Build section, gradually increase difficulty_level (beginner → intermediate → advanced).
 - Favor progressive layering over abrupt resets of orientation, base, or difficulty.
+
+SEQUENCING PRIORITY ORDER (critical — resolve conflicts in this order):
+1. Orientation continuity (highest priority)
+2. Base continuity
+3. Family continuity
+4. Intensity progression (lowest priority, but still required)
+
+INTENSITY PROGRESSION RULES (critical):
+- Use the intensity_level (numeric) from each pose to guide energetic arc.
+- In the BUILD section, intensity_level must trend upward toward the peak. Minor dips of 1 level are allowed for transition poses, but never drop more than 1 intensity level before the peak.
+- The PEAK pose MUST have the highest intensity_level of any pose in the entire class.
+- Do NOT place lower-intensity symmetrical reset poses immediately before the peak — maintain energetic momentum leading into it.
+- Use intensity progression to create a sense of energetic build, not just structural or anatomical continuity.
+- In WARM-UP, keep intensity_level low and gradual.
+- In COOL DOWN, intensity_level should decrease steadily toward rest.
 
 SEQUENCING PRINCIPLES (critical):
 - Optimize for physical continuity: consider where hands, feet, and body are at the end of each pose before choosing the next. Avoid abrupt directional changes or unnecessary stepping forward/backward.
