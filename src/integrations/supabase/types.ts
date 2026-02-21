@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      pose_library: {
+        Row: {
+          base: string | null
+          created_at: string | null
+          difficulty_level: string | null
+          family: string | null
+          id: string
+          orientation: string | null
+          pose_name: string
+          symmetry: string | null
+          weight_bearing: string | null
+        }
+        Insert: {
+          base?: string | null
+          created_at?: string | null
+          difficulty_level?: string | null
+          family?: string | null
+          id?: string
+          orientation?: string | null
+          pose_name: string
+          symmetry?: string | null
+          weight_bearing?: string | null
+        }
+        Update: {
+          base?: string | null
+          created_at?: string | null
+          difficulty_level?: string | null
+          family?: string | null
+          id?: string
+          orientation?: string | null
+          pose_name?: string
+          symmetry?: string | null
+          weight_bearing?: string | null
+        }
+        Relationships: []
+      }
       pose_media: {
         Row: {
           id: string
