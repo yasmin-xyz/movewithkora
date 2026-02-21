@@ -251,6 +251,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                 const oldLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
                 const newMods = p.modifications.filter((m) => m !== mod);
                 newMods.push(oldLabel);
+                const imageUrl = findPoseImage(name, media);
                 return {
                   ...p,
                   name,
@@ -259,6 +260,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                   isSelected: true,
                   originalName: p.originalName || p.name,
                   originalCue: p.originalCue ?? p.cue,
+                  imageUrl,
                 };
               }),
             }
@@ -274,7 +276,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
       next.delete(key);
       return next;
     });
-  }, [onContentChange]);
+  }, [onContentChange, media]);
 
   const handleReset = useCallback((sectionIdx: number, poseIdx: number) => {
     setSections((prev) => {
@@ -288,6 +290,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                 const currentLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
                 const newMods = p.modifications.filter((m) => m !== (p.originalCue ? `${p.originalName} – ${p.originalCue}` : p.originalName));
                 newMods.push(currentLabel);
+                const imageUrl = findPoseImage(p.originalName, media);
                 return {
                   ...p,
                   name: p.originalName,
@@ -296,6 +299,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                   isSelected: false,
                   originalName: undefined,
                   originalCue: undefined,
+                  imageUrl,
                 };
               }),
             }
@@ -305,7 +309,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
       onContentChange?.(serialized);
       return next;
     });
-  }, [onContentChange]);
+  }, [onContentChange, media]);
 
   const toggleOpen = (key: string, open: boolean) => {
     setOpenKeys((prev) => {
