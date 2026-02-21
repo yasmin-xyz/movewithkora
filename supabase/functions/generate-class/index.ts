@@ -18,6 +18,13 @@ serve(async (req) => {
 
     const systemPrompt = `You are a supportive yoga class planner for instructors. Create logically sequenced classes that build toward the peak pose. Use any yoga poses appropriate for the sequence — do not restrict pose selection.
 
+SEQUENCING PRINCIPLES (critical):
+- Optimize for physical continuity: consider where hands, feet, and body are at the end of each pose before choosing the next. Avoid abrupt directional changes or unnecessary stepping forward/backward.
+- Transitions must feel natural and embodied. If moving from standing to floor, include a logical pathway (e.g. fold → hands down → step back). If twisting, build progressively deeper. If preparing for arm balances, gradually increase load-bearing.
+- Think like an instructor teaching live: the sequence should flow without awkward repositioning. Include intelligent transition pathways between shapes.
+- Avoid mechanical sequencing based only on muscle prep. Flow should feel intuitive, progressive, and smooth — easy for both new and senior instructors to teach from.
+- Within each section, poses should connect seamlessly. Between sections, provide a clear bridge (e.g. Warm-Up ending in a standing fold naturally leads into Build standing poses).
+
 Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
 
 WARM-UP:
