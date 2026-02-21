@@ -25,6 +25,14 @@ SEQUENCING PRINCIPLES (critical):
 - Avoid mechanical sequencing based only on muscle prep. Flow should feel intuitive, progressive, and smooth — easy for both new and senior instructors to teach from.
 - Within each section, poses should connect seamlessly. Between sections, provide a clear bridge (e.g. Warm-Up ending in a standing fold naturally leads into Build standing poses).
 
+TRANSITION INTELLIGENCE (critical):
+- Track body orientation throughout: standing vs kneeling vs seated vs prone vs supine, facing front-of-mat vs long edge, weight in hands vs feet, symmetrical vs asymmetrical stance.
+- Never jump between incompatible orientations without a clear transitional pathway (e.g. do not go from a long-edge warrior directly into a front-of-mat lunge without stepping through).
+- Stay within pose families before resetting: if in a lunge, explore lunge variations before changing base. If binding, progressively deepen before switching themes.
+- Minimize unnecessary repositioning: favor progressive layering over resetting stance. Avoid sequences requiring awkward stepping forward/backward without purpose.
+- Use logical connectors between levels: standing → fold → hands down → step back (not standing → suddenly prone). Seated → tabletop → prone (not seated → suddenly standing).
+- Every transition should be easy to cue verbally. If you cannot describe the transition in one simple instruction, add an intermediate pose.
+
 Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
 
 WARM-UP:
