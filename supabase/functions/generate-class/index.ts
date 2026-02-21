@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,7 +17,38 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are a supportive yoga class planner for instructors. Create logically sequenced classes that build toward the peak pose. Use any yoga poses appropriate for the sequence — do not restrict pose selection.
+    // Fetch pose library from database
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data: poses, error: posesError } = await supabase
+      .from("pose_library")
+      .select("pose_name, orientation, base, symmetry, weight_bearing, family, difficulty_level");
+
+    if (posesError) {
+      console.error("Failed to fetch pose library:", posesError);
+      throw new Error("Failed to fetch pose library");
+    }
+
+    const poseListFormatted = (poses || [])
+      .map((p: any) => `- ${p.pose_name} | base: ${p.base} | orientation: ${p.orientation} | family: ${p.family} | difficulty: ${p.difficulty_level} | symmetry: ${p.symmetry} | weight_bearing: ${p.weight_bearing}`)
+      .join("\n");
+
+    const systemPrompt = `You are a supportive yoga class planner for instructors. Create logically sequenced classes that build toward the peak pose.
+
+CRITICAL: You may ONLY use poses from the following library. Do NOT invent or use any poses not listed here.
+
+AVAILABLE POSES:
+${poseListFormatted}
+
+METADATA-BASED SEQUENCING RULES (critical):
+- Use the metadata (orientation, base, family, difficulty_level, symmetry, weight_bearing) to guide pose order.
+- Do NOT change orientation (e.g. front ↔ long_edge ↔ neutral) without inserting a logical bridge pose that shares one orientation.
+- Do NOT change base (e.g. standing ↔ kneeling ↔ prone ↔ seated) without a transition pose that connects the two bases.
+- Stay within the same family for at least two consecutive poses before switching to a different family theme.
+- In the Build section, gradually increase difficulty_level (beginner → intermediate → advanced).
+- Favor progressive layering over abrupt resets of orientation, base, or difficulty.
 
 SEQUENCING PRINCIPLES (critical):
 - Optimize for physical continuity: consider where hands, feet, and body are at the end of each pose before choosing the next. Avoid abrupt directional changes or unnecessary stepping forward/backward.
