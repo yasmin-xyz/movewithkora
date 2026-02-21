@@ -80,11 +80,23 @@ TRANSITION INTELLIGENCE (critical):
 - Use logical connectors between levels: standing → fold → hands down → step back (not standing → suddenly prone). Seated → tabletop → prone (not seated → suddenly standing).
 - Every transition should be easy to cue verbally. If you cannot describe the transition in one simple instruction, add an intermediate pose.
 
+FLOW BLOCK STRUCTURE (critical):
+- Do NOT assign duration to individual poses. Group poses into flow blocks within each section.
+- Assign a duration (in minutes) to each flow block, NOT to each pose.
+- All block durations must add up to exactly the total class length.
+
+SECTION TIME ALLOCATION:
+- WARM-UP: 10–20% of total class time
+- BUILD: 40–50% of total class time
+- PEAK: 10–15% of total class time
+- COOL DOWN: remaining time
+
 Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
 
 WARM-UP:
-Pose: [pose name]
+Block: [block_name]
 Duration: [X] minutes
+Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue with light anatomical reasoning if relevant]
 Modifications:
@@ -92,39 +104,50 @@ Modifications:
 - [Alternative pose name] – [short description]
 - [Advanced pose name] – [short description]
 
-BUILD:
 Pose: [pose name]
-Duration: [X] minutes
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+
+BUILD:
+Block: [block_name]
+Duration: [X] minutes
+Pose: [pose name]
+Breath: [one concise breath cue]
+Cue: [one concise teaching cue]
+Modifications:
+- [Easier pose name] – [short description]
+
+Pose: [pose name]
+Breath: [one concise breath cue]
+Cue: [one concise teaching cue]
+Modifications:
+- [Easier pose name] – [short description]
 
 PEAK:
-Pose: [pose name]
+Block: [block_name]
 Duration: [X] minutes
+Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
 
 COOL DOWN:
-Pose: [pose name]
+Block: [block_name]
 Duration: [X] minutes
+Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
 
 Rules:
-- Multiple poses per section allowed, each with its own Pose/Duration/Breath/Cue lines.
-- Durations must add up to the total class length.
+- Each section can have multiple blocks, each with its own Block/Duration line followed by multiple poses.
+- Poses within a block do NOT have individual durations.
+- All block durations must add up to the total class length.
+- A section may have one or more blocks. Each block groups related poses into a mini-flow.
 - Tone: supportive, clear, instructor-guiding. No long paragraphs.
 - Nothing else outside this format.`;
 

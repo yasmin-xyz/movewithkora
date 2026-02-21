@@ -18,7 +18,6 @@ interface PoseMedia {
 
 interface PoseEntry {
   name: string;
-  duration: string;
   breath: string;
   cue: string;
   imageUrl?: string;
@@ -28,9 +27,15 @@ interface PoseEntry {
   originalCue?: string;
 }
 
+interface FlowBlock {
+  blockName: string;
+  duration: string;
+  poses: PoseEntry[];
+}
+
 interface Section {
   title: string;
-  poses: PoseEntry[];
+  blocks: FlowBlock[];
 }
 
 const TYPO_CORRECTIONS: Record<string, string> = {
@@ -138,6 +143,7 @@ function findPoseImage(name: string, media: PoseMedia[]): string | undefined {
 function parsePlan(raw: string, media: PoseMedia[]): Section[] {
   const sections: Section[] = [];
   let current: Section | null = null;
+  let currentBlock: FlowBlock | null = null;
 
   for (const line of raw.split("\n")) {
     const trimmed = line.trim();
@@ -145,38 +151,56 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
 
     const sectionMatch = trimmed.match(/^(WARM-UP|BUILD|PEAK|COOL DOWN):?$/i);
     if (sectionMatch) {
-      current = { title: sectionMatch[1].toUpperCase(), poses: [] };
+      current = { title: sectionMatch[1].toUpperCase(), blocks: [] };
       sections.push(current);
+      currentBlock = null;
       continue;
     }
 
-    if (current) {
-      const poseMatch = trimmed.match(/^Pose:\s*(.+)/i);
-      if (poseMatch) {
-        const rawName = poseMatch[1].trim();
-        const name = correctPoseName(rawName, media);
-        const imageUrl = findPoseImage(name, media);
-        current.poses.push({ name, duration: "", breath: "", cue: "", modifications: [], isSelected: false, imageUrl });
-        continue;
-      }
+    if (!current) continue;
 
-      const last = current.poses[current.poses.length - 1];
-      if (!last) continue;
-
-      const durMatch = trimmed.match(/^Duration:\s*(.+)/i);
-      if (durMatch) { last.duration = durMatch[1].trim(); continue; }
-
-      const breathMatch = trimmed.match(/^Breath:\s*(.+)/i);
-      if (breathMatch) { last.breath = breathMatch[1].trim(); continue; }
-
-      const cueMatch = trimmed.match(/^Cue:\s*(.+)/i);
-      if (cueMatch) { last.cue = cueMatch[1].trim(); continue; }
-
-      if (/^Modifications:\s*$/i.test(trimmed)) continue;
-
-      const modMatch = trimmed.match(/^-\s*(.+)/);
-      if (modMatch) { last.modifications.push(modMatch[1].trim()); continue; }
+    const blockMatch = trimmed.match(/^Block:\s*(.+)/i);
+    if (blockMatch) {
+      currentBlock = { blockName: blockMatch[1].trim(), duration: "", poses: [] };
+      current.blocks.push(currentBlock);
+      continue;
     }
+
+    // Duration at block level
+    const durMatch = trimmed.match(/^Duration:\s*(.+)/i);
+    if (durMatch && currentBlock && currentBlock.poses.length === 0) {
+      currentBlock.duration = durMatch[1].trim();
+      continue;
+    }
+
+    // If no block exists yet, create a default one
+    if (!currentBlock) {
+      currentBlock = { blockName: current.title, duration: "", poses: [] };
+      current.blocks.push(currentBlock);
+    }
+
+    const poseMatch = trimmed.match(/^Pose:\s*(.+)/i);
+    if (poseMatch) {
+      const rawName = poseMatch[1].trim();
+      const name = correctPoseName(rawName, media);
+      const imageUrl = findPoseImage(name, media);
+      currentBlock.poses.push({ name, breath: "", cue: "", modifications: [], isSelected: false, imageUrl });
+      continue;
+    }
+
+    const last = currentBlock.poses[currentBlock.poses.length - 1];
+    if (!last) continue;
+
+    const breathMatch = trimmed.match(/^Breath:\s*(.+)/i);
+    if (breathMatch) { last.breath = breathMatch[1].trim(); continue; }
+
+    const cueMatch = trimmed.match(/^Cue:\s*(.+)/i);
+    if (cueMatch) { last.cue = cueMatch[1].trim(); continue; }
+
+    if (/^Modifications:\s*$/i.test(trimmed)) continue;
+
+    const modMatch = trimmed.match(/^-\s*(.+)/);
+    if (modMatch) { last.modifications.push(modMatch[1].trim()); continue; }
   }
 
   return sections;
@@ -186,18 +210,21 @@ function serializeSections(sections: Section[]): string {
   const lines: string[] = [];
   for (const section of sections) {
     lines.push(`${section.title}:`);
-    for (const pose of section.poses) {
-      lines.push(`Pose: ${pose.name}`);
-      if (pose.duration) lines.push(`Duration: ${pose.duration}`);
-      if (pose.breath) lines.push(`Breath: ${pose.breath}`);
-      if (pose.cue) lines.push(`Cue: ${pose.cue}`);
-      if (pose.modifications.length > 0) {
-        lines.push("Modifications:");
-        for (const mod of pose.modifications) {
-          lines.push(`- ${mod}`);
+    for (const block of section.blocks) {
+      lines.push(`Block: ${block.blockName}`);
+      if (block.duration) lines.push(`Duration: ${block.duration}`);
+      for (const pose of block.poses) {
+        lines.push(`Pose: ${pose.name}`);
+        if (pose.breath) lines.push(`Breath: ${pose.breath}`);
+        if (pose.cue) lines.push(`Cue: ${pose.cue}`);
+        if (pose.modifications.length > 0) {
+          lines.push("Modifications:");
+          for (const mod of pose.modifications) {
+            lines.push(`- ${mod}`);
+          }
         }
+        lines.push("");
       }
-      lines.push("");
     }
   }
   return lines.join("\n");
@@ -238,31 +265,38 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
     }
   }, [content, media]);
 
-  const handleModClick = useCallback((sectionIdx: number, poseIdx: number, mod: string) => {
+  const handleModClick = useCallback((sectionIdx: number, blockIdx: number, poseIdx: number, mod: string) => {
     setSections((prev) => {
       const next = prev.map((s, si) =>
         si !== sectionIdx
           ? s
           : {
               ...s,
-              poses: s.poses.map((p, pi) => {
-                if (pi !== poseIdx) return p;
-                const { name, description } = parseModification(mod);
-                const oldLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
-                const newMods = p.modifications.filter((m) => m !== mod);
-                newMods.push(oldLabel);
-                const imageUrl = findPoseImage(name, media);
-                return {
-                  ...p,
-                  name,
-                  cue: description || p.cue,
-                  modifications: newMods,
-                  isSelected: true,
-                  originalName: p.originalName || p.name,
-                  originalCue: p.originalCue ?? p.cue,
-                  imageUrl,
-                };
-              }),
+              blocks: s.blocks.map((b, bi) =>
+                bi !== blockIdx
+                  ? b
+                  : {
+                      ...b,
+                      poses: b.poses.map((p, pi) => {
+                        if (pi !== poseIdx) return p;
+                        const { name, description } = parseModification(mod);
+                        const oldLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
+                        const newMods = p.modifications.filter((m) => m !== mod);
+                        newMods.push(oldLabel);
+                        const imageUrl = findPoseImage(name, media);
+                        return {
+                          ...p,
+                          name,
+                          cue: description || p.cue,
+                          modifications: newMods,
+                          isSelected: true,
+                          originalName: p.originalName || p.name,
+                          originalCue: p.originalCue ?? p.cue,
+                          imageUrl,
+                        };
+                      }),
+                    }
+              ),
             }
       );
       const serialized = serializeSections(next);
@@ -271,37 +305,44 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
       return next;
     });
     setOpenKeys((prev) => {
-      const key = `${sectionIdx}-${poseIdx}`;
+      const key = `${sectionIdx}-${blockIdx}-${poseIdx}`;
       const next = new Set(prev);
       next.delete(key);
       return next;
     });
   }, [onContentChange, media]);
 
-  const handleReset = useCallback((sectionIdx: number, poseIdx: number) => {
+  const handleReset = useCallback((sectionIdx: number, blockIdx: number, poseIdx: number) => {
     setSections((prev) => {
       const next = prev.map((s, si) =>
         si !== sectionIdx
           ? s
           : {
               ...s,
-              poses: s.poses.map((p, pi) => {
-                if (pi !== poseIdx || !p.originalName) return p;
-                const currentLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
-                const newMods = p.modifications.filter((m) => m !== (p.originalCue ? `${p.originalName} – ${p.originalCue}` : p.originalName));
-                newMods.push(currentLabel);
-                const imageUrl = findPoseImage(p.originalName, media);
-                return {
-                  ...p,
-                  name: p.originalName,
-                  cue: p.originalCue || "",
-                  modifications: newMods,
-                  isSelected: false,
-                  originalName: undefined,
-                  originalCue: undefined,
-                  imageUrl,
-                };
-              }),
+              blocks: s.blocks.map((b, bi) =>
+                bi !== blockIdx
+                  ? b
+                  : {
+                      ...b,
+                      poses: b.poses.map((p, pi) => {
+                        if (pi !== poseIdx || !p.originalName) return p;
+                        const currentLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
+                        const newMods = p.modifications.filter((m) => m !== (p.originalCue ? `${p.originalName} – ${p.originalCue}` : p.originalName));
+                        newMods.push(currentLabel);
+                        const imageUrl = findPoseImage(p.originalName, media);
+                        return {
+                          ...p,
+                          name: p.originalName,
+                          cue: p.originalCue || "",
+                          modifications: newMods,
+                          isSelected: false,
+                          originalName: undefined,
+                          originalCue: undefined,
+                          imageUrl,
+                        };
+                      }),
+                    }
+              ),
             }
       );
       const serialized = serializeSections(next);
@@ -326,108 +367,119 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
           <h2 className="font-heading text-2xl tracking-tight text-foreground border-b border-border pb-2 mb-5">
             {section.title}
           </h2>
-          <div className="space-y-4">
-            {section.poses.map((pose, i) => {
-              const key = `${si}-${i}`;
-              return (
-                <Collapsible
-                  key={key}
-                  open={openKeys.has(key)}
-                  onOpenChange={(open) => toggleOpen(key, open)}
-                >
-                  <div className="rounded-lg border border-border bg-card overflow-hidden">
-                    <div className="flex items-center gap-4 p-3">
-                      {pose.imageUrl && (
-                        <img
-                          src={pose.imageUrl}
-                          alt={pose.name}
-                          className="w-[72px] h-[72px] rounded-md object-cover flex-shrink-0"
-                        />
-                      )}
-                      <div className="space-y-1 min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <p className="font-body text-base font-medium text-foreground truncate">
-                              {pose.name}
-                            </p>
-                            {pose.isSelected && (
-                               <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
-                                 Selected
-                               </span>
-                             )}
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            {pose.duration && (
-                              <span className="font-body text-xs text-muted-foreground whitespace-nowrap">
-                                {pose.duration}
-                              </span>
+          <div className="space-y-6">
+            {section.blocks.map((block, bi) => (
+              <div key={`${si}-${bi}`}>
+                <div className="flex items-baseline justify-between mb-3">
+                  <h3 className="font-body text-sm font-medium text-foreground/80 uppercase tracking-wide">
+                    {block.blockName}
+                  </h3>
+                  {block.duration && (
+                    <span className="font-body text-xs text-muted-foreground">
+                      {block.duration}
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  {block.poses.map((pose, pi) => {
+                    const key = `${si}-${bi}-${pi}`;
+                    return (
+                      <Collapsible
+                        key={key}
+                        open={openKeys.has(key)}
+                        onOpenChange={(open) => toggleOpen(key, open)}
+                      >
+                        <div className="rounded-lg border border-border bg-card overflow-hidden">
+                          <div className="flex items-center gap-4 p-3">
+                            {pose.imageUrl && (
+                              <img
+                                src={pose.imageUrl}
+                                alt={pose.name}
+                                className="w-[72px] h-[72px] rounded-md object-cover flex-shrink-0"
+                              />
                             )}
-                            {!readOnly && (
-                              <>
-                                <CollapsibleTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
-                                  >
-                                    Modify
-                                  </Button>
-                                </CollapsibleTrigger>
-                                {pose.isSelected && (
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); handleReset(si, i); }}
-                                    className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
-                                  >
-                                    Reset
-                                  </button>
-                                )}
-                              </>
-                            )}
+                            <div className="space-y-1 min-w-0 flex-1">
+                              <div className="flex items-baseline justify-between gap-2">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <p className="font-body text-base font-medium text-foreground truncate">
+                                    {pose.name}
+                                  </p>
+                                  {pose.isSelected && (
+                                    <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
+                                      Selected
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  {!readOnly && (
+                                    <>
+                                      <CollapsibleTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
+                                        >
+                                          Modify
+                                        </Button>
+                                      </CollapsibleTrigger>
+                                      {pose.isSelected && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
+                                          className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
+                                        >
+                                          Reset
+                                        </button>
+                                      )}
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                              {pose.breath && (
+                                <p className="font-body text-sm text-muted-foreground">
+                                  <span className="font-medium text-foreground/70">Breath:</span>{" "}
+                                  {pose.breath}
+                                </p>
+                              )}
+                              {pose.cue && (
+                                <p className="font-body text-sm text-muted-foreground">
+                                  <span className="font-medium text-foreground/70">Cue:</span>{" "}
+                                  {pose.cue}
+                                </p>
+                              )}
+                            </div>
                           </div>
+                          <CollapsibleContent>
+                            <div className="border-t border-border px-4 py-2 bg-muted/30 space-y-0.5">
+                              {pose.modifications.length > 0 ? (
+                                <>
+                                  {pose.modifications.map((mod, mi) => (
+                                    <button
+                                      key={mi}
+                                      onClick={() => handleModClick(si, bi, pi, mod)}
+                                      aria-label={`Swap with ${parseModification(mod).name}`}
+                                      className="group w-full rounded-md px-2.5 py-1.5 font-body text-sm text-muted-foreground hover:bg-secondary/60 transition-all duration-150 cursor-pointer flex items-center justify-between"
+                                    >
+                                      <span className="text-left">• {mod}</span>
+                                      <span className="font-body text-[11px] font-medium text-muted-foreground/70 group-hover:text-muted-foreground transition-opacity duration-150 shrink-0 ml-3">
+                                        Swap
+                                      </span>
+                                    </button>
+                                  ))}
+                                </>
+                              ) : (
+                                <p className="font-body text-xs text-muted-foreground">
+                                  No modifications available.
+                                </p>
+                              )}
+                            </div>
+                          </CollapsibleContent>
                         </div>
-                        {pose.breath && (
-                          <p className="font-body text-sm text-muted-foreground">
-                            <span className="font-medium text-foreground/70">Breath:</span>{" "}
-                            {pose.breath}
-                          </p>
-                        )}
-                        {pose.cue && (
-                          <p className="font-body text-sm text-muted-foreground">
-                            <span className="font-medium text-foreground/70">Cue:</span>{" "}
-                            {pose.cue}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <CollapsibleContent>
-                      <div className="border-t border-border px-4 py-2 bg-muted/30 space-y-0.5">
-                        {pose.modifications.length > 0 ? (
-                          <>
-                            {pose.modifications.map((mod, mi) => (
-                              <button
-                                key={mi}
-                                onClick={() => handleModClick(si, i, mod)}
-                                aria-label={`Swap with ${parseModification(mod).name}`}
-                                className="group w-full rounded-md px-2.5 py-1.5 font-body text-sm text-muted-foreground hover:bg-secondary/60 transition-all duration-150 cursor-pointer flex items-center justify-between"
-                              >
-                                <span className="text-left">• {mod}</span>
-                                <span className="font-body text-[11px] font-medium text-muted-foreground/70 group-hover:text-muted-foreground transition-opacity duration-150 shrink-0 ml-3">
-                                  Swap
-                                </span>
-                              </button>
-                            ))}
-                          </>
-                        ) : (
-                          <p className="font-body text-xs text-muted-foreground">
-                            No modifications available.
-                          </p>
-                        )}
-                      </div>
-                    </CollapsibleContent>
-                  </div>
-                </Collapsible>
-              );
-            })}
+                      </Collapsible>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       ))}
