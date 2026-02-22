@@ -186,6 +186,15 @@ Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – [short description]
 
+ASYMMETRICAL POSE RULES (critical):
+- If a pose has symmetry == "asymmetrical" in the pose library, you MUST:
+  1. Label the pose with "(Right)" appended to its name, e.g. "Pose: Low Lunge (Right)"
+  2. Immediately after that pose's full entry (Breath, Cue, Modifications), add a line: "Repeat: Left"
+  3. Do NOT duplicate the full cue, breath, or modifications for the left side.
+  4. The "Repeat: Left" line signals the second side is done with the same instructions.
+- If the PEAK pose is asymmetrical, BOTH sides MUST be completed within the PEAK section BEFORE Cool Down begins.
+- Do NOT split asymmetrical sides across different sections or blocks.
+
 Rules:
 - Each section can have multiple blocks, each with its own Block/Duration line followed by multiple poses.
 - Poses within a block do NOT have individual durations.
