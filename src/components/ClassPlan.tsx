@@ -25,6 +25,8 @@ interface PoseEntry {
   modifications: string[];
   isSelected: boolean;
   isTransition: boolean;
+  isRepeatSide: boolean;
+  repeatSideLabel?: string;
   originalName?: string;
   originalCue?: string;
 }
@@ -187,7 +189,15 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
       const name = correctPoseName(rawName, media);
       const imageUrl = findPoseImage(name, media);
       const isTransition = /transition/i.test(rawName) || /vinyasa/i.test(rawName);
-      currentBlock.poses.push({ name, breath: "", cue: "", modifications: [], isSelected: false, isTransition, imageUrl });
+      currentBlock.poses.push({ name, breath: "", cue: "", modifications: [], isSelected: false, isTransition, isRepeatSide: false, imageUrl });
+      continue;
+    }
+
+    const repeatMatch = trimmed.match(/^Repeat:\s*(.+)/i);
+    if (repeatMatch && currentBlock.poses.length > 0) {
+      const last = currentBlock.poses[currentBlock.poses.length - 1];
+      last.isRepeatSide = true;
+      last.repeatSideLabel = repeatMatch[1].trim();
       continue;
     }
 
@@ -446,97 +456,105 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                           }
 
                           return (
-                            <Collapsible
-                              key={key}
-                              open={openKeys.has(key)}
-                              onOpenChange={(open) => toggleOpen(key, open)}
-                            >
-                              <div className="rounded-lg border border-border bg-card overflow-hidden">
-                                <div className="flex items-center gap-4 p-3">
-                                  {pose.imageUrl && (
-                                    <img
-                                      src={pose.imageUrl}
-                                      alt={pose.name}
-                                      className="w-[72px] h-[72px] rounded-md object-cover flex-shrink-0"
-                                    />
-                                  )}
-                                  <div className="space-y-1 min-w-0 flex-1">
-                                    <div className="flex items-baseline justify-between gap-2">
-                                      <div className="flex items-center gap-2 min-w-0">
-                                        <p className="font-body text-base font-medium text-foreground truncate">
-                                          {pose.name}
-                                        </p>
-                                        {pose.isSelected && (
-                                          <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
-                                            Selected
-                                          </span>
-                                        )}
-                                      </div>
-                                      <div className="flex items-center gap-2 flex-shrink-0">
-                                        {!readOnly && (
-                                          <>
-                                            <CollapsibleTrigger asChild>
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
-                                              >
-                                                Modify
-                                              </Button>
-                                            </CollapsibleTrigger>
-                                            {pose.isSelected && (
-                                              <button
-                                                onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
-                                                className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
-                                              >
-                                                Reset
-                                              </button>
-                                            )}
-                                          </>
-                                        )}
-                                      </div>
-                                    </div>
-                                    {pose.breath && (
-                                      <p className="font-body text-sm text-muted-foreground">
-                                        <span className="font-medium text-foreground/70">Breath:</span>{" "}
-                                        {pose.breath}
-                                      </p>
+                            <div key={key}>
+                              <Collapsible
+                                open={openKeys.has(key)}
+                                onOpenChange={(open) => toggleOpen(key, open)}
+                              >
+                                <div className="rounded-lg border border-border bg-card overflow-hidden">
+                                  <div className="flex items-center gap-4 p-3">
+                                    {pose.imageUrl && (
+                                      <img
+                                        src={pose.imageUrl}
+                                        alt={pose.name}
+                                        className="w-[72px] h-[72px] rounded-md object-cover flex-shrink-0"
+                                      />
                                     )}
-                                    {pose.cue && (
-                                      <p className="font-body text-sm text-muted-foreground">
-                                        <span className="font-medium text-foreground/70">Cue:</span>{" "}
-                                        {pose.cue}
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                                <CollapsibleContent>
-                                  <div className="border-t border-border px-4 py-2 bg-muted/30 space-y-0.5">
-                                    {pose.modifications.length > 0 ? (
-                                      <>
-                                        {pose.modifications.map((mod, mi) => (
-                                          <button
-                                            key={mi}
-                                            onClick={() => handleModClick(si, bi, pi, mod)}
-                                            aria-label={`Swap with ${parseModification(mod).name}`}
-                                            className="group w-full rounded-md px-2.5 py-1.5 font-body text-sm text-muted-foreground hover:bg-secondary/60 transition-all duration-150 cursor-pointer flex items-center justify-between"
-                                          >
-                                            <span className="text-left">• {mod}</span>
-                                            <span className="font-body text-[11px] font-medium text-muted-foreground/70 group-hover:text-muted-foreground transition-opacity duration-150 shrink-0 ml-3">
-                                              Swap
+                                    <div className="space-y-1 min-w-0 flex-1">
+                                      <div className="flex items-baseline justify-between gap-2">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <p className="font-body text-base font-medium text-foreground truncate">
+                                            {pose.name}
+                                          </p>
+                                          {pose.isSelected && (
+                                            <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
+                                              Selected
                                             </span>
-                                          </button>
-                                        ))}
-                                      </>
-                                    ) : (
-                                      <p className="font-body text-xs text-muted-foreground">
-                                        No modifications available.
-                                      </p>
-                                    )}
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                          {!readOnly && (
+                                            <>
+                                              <CollapsibleTrigger asChild>
+                                                <Button
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
+                                                >
+                                                  Modify
+                                                </Button>
+                                              </CollapsibleTrigger>
+                                              {pose.isSelected && (
+                                                <button
+                                                  onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
+                                                  className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
+                                                >
+                                                  Reset
+                                                </button>
+                                              )}
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                      {pose.breath && (
+                                        <p className="font-body text-sm text-muted-foreground">
+                                          <span className="font-medium text-foreground/70">Breath:</span>{" "}
+                                          {pose.breath}
+                                        </p>
+                                      )}
+                                      {pose.cue && (
+                                        <p className="font-body text-sm text-muted-foreground">
+                                          <span className="font-medium text-foreground/70">Cue:</span>{" "}
+                                          {pose.cue}
+                                        </p>
+                                      )}
+                                    </div>
                                   </div>
-                                </CollapsibleContent>
-                              </div>
-                            </Collapsible>
+                                  <CollapsibleContent>
+                                    <div className="border-t border-border px-4 py-2 bg-muted/30 space-y-0.5">
+                                      {pose.modifications.length > 0 ? (
+                                        <>
+                                          {pose.modifications.map((mod, mi) => (
+                                            <button
+                                              key={mi}
+                                              onClick={() => handleModClick(si, bi, pi, mod)}
+                                              aria-label={`Swap with ${parseModification(mod).name}`}
+                                              className="group w-full rounded-md px-2.5 py-1.5 font-body text-sm text-muted-foreground hover:bg-secondary/60 transition-all duration-150 cursor-pointer flex items-center justify-between"
+                                            >
+                                              <span className="text-left">• {mod}</span>
+                                              <span className="font-body text-[11px] font-medium text-muted-foreground/70 group-hover:text-muted-foreground transition-opacity duration-150 shrink-0 ml-3">
+                                                Swap
+                                              </span>
+                                            </button>
+                                          ))}
+                                        </>
+                                      ) : (
+                                        <p className="font-body text-xs text-muted-foreground">
+                                          No modifications available.
+                                        </p>
+                                      )}
+                                    </div>
+                                  </CollapsibleContent>
+                                </div>
+                              </Collapsible>
+                              {pose.isRepeatSide && (
+                                <div className="pl-6 py-1.5">
+                                  <p className="font-body text-[12px] text-muted-foreground/50">
+                                    ↳ Repeat {pose.repeatSideLabel}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
                           );
                         })}
                       </div>
