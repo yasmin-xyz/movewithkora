@@ -186,12 +186,46 @@ Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – [short description]
 
-ASYMMETRICAL POSE RULES (critical):
-- If a pose has symmetry == "asymmetrical" in the pose library, you MUST:
-  1. Label the pose with "(Right)" appended to its name, e.g. "Pose: Low Lunge (Right)"
-  2. Immediately after that pose's full entry (Breath, Cue, Modifications), add a line: "Repeat: Left"
-  3. Do NOT duplicate the full cue, breath, or modifications for the left side.
-  4. The "Repeat: Left" line signals the second side is done with the same instructions.
+ASYMMETRICAL POSE SIDE FLOW RULES (critical):
+- If a block contains asymmetrical poses (symmetry == "asymmetrical"), you MUST group them into a Side Flow.
+- Output ALL asymmetrical poses in the block for the right side first, then a Vinyasa separator line, then the SAME poses for the left side.
+- Do NOT use "Repeat: Left" for individual poses. Mirror the ENTIRE cluster, not pose-by-pose.
+- Only insert ONE vinyasa between the right and left side flows (not between each pose).
+- Bilateral poses in the same block go OUTSIDE the side flow (before or after it).
+- Format:
+
+Right Side Flow:
+Pose: [pose name] (Right)
+Breath: [cue]
+Cue: [cue]
+Modifications:
+- [mod]
+
+Pose: [next asymmetrical pose] (Right)
+Breath: [cue]
+Cue: [cue]
+Modifications:
+- [mod]
+
+Vinyasa: [vinyasa type]
+
+Left Side Flow:
+Pose: [pose name] (Left)
+Breath: [cue]
+Cue: [cue]
+Modifications:
+- [mod]
+
+Pose: [next asymmetrical pose] (Left)
+Breath: [cue]
+Cue: [cue]
+Modifications:
+- [mod]
+
+- Vinyasa type between sides depends on skill level:
+  - Beginner: "Down Dog Reset"
+  - Intermediate: "Half Vinyasa"
+  - Advanced: "Full Vinyasa"
 - If the PEAK pose is asymmetrical, BOTH sides MUST be completed within the PEAK section BEFORE Cool Down begins.
 - Do NOT split asymmetrical sides across different sections or blocks.
 

@@ -25,8 +25,9 @@ interface PoseEntry {
   modifications: string[];
   isSelected: boolean;
   isTransition: boolean;
-  isRepeatSide: boolean;
-  repeatSideLabel?: string;
+  sideFlow?: 'right' | 'left';
+  isSideFlowVinyasa?: boolean;
+  sideFlowVinyasaLabel?: string;
   originalName?: string;
   originalCue?: string;
 }
@@ -148,6 +149,7 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
   const sections: Section[] = [];
   let current: Section | null = null;
   let currentBlock: FlowBlock | null = null;
+  let currentSideFlow: 'right' | 'left' | undefined;
 
   for (const line of raw.split("\n")) {
     const trimmed = line.trim();
@@ -158,6 +160,7 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
       current = { title: sectionMatch[1].toUpperCase(), blocks: [] };
       sections.push(current);
       currentBlock = null;
+      currentSideFlow = undefined;
       continue;
     }
 
@@ -167,6 +170,7 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
     if (blockMatch) {
       currentBlock = { blockName: blockMatch[1].trim(), duration: "", poses: [] };
       current.blocks.push(currentBlock);
+      currentSideFlow = undefined;
       continue;
     }
 
@@ -189,15 +193,34 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
       const name = correctPoseName(rawName, media);
       const imageUrl = findPoseImage(name, media);
       const isTransition = /transition/i.test(rawName) || /vinyasa/i.test(rawName);
-      currentBlock.poses.push({ name, breath: "", cue: "", modifications: [], isSelected: false, isTransition, isRepeatSide: false, imageUrl });
+      currentBlock.poses.push({ name, breath: "", cue: "", modifications: [], isSelected: false, isTransition, sideFlow: currentSideFlow, imageUrl });
       continue;
     }
 
-    const repeatMatch = trimmed.match(/^Repeat:\s*(.+)/i);
-    if (repeatMatch && currentBlock.poses.length > 0) {
-      const last = currentBlock.poses[currentBlock.poses.length - 1];
-      last.isRepeatSide = true;
-      last.repeatSideLabel = repeatMatch[1].trim();
+    // Side Flow markers
+    const rightFlowMatch = trimmed.match(/^Right Side Flow:?$/i);
+    if (rightFlowMatch) {
+      currentSideFlow = 'right';
+      continue;
+    }
+
+    const leftFlowMatch = trimmed.match(/^Left Side Flow:?$/i);
+    if (leftFlowMatch) {
+      currentSideFlow = 'left';
+      continue;
+    }
+
+    // Vinyasa between side flows
+    const vinyasaMatch = trimmed.match(/^Vinyasa:\s*(.+)/i);
+    if (vinyasaMatch && currentBlock) {
+      currentBlock.poses.push({
+        name: vinyasaMatch[1].trim(),
+        breath: "", cue: "", modifications: [], isSelected: false,
+        isTransition: true, isSideFlowVinyasa: true,
+        sideFlowVinyasaLabel: vinyasaMatch[1].trim(),
+        imageUrl: undefined,
+      });
+      currentSideFlow = undefined;
       continue;
     }
 
@@ -233,7 +256,16 @@ function serializeSections(sections: Section[]): string {
     for (const block of section.blocks) {
       lines.push(`Block: ${block.blockName}`);
       if (block.duration) lines.push(`Duration: ${block.duration}`);
+      let lastSideFlow: string | undefined;
       for (const pose of block.poses) {
+        if (pose.sideFlow && pose.sideFlow !== lastSideFlow) {
+          lines.push(pose.sideFlow === 'right' ? 'Right Side Flow:' : 'Left Side Flow:');
+        }
+        lastSideFlow = pose.sideFlow;
+        if (pose.isSideFlowVinyasa) {
+          lines.push(`Vinyasa: ${pose.sideFlowVinyasaLabel || pose.name}`);
+          continue;
+        }
         lines.push(`Pose: ${pose.name}`);
         if (pose.breath) lines.push(`Breath: ${pose.breath}`);
         if (pose.cue) lines.push(`Cue: ${pose.cue}`);
@@ -440,123 +472,150 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                     </button>
                     {isBlockOpen && (
                       <div className="space-y-3">
-                        {block.poses.map((pose, pi) => {
-                          const key = `${si}-${bi}-${pi}`;
+                        {(() => {
+                          const elements: React.ReactNode[] = [];
+                          let lastSideFlow: string | undefined;
 
-                          if (pose.isTransition) {
-                            return (
-                              <div key={key} className="py-1">
-                                <div className="border-t border-border/40" />
-                                <p className="font-body text-[11px] text-muted-foreground/50 py-1.5 px-3">
-                                  Transition: {pose.name}
-                                </p>
-                                <div className="border-b border-border/40" />
-                              </div>
-                            );
-                          }
+                          block.poses.forEach((pose, pi) => {
+                            const key = `${si}-${bi}-${pi}`;
 
-                          return (
-                            <div key={key}>
-                              <Collapsible
-                                open={openKeys.has(key)}
-                                onOpenChange={(open) => toggleOpen(key, open)}
-                              >
-                                <div className="rounded-lg border border-border bg-card overflow-hidden">
-                                  <div className="flex items-center gap-4 p-3">
-                                    {pose.imageUrl && (
-                                      <img
-                                        src={pose.imageUrl}
-                                        alt={pose.name}
-                                        className="w-[72px] h-[72px] rounded-md object-cover flex-shrink-0"
-                                      />
-                                    )}
-                                    <div className="space-y-1 min-w-0 flex-1">
-                                      <div className="flex items-baseline justify-between gap-2">
-                                        <div className="flex items-center gap-2 min-w-0">
-                                          <p className="font-body text-base font-medium text-foreground truncate">
-                                            {pose.name}
-                                          </p>
-                                          {pose.isSelected && (
-                                            <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
-                                              Selected
-                                            </span>
-                                          )}
-                                        </div>
-                                        <div className="flex items-center gap-2 flex-shrink-0">
-                                          {!readOnly && (
-                                            <>
-                                              <CollapsibleTrigger asChild>
-                                                <Button
-                                                  variant="ghost"
-                                                  size="sm"
-                                                  className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
-                                                >
-                                                  Modify
-                                                </Button>
-                                              </CollapsibleTrigger>
-                                              {pose.isSelected && (
-                                                <button
-                                                  onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
-                                                  className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
-                                                >
-                                                  Reset
-                                                </button>
-                                              )}
-                                            </>
-                                          )}
-                                        </div>
-                                      </div>
-                                      {pose.breath && (
-                                        <p className="font-body text-sm text-muted-foreground">
-                                          <span className="font-medium text-foreground/70">Breath:</span>{" "}
-                                          {pose.breath}
-                                        </p>
-                                      )}
-                                      {pose.cue && (
-                                        <p className="font-body text-sm text-muted-foreground">
-                                          <span className="font-medium text-foreground/70">Cue:</span>{" "}
-                                          {pose.cue}
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <CollapsibleContent>
-                                    <div className="border-t border-border px-4 py-2 bg-muted/30 space-y-0.5">
-                                      {pose.modifications.length > 0 ? (
-                                        <>
-                                          {pose.modifications.map((mod, mi) => (
-                                            <button
-                                              key={mi}
-                                              onClick={() => handleModClick(si, bi, pi, mod)}
-                                              aria-label={`Swap with ${parseModification(mod).name}`}
-                                              className="group w-full rounded-md px-2.5 py-1.5 font-body text-sm text-muted-foreground hover:bg-secondary/60 transition-all duration-150 cursor-pointer flex items-center justify-between"
-                                            >
-                                              <span className="text-left">• {mod}</span>
-                                              <span className="font-body text-[11px] font-medium text-muted-foreground/70 group-hover:text-muted-foreground transition-opacity duration-150 shrink-0 ml-3">
-                                                Swap
-                                              </span>
-                                            </button>
-                                          ))}
-                                        </>
-                                      ) : (
-                                        <p className="font-body text-xs text-muted-foreground">
-                                          No modifications available.
-                                        </p>
-                                      )}
-                                    </div>
-                                  </CollapsibleContent>
-                                </div>
-                              </Collapsible>
-                              {pose.isRepeatSide && (
-                                <div className="pl-6 py-1.5">
-                                  <p className="font-body text-[12px] text-muted-foreground/50">
-                                    ↳ Repeat {pose.repeatSideLabel}
+                            // Side flow header
+                            if (pose.sideFlow && pose.sideFlow !== lastSideFlow) {
+                              elements.push(
+                                <div key={`sf-header-${key}`} className="pt-2 pb-1">
+                                  <p className="font-body text-[12px] font-medium text-foreground/50 uppercase tracking-wider pl-1">
+                                    {pose.sideFlow === 'right' ? 'Right Side Flow' : 'Left Side Flow'}
                                   </p>
                                 </div>
-                              )}
-                            </div>
-                          );
-                        })}
+                              );
+                            }
+                            lastSideFlow = pose.sideFlow;
+
+                            // Side flow vinyasa
+                            if (pose.isSideFlowVinyasa) {
+                              elements.push(
+                                <div key={key} className="py-1">
+                                  <div className="border-t border-border/40" />
+                                  <p className="font-body text-[11px] text-muted-foreground/50 py-1.5 px-3">
+                                    Vinyasa: {pose.sideFlowVinyasaLabel || pose.name}
+                                  </p>
+                                  <div className="border-b border-border/40" />
+                                </div>
+                              );
+                              return;
+                            }
+
+                            if (pose.isTransition) {
+                              elements.push(
+                                <div key={key} className="py-1">
+                                  <div className="border-t border-border/40" />
+                                  <p className="font-body text-[11px] text-muted-foreground/50 py-1.5 px-3">
+                                    Transition: {pose.name}
+                                  </p>
+                                  <div className="border-b border-border/40" />
+                                </div>
+                              );
+                              return;
+                            }
+
+                            elements.push(
+                              <div key={key}>
+                                <Collapsible
+                                  open={openKeys.has(key)}
+                                  onOpenChange={(open) => toggleOpen(key, open)}
+                                >
+                                  <div className={`rounded-lg border border-border bg-card overflow-hidden ${pose.sideFlow ? 'ml-3' : ''}`}>
+                                    <div className="flex items-center gap-4 p-3">
+                                      {pose.imageUrl && (
+                                        <img
+                                          src={pose.imageUrl}
+                                          alt={pose.name}
+                                          className="w-[72px] h-[72px] rounded-md object-cover flex-shrink-0"
+                                        />
+                                      )}
+                                      <div className="space-y-1 min-w-0 flex-1">
+                                        <div className="flex items-baseline justify-between gap-2">
+                                          <div className="flex items-center gap-2 min-w-0">
+                                            <p className="font-body text-base font-medium text-foreground truncate">
+                                              {pose.name}
+                                            </p>
+                                            {pose.isSelected && (
+                                              <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
+                                                Selected
+                                              </span>
+                                            )}
+                                          </div>
+                                          <div className="flex items-center gap-2 flex-shrink-0">
+                                            {!readOnly && (
+                                              <>
+                                                <CollapsibleTrigger asChild>
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
+                                                  >
+                                                    Modify
+                                                  </Button>
+                                                </CollapsibleTrigger>
+                                                {pose.isSelected && (
+                                                  <button
+                                                    onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
+                                                    className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
+                                                  >
+                                                    Reset
+                                                  </button>
+                                                )}
+                                              </>
+                                            )}
+                                          </div>
+                                        </div>
+                                        {pose.breath && (
+                                          <p className="font-body text-sm text-muted-foreground">
+                                            <span className="font-medium text-foreground/70">Breath:</span>{" "}
+                                            {pose.breath}
+                                          </p>
+                                        )}
+                                        {pose.cue && (
+                                          <p className="font-body text-sm text-muted-foreground">
+                                            <span className="font-medium text-foreground/70">Cue:</span>{" "}
+                                            {pose.cue}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <CollapsibleContent>
+                                      <div className="border-t border-border px-4 py-2 bg-muted/30 space-y-0.5">
+                                        {pose.modifications.length > 0 ? (
+                                          <>
+                                            {pose.modifications.map((mod, mi) => (
+                                              <button
+                                                key={mi}
+                                                onClick={() => handleModClick(si, bi, pi, mod)}
+                                                aria-label={`Swap with ${parseModification(mod).name}`}
+                                                className="group w-full rounded-md px-2.5 py-1.5 font-body text-sm text-muted-foreground hover:bg-secondary/60 transition-all duration-150 cursor-pointer flex items-center justify-between"
+                                              >
+                                                <span className="text-left">• {mod}</span>
+                                                <span className="font-body text-[11px] font-medium text-muted-foreground/70 group-hover:text-muted-foreground transition-opacity duration-150 shrink-0 ml-3">
+                                                  Swap
+                                                </span>
+                                              </button>
+                                            ))}
+                                          </>
+                                        ) : (
+                                          <p className="font-body text-xs text-muted-foreground">
+                                            No modifications available.
+                                          </p>
+                                        )}
+                                      </div>
+                                    </CollapsibleContent>
+                                  </div>
+                                </Collapsible>
+                              </div>
+                            );
+                          });
+
+                          return elements;
+                        })()}
                       </div>
                     )}
                   </div>
