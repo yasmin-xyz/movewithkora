@@ -435,10 +435,12 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
 
                           if (pose.isTransition) {
                             return (
-                              <div key={key} className="flex items-center justify-center py-2">
-                                <span className="font-body text-[11px] text-muted-foreground/40 tracking-wider">
-                                  — {pose.name} —
-                                </span>
+                              <div key={key} className="py-1">
+                                <div className="border-t border-border/40" />
+                                <p className="font-body text-[11px] text-muted-foreground/50 py-1.5 px-3">
+                                  Transition: {pose.name}
+                                </p>
+                                <div className="border-b border-border/40" />
                               </div>
                             );
                           }
