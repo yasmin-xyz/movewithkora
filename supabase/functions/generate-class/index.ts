@@ -72,13 +72,38 @@ SEQUENCING PRINCIPLES (critical):
 - Avoid mechanical sequencing based only on muscle prep. Flow should feel intuitive, progressive, and smooth — easy for both new and senior instructors to teach from.
 - Within each section, poses should connect seamlessly. Between sections, provide a clear bridge (e.g. Warm-Up ending in a standing fold naturally leads into Build standing poses).
 
-TRANSITION INTELLIGENCE (critical):
-- Track body orientation throughout: standing vs kneeling vs seated vs prone vs supine, facing front-of-mat vs long edge, weight in hands vs feet, symmetrical vs asymmetrical stance.
-- Never jump between incompatible orientations without a clear transitional pathway (e.g. do not go from a long-edge warrior directly into a front-of-mat lunge without stepping through).
-- Stay within pose families before resetting: if in a lunge, explore lunge variations before changing base. If binding, progressively deepen before switching themes.
-- Minimize unnecessary repositioning: favor progressive layering over resetting stance. Avoid sequences requiring awkward stepping forward/backward without purpose.
-- Use logical connectors between levels: standing → fold → hands down → step back (not standing → suddenly prone). Seated → tabletop → prone (not seated → suddenly standing).
-- Every transition should be easy to cue verbally. If you cannot describe the transition in one simple instruction, add an intermediate pose.
+DELTA-BASED TRANSITION SCORING (critical):
+For each adjacent pose pair within a block, calculate a transition_score:
+  +2 if base changes (e.g. standing → kneeling)
+  +1 if orientation changes (e.g. front → long_edge)
+  +1 if symmetry changes (e.g. bilateral → unilateral)
+  +1 if weight_bearing changes (e.g. feet → hands)
+
+Insert transitions based on the score AND skill_level:
+
+Beginner:
+  - Only insert a transition if score >= 3
+  - Use "Down Dog Reset" as the transition (Pose: Down Dog Reset)
+  - Mark it with Cue: Transition
+
+Intermediate:
+  - Insert a transition if score >= 2
+  - If score >= 3: use "Full Vinyasa" (Pose: Vinyasa)
+  - If score == 2: use "Down Dog Reset" (Pose: Down Dog Reset)
+  - Mark with Cue: Transition
+
+Advanced:
+  - Insert a transition if score >= 2
+  - If score >= 3: use a creative vinyasa variation (e.g. "Vinyasa with Knee-to-Nose", "Flip Dog Vinyasa")
+  - If score == 2 AND only orientation changed: insert a directional bridge cue (e.g. "Pivot to long edge" or "Step to face front") instead of a full vinyasa. Use Cue: Transition
+  - If score == 2 and multiple properties changed: use "Down Dog Reset"
+  - Mark all transitions with Cue: Transition
+
+Transition rules:
+- Transitions are inserted WITHIN blocks as poses, NOT as separate timed entries.
+- Transition poses do NOT have their own duration — they share the block's duration.
+- Do NOT add transitions between blocks or between sections.
+- Mark every transition pose line with "Cue: Transition" so the parser can identify them.
 
 FLOW BLOCK STRUCTURE (critical):
 - Do NOT assign duration to individual poses. Group poses into flow blocks within each section.

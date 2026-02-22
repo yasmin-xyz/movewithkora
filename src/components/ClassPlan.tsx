@@ -198,7 +198,14 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
     if (breathMatch) { last.breath = breathMatch[1].trim(); continue; }
 
     const cueMatch = trimmed.match(/^Cue:\s*(.+)/i);
-    if (cueMatch) { last.cue = cueMatch[1].trim(); continue; }
+    if (cueMatch) {
+      last.cue = cueMatch[1].trim();
+      // Mark as transition if cue says "Transition"
+      if (/^transition$/i.test(last.cue.trim())) {
+        last.isTransition = true;
+      }
+      continue;
+    }
 
     if (/^Modifications:\s*$/i.test(trimmed)) continue;
 
