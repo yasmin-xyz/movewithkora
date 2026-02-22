@@ -82,7 +82,8 @@ For each adjacent pose pair within a block, calculate a transition_score:
 Insert transitions based on the score AND skill_level:
 
 Beginner:
-  - Only insert a transition if score >= 3
+  - Only insert a transition if score >= 4
+  - Do NOT insert transitions between standing asymmetrical poses on the same side (e.g. Low Lunge → Extended Side Angle on the same leg). These share the same base and orientation — no reset needed.
   - Use "Down Dog Reset" as the transition (Pose: Down Dog Reset)
   - Mark it with Cue: Transition
 
