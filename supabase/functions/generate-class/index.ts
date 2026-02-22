@@ -79,11 +79,28 @@ For each adjacent pose pair within a block, calculate a transition_score:
   +1 if symmetry changes (e.g. bilateral → unilateral)
   +1 if weight_bearing changes (e.g. feet → hands)
 
-Insert transitions based on the score AND skill_level:
+STANDING CONTINUITY RULE (highest priority — overrides all other transition rules):
+If BOTH the previous pose AND the next pose have base == "standing":
+  - Do NOT insert Down Dog Reset.
+  - Do NOT insert Full Vinyasa or any vinyasa variation.
+  - IGNORE orientation changes when calculating the transition_score (subtract the +1 for orientation).
+  - If orientation changes within standing (e.g. front → long_edge), insert ONLY a directional bridge cue:
+    Pose: Pivot to front of mat   (or "Turn to long edge", depending on direction)
+    Cue: Transition
+  - If no orientation change, insert NO transition at all.
+  - Standing sequences must remain in the standing ecosystem unless the sequence intentionally descends to floor.
+
+DOWN DOG RESET RULES:
+Down Dog Reset should ONLY be inserted when:
+  - base changes from standing → prone, OR prone → standing
+  - OR transition_score >= 4 AND base changes
+Never use Down Dog Reset between two standing poses.
+
+Insert transitions based on the score AND skill_level (AFTER applying standing continuity rule above):
 
 Beginner:
   - Only insert a transition if score >= 4
-  - Do NOT insert transitions between standing asymmetrical poses on the same side (e.g. Low Lunge → Extended Side Angle on the same leg). These share the same base and orientation — no reset needed.
+  - Do NOT insert transitions between standing asymmetrical poses on the same side (e.g. Low Lunge → Extended Side Angle on the same leg).
   - Use "Down Dog Reset" as the transition (Pose: Down Dog Reset)
   - Mark it with Cue: Transition
 
