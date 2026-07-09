@@ -10,6 +10,17 @@ const Landing = () => {
   const meaningInnerRef = useRef<HTMLDivElement>(null);
   const [cycleIndex, setCycleIndex] = useState(0);
   const [revealedEls, setRevealedEls] = useState<Set<string>>(new Set());
+  const [navScrolled, setNavScrolled] = useState(false);
+
+  // Nav becomes opaque once the user scrolls past the hero
+  useEffect(() => {
+    const handleScroll = () => {
+      setNavScrolled(window.scrollY > 40);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Scroll reveal observer for .reveal / .step elements
   useEffect(() => {
@@ -137,6 +148,11 @@ const Landing = () => {
         .kora-landing nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center;
+          background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none;
+          border-bottom: 1px solid transparent;
+          transition: background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease;
+        }
+        .kora-landing nav.scrolled {
           background: rgba(245, 240, 235, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
           border-bottom: 1px solid var(--card-border);
         }
@@ -150,11 +166,11 @@ const Landing = () => {
         }
         .kora-landing .nav-cta:hover { background: var(--olive-light); transform: translateY(-1px); }
         .kora-landing .hero {
-  background: var(--white);
-  max-width: 100%;
-  min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center;
-  align-items: center; text-align: center; padding: 6rem 1.5rem 4rem; position: relative;
-}
+          background: var(--white);
+          max-width: 100%;
+          min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center;
+          align-items: center; text-align: center; padding: 6rem 1.5rem 4rem; position: relative;
+        }
         .kora-landing .lotus-wrap { width: 180px; height: 95px; margin-bottom: 2rem; }
         .kora-landing .lotus-wrap svg { width: 100%; height: 100%; overflow: visible; }
         .kora-landing .lotus-petal {
@@ -273,7 +289,7 @@ const Landing = () => {
         }
       `}</style>
 
-      <nav>
+      <nav className={navScrolled ? "scrolled" : ""}>
         <div className="nav-logo">
           <svg viewBox="0 0 200 105" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M100 78 C82 66, 32 52, 6 64 C4 72, 28 84, 60 86 C78 86, 94 82, 100 78Z" stroke="#66725F" strokeWidth="3" fill="none" opacity="0.45"/>
