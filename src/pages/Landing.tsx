@@ -211,7 +211,9 @@ const Landing = () => {
           content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; height: 350px;
           background: radial-gradient(circle, var(--olive-muted) 0%, transparent 70%); opacity: 0.4; border-radius: 50%; pointer-events: none;
         }
-        .kora-landing .steps { margin-top: 3rem; display: flex; flex-direction: column; gap: 2.75rem; }
+        .kora-landing .how-it-works { background: var(--white); max-width: 100%; padding-bottom: 6rem; }
+        .kora-landing .how-it-works > * { max-width: 720px; margin-left: auto; margin-right: auto; }
+        .kora-landing .steps { margin-top: 3rem; display: flex; flex-direction: column; gap: 2.75rem; max-width: 720px; margin-left: auto; margin-right: auto; }
         .kora-landing .step { display: flex; gap: 1.75rem; align-items: flex-start; opacity: 0; transform: translateY(24px); transition: all 0.65s ease; }
         .kora-landing .step.visible { opacity: 1; transform: translateY(0); }
         .kora-landing .step-indicator { flex-shrink: 0; width: 44px; height: 44px; background: var(--olive-muted); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -219,18 +221,18 @@ const Landing = () => {
         .kora-landing .step-content h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; color: var(--text-primary); margin-bottom: 0.4rem; letter-spacing: -0.01em; }
         .kora-landing .step-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; }
         .kora-landing .step-content em { color: var(--olive); font-style: italic; }
-        .kora-landing .preview { background: var(--white); max-width: 100%; padding: 6rem 1.5rem; text-align: center; }
+        .kora-landing .preview { background: var(--cream); max-width: 100%; padding: 6rem 1.5rem; text-align: center; }
         .kora-landing .preview-inner { max-width: 720px; margin: 0 auto; }
-        .kora-landing .preview-card { margin-top: 3rem; background: var(--cream); border: 1px solid var(--card-border); border-radius: 4px; overflow: hidden; text-align: left; }
+        .kora-landing .preview-card { margin-top: 3rem; background: var(--white); border: 1px solid var(--card-border); border-radius: 4px; overflow: hidden; text-align: left; }
         .kora-landing .preview-header { padding: 1.75rem 1.5rem 0; display: flex; justify-content: space-between; align-items: baseline; }
         .kora-landing .preview-phase { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; color: var(--text-primary); letter-spacing: 0.04em; text-transform: uppercase; }
         .kora-landing .preview-time { font-size: 0.75rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
         .kora-landing .preview-divider { height: 2px; background: var(--olive); margin: 1rem 1.5rem 0; opacity: 0.6; }
         .kora-landing .preview-subtitle { font-size: 0.95rem; color: var(--text-secondary); padding: 1.25rem 1.5rem 0; font-style: italic; }
         .kora-landing .pose-cards { padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
-        .kora-landing .pose-card { background: var(--white); border: 1px solid var(--card-border); border-radius: 3px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start; transition: transform 0.25s ease; }
+        .kora-landing .pose-card { background: var(--cream); border: 1px solid var(--card-border); border-radius: 3px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start; transition: transform 0.25s ease; }
         .kora-landing .pose-card:hover { transform: translateX(4px); }
-        .kora-landing .pose-icon { width: 56px; height: 56px; flex-shrink: 0; background: var(--cream); border-radius: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .kora-landing .pose-icon { width: 56px; height: 56px; flex-shrink: 0; background: var(--white); border-radius: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .kora-landing .pose-icon svg { width: 44px; height: 44px; color: var(--text-secondary); animation: breathe 4s ease-in-out infinite; }
         .kora-landing .pose-card:nth-child(2) .pose-icon svg { animation-delay: -1.3s; }
         .kora-landing .pose-card:nth-child(3) .pose-icon svg { animation-delay: -2.6s; }
