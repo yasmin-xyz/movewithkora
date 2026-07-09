@@ -150,10 +150,11 @@ const Landing = () => {
         }
         .kora-landing .nav-cta:hover { background: var(--olive-light); transform: translateY(-1px); }
         .kora-landing .hero {
-          background: var(--white);
-          min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center;
-          align-items: center; text-align: center; padding: 6rem 1.5rem 4rem; position: relative;
-        }
+  background: var(--white);
+  max-width: 100%;
+  min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center;
+  align-items: center; text-align: center; padding: 6rem 1.5rem 4rem; position: relative;
+}
         .kora-landing .lotus-wrap { width: 180px; height: 95px; margin-bottom: 2rem; }
         .kora-landing .lotus-wrap svg { width: 100%; height: 100%; overflow: visible; }
         .kora-landing .lotus-petal {
