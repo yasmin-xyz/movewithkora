@@ -150,6 +150,7 @@ const Landing = () => {
         }
         .kora-landing .nav-cta:hover { background: var(--olive-light); transform: translateY(-1px); }
         .kora-landing .hero {
+          background: var(--white);
           min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center;
           align-items: center; text-align: center; padding: 6rem 1.5rem 4rem; position: relative;
         }
@@ -181,8 +182,8 @@ const Landing = () => {
           letter-spacing: 0.02em; opacity: 0; animation: fadeUp 0.8s ease 1.4s forwards;
         }
         .kora-landing .hero-description {
-          font-size: 1rem; color: var(--text-secondary); max-width: 440px; margin-top: 2rem; line-height: 1.7;
-          opacity: 0; animation: fadeUp 0.8s ease 1.55s forwards;
+          font-size: 1rem; color: var(--text-secondary); max-width: 460px; margin-top: 2rem; line-height: 1.7;
+          opacity: 0; animation: fadeUp 0.8s ease 1.55s forwards; text-wrap: pretty;
         }
         .kora-landing .hero-cta { margin-top: 3rem; opacity: 0; animation: fadeUp 0.8s ease 1.7s forwards; }
         .kora-landing .hero-cta button {
@@ -193,16 +194,16 @@ const Landing = () => {
         .kora-landing .hero-cta button:hover { background: var(--olive-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(92, 107, 85, 0.2); }
         .kora-landing section { padding: 6rem 1.5rem; max-width: 720px; margin: 0 auto; }
         .kora-landing .section-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--olive); margin-bottom: 1.5rem; }
-        .kora-landing .section-heading { font-family: var(--serif); font-size: clamp(2rem, 5vw, 2.75rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; color: var(--text-primary); margin-bottom: 1.5rem; }
-        .kora-landing .section-body { font-size: 1rem; color: var(--text-secondary); line-height: 1.75; max-width: 540px; }
-        .kora-landing .problem { background: var(--white); max-width: 100%; padding: 5rem 1.5rem; }
+        .kora-landing .section-heading { font-family: var(--serif); font-size: clamp(2rem, 5vw, 2.75rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; color: var(--text-primary); margin-bottom: 1.5rem; text-wrap: balance; }
+        .kora-landing .section-body { font-size: 1rem; color: var(--text-secondary); line-height: 1.75; max-width: 580px; text-wrap: pretty; }
+        .kora-landing .problem { background: var(--cream); max-width: 100%; padding: 5rem 1.5rem; }
         .kora-landing .problem-inner { max-width: 720px; margin: 0 auto; text-align: center; }
         .kora-landing .problem .section-heading, .kora-landing .problem .section-body { max-width: 600px; margin-left: auto; margin-right: auto; }
-        .kora-landing .meaning { max-width: 100%; padding: 5rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
+        .kora-landing .meaning { background: var(--white); max-width: 100%; padding: 5rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
         .kora-landing .meaning-inner { max-width: 560px; margin: 0 auto; position: relative; z-index: 1; will-change: transform; }
         .kora-landing .meaning-name { font-family: var(--serif); font-size: clamp(2.5rem, 7vw, 3.5rem); font-style: italic; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 1.25rem; }
         .kora-landing .meaning-origin { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--olive); margin-bottom: 1.75rem; }
-        .kora-landing .meaning-text { font-size: 1rem; color: var(--text-secondary); line-height: 1.8; max-width: 440px; margin: 0 auto 2.5rem; }
+        .kora-landing .meaning-text { font-size: 1rem; color: var(--text-secondary); line-height: 1.8; max-width: 480px; margin: 0 auto 2.5rem; text-wrap: pretty; }
         .kora-landing .cycle-arc { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
         .kora-landing .cycle-word { font-family: var(--serif); font-size: 0.85rem; color: var(--text-muted); letter-spacing: 0.02em; transition: color 0.4s ease; }
         .kora-landing .cycle-word.active { color: var(--olive); }
@@ -211,7 +212,7 @@ const Landing = () => {
           content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; height: 350px;
           background: radial-gradient(circle, var(--olive-muted) 0%, transparent 70%); opacity: 0.4; border-radius: 50%; pointer-events: none;
         }
-        .kora-landing .how-it-works { background: var(--white); max-width: 100%; padding-bottom: 6rem; }
+        .kora-landing .how-it-works { background: var(--cream); max-width: 100%; padding-bottom: 6rem; }
         .kora-landing .how-it-works > * { max-width: 720px; margin-left: auto; margin-right: auto; }
         .kora-landing .steps { margin-top: 3rem; display: flex; flex-direction: column; gap: 2.75rem; max-width: 720px; margin-left: auto; margin-right: auto; }
         .kora-landing .step { display: flex; gap: 1.75rem; align-items: flex-start; opacity: 0; transform: translateY(24px); transition: all 0.65s ease; }
@@ -219,20 +220,20 @@ const Landing = () => {
         .kora-landing .step-indicator { flex-shrink: 0; width: 44px; height: 44px; background: var(--olive-muted); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .kora-landing .step-indicator span { font-family: var(--serif); font-size: 1.05rem; color: var(--olive); }
         .kora-landing .step-content h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; color: var(--text-primary); margin-bottom: 0.4rem; letter-spacing: -0.01em; }
-        .kora-landing .step-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; }
+        .kora-landing .step-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; text-wrap: pretty; }
         .kora-landing .step-content em { color: var(--olive); font-style: italic; }
-        .kora-landing .preview { background: var(--cream); max-width: 100%; padding: 6rem 1.5rem; text-align: center; }
+        .kora-landing .preview { background: var(--white); max-width: 100%; padding: 6rem 1.5rem; text-align: center; }
         .kora-landing .preview-inner { max-width: 720px; margin: 0 auto; }
-        .kora-landing .preview-card { margin-top: 3rem; background: var(--white); border: 1px solid var(--card-border); border-radius: 4px; overflow: hidden; text-align: left; }
+        .kora-landing .preview-card { margin-top: 3rem; background: var(--cream); border: 1px solid var(--card-border); border-radius: 4px; overflow: hidden; text-align: left; }
         .kora-landing .preview-header { padding: 1.75rem 1.5rem 0; display: flex; justify-content: space-between; align-items: baseline; }
         .kora-landing .preview-phase { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; color: var(--text-primary); letter-spacing: 0.04em; text-transform: uppercase; }
         .kora-landing .preview-time { font-size: 0.75rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
         .kora-landing .preview-divider { height: 2px; background: var(--olive); margin: 1rem 1.5rem 0; opacity: 0.6; }
         .kora-landing .preview-subtitle { font-size: 0.95rem; color: var(--text-secondary); padding: 1.25rem 1.5rem 0; font-style: italic; }
         .kora-landing .pose-cards { padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
-        .kora-landing .pose-card { background: var(--cream); border: 1px solid var(--card-border); border-radius: 3px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start; transition: transform 0.25s ease; }
+        .kora-landing .pose-card { background: var(--white); border: 1px solid var(--card-border); border-radius: 3px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start; transition: transform 0.25s ease; }
         .kora-landing .pose-card:hover { transform: translateX(4px); }
-        .kora-landing .pose-icon { width: 56px; height: 56px; flex-shrink: 0; background: var(--white); border-radius: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .kora-landing .pose-icon { width: 56px; height: 56px; flex-shrink: 0; background: var(--cream); border-radius: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .kora-landing .pose-icon svg { width: 44px; height: 44px; color: var(--text-secondary); animation: breathe 4s ease-in-out infinite; }
         .kora-landing .pose-card:nth-child(2) .pose-icon svg { animation-delay: -1.3s; }
         .kora-landing .pose-card:nth-child(3) .pose-icon svg { animation-delay: -2.6s; }
@@ -379,7 +380,7 @@ const Landing = () => {
           <h2 className={`section-heading reveal reveal-delay-1 ${isRevealed("preview-h") ? "visible" : ""}`} data-reveal-id="preview-h">
             Every pose. Every cue.<br />Ready to teach.
           </h2>
-          <p className={`section-body reveal reveal-delay-2 ${isRevealed("preview-p") ? "visible" : ""}`} data-reveal-id="preview-p" style={{ margin: "0 auto" }}>
+          <p className={`section-body reveal reveal-delay-2 ${isRevealed("preview-p") ? "visible" : ""}`} data-reveal-id="preview-p" style={{ margin: "0 auto", maxWidth: "620px" }}>
             Breath cues, teaching cues, and modifications — structured in the arc your class deserves.
           </p>
 
