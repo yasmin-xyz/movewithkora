@@ -2,6 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CYCLE_WORDS = ["Arrival", "Build", "Peak", "Return", "Completion"];
+const CYCLE_NODES = [
+  { x: 50, y: 180 },
+  { x: 175, y: 120 },
+  { x: 300, y: 100 },
+  { x: 425, y: 120 },
+  { x: 550, y: 180 },
+];
+const ARC_PATH = "M50,180 Q300,20 550,180";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -11,6 +19,14 @@ const Landing = () => {
   const [cycleIndex, setCycleIndex] = useState(0);
   const [revealedEls, setRevealedEls] = useState<Set<string>>(new Set());
   const [navScrolled, setNavScrolled] = useState(false);
+  const arcFillRef = useRef<SVGPathElement>(null);
+  const [arcLength, setArcLength] = useState(900);
+
+  useEffect(() => {
+    if (arcFillRef.current) {
+      setArcLength(arcFillRef.current.getTotalLength());
+    }
+  }, []);
 
   // Nav becomes opaque once the user scrolls past the hero
   useEffect(() => {
@@ -216,12 +232,20 @@ const Landing = () => {
         .kora-landing .problem { background: var(--cream); max-width: 100%; padding: 5rem 1.5rem; }
         .kora-landing .problem-inner { max-width: 720px; margin: 0 auto; text-align: center; }
         .kora-landing .problem .section-heading, .kora-landing .problem .section-body { max-width: 600px; margin-left: auto; margin-right: auto; }
-        .kora-landing .meaning { background: var(--white); max-width: 100%; padding: 5rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
-        .kora-landing .meaning-inner { max-width: 560px; margin: 0 auto; position: relative; z-index: 1; will-change: transform; }
+        .kora-landing .meaning { background: var(--white); max-width: 100%; padding: 6rem 1.5rem 7rem; text-align: center; position: relative; overflow: hidden; }
+        .kora-landing .meaning-inner { max-width: 600px; margin: 0 auto; position: relative; z-index: 1; will-change: transform; }
         .kora-landing .meaning-name { font-family: var(--serif); font-size: clamp(2.5rem, 7vw, 3.5rem); font-style: italic; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 1.25rem; }
         .kora-landing .meaning-origin { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--olive); margin-bottom: 1.75rem; }
         .kora-landing .meaning-text { font-size: 1rem; color: var(--text-secondary); line-height: 1.8; max-width: 480px; margin: 0 auto 2.5rem; text-wrap: pretty; }
         .kora-landing .cycle-arc { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+        .kora-landing .cycle-diagram { margin-top: 1rem; }
+        .kora-landing .cycle-arc-svg { width: 100%; max-width: 560px; height: auto; overflow: visible; }
+        .kora-landing .cycle-arc-bg { fill: none; stroke: var(--card-border); stroke-width: 2; }
+        .kora-landing .cycle-arc-fill { fill: none; stroke: var(--olive); stroke-width: 2; transition: stroke-dashoffset 1s ease; }
+        .kora-landing .cycle-node { fill: var(--white); stroke: var(--text-muted); stroke-width: 2; transition: r 0.4s ease, fill 0.4s ease, stroke 0.4s ease; }
+        .kora-landing .cycle-node.active { fill: var(--olive); stroke: var(--olive); }
+        .kora-landing .cycle-node-label { font-family: var(--serif); font-size: 13px; fill: var(--text-muted); transition: fill 0.4s ease, font-style 0.4s ease; }
+        .kora-landing .cycle-node-label.active { fill: var(--olive); font-style: italic; }
         .kora-landing .cycle-word { font-family: var(--serif); font-size: 0.85rem; color: var(--text-muted); letter-spacing: 0.02em; transition: color 0.4s ease; }
         .kora-landing .cycle-word.active { color: var(--olive); }
         .kora-landing .cycle-arrow { font-size: 0.65rem; color: var(--text-muted); opacity: 0.4; }
@@ -347,13 +371,32 @@ const Landing = () => {
           <p className={`meaning-text reveal reveal-delay-2 ${isRevealed("meaning-text") ? "visible" : ""}`} data-reveal-id="meaning-text">
             In Tibetan tradition, a kora is a circular pilgrimage — an intentional journey around a sacred site. The word means to move in a complete arc. Every great class follows its own cycle. Kora is the intelligent structure behind that flow.
           </p>
-          <div className={`cycle-arc reveal reveal-delay-3 ${isRevealed("cycle-arc") ? "visible" : ""}`} data-reveal-id="cycle-arc">
-            {CYCLE_WORDS.map((word, i) => (
-              <span key={word}>
-                <span className={`cycle-word ${i === cycleIndex ? "active" : ""}`}>{word}</span>
-                {i < CYCLE_WORDS.length - 1 && <span className="cycle-arrow"> → </span>}
-              </span>
-            ))}
+          <div className={`cycle-diagram reveal reveal-delay-3 ${isRevealed("cycle-arc") ? "visible" : ""}`} data-reveal-id="cycle-arc">
+            <svg viewBox="0 0 600 210" className="cycle-arc-svg">
+              <path className="cycle-arc-bg" d={ARC_PATH} />
+              <path
+                ref={arcFillRef}
+                className="cycle-arc-fill"
+                d={ARC_PATH}
+                style={{
+                  strokeDasharray: arcLength,
+                  strokeDashoffset: arcLength - (arcLength * cycleIndex) / (CYCLE_WORDS.length - 1),
+                }}
+              />
+              {CYCLE_NODES.map((node, i) => (
+                <g key={CYCLE_WORDS[i]}>
+                  <circle
+                    cx={node.x}
+                    cy={node.y}
+                    r={i === cycleIndex ? 7 : 4.5}
+                    className={`cycle-node ${i === cycleIndex ? "active" : ""}`}
+                  />
+                  <text x={node.x} y={node.y + 30} textAnchor="middle" className={`cycle-node-label ${i === cycleIndex ? "active" : ""}`}>
+                    {CYCLE_WORDS[i]}
+                  </text>
+                </g>
+              ))}
+            </svg>
           </div>
         </div>
       </section>
