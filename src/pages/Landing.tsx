@@ -19,14 +19,6 @@ const Landing = () => {
   const [cycleIndex, setCycleIndex] = useState(0);
   const [revealedEls, setRevealedEls] = useState<Set<string>>(new Set());
   const [navScrolled, setNavScrolled] = useState(false);
-  const arcFillRef = useRef<SVGPathElement>(null);
-  const [arcLength, setArcLength] = useState(900);
-
-  useEffect(() => {
-    if (arcFillRef.current) {
-      setArcLength(arcFillRef.current.getTotalLength());
-    }
-  }, []);
 
   // Nav becomes opaque once the user scrolls past the hero
   useEffect(() => {
@@ -236,16 +228,15 @@ const Landing = () => {
         .kora-landing .meaning-inner { max-width: 600px; margin: 0 auto; position: relative; z-index: 1; will-change: transform; }
         .kora-landing .meaning-name { font-family: var(--serif); font-size: clamp(2.5rem, 7vw, 3.5rem); font-style: italic; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 1.25rem; }
         .kora-landing .meaning-origin { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--olive); margin-bottom: 1.75rem; }
-        .kora-landing .meaning-text { font-size: 1rem; color: var(--text-secondary); line-height: 1.8; max-width: 480px; margin: 0 auto 2.5rem; text-wrap: pretty; }
+        .kora-landing .meaning-text { font-size: 1rem; color: var(--text-secondary); line-height: 1.8; max-width: 480px; margin: 0 auto 0.5rem; text-wrap: pretty; }
         .kora-landing .cycle-arc { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
-        .kora-landing .cycle-diagram { margin-top: 1rem; }
-        .kora-landing .cycle-arc-svg { width: 100%; max-width: 560px; height: auto; overflow: visible; }
-        .kora-landing .cycle-arc-bg { fill: none; stroke: var(--card-border); stroke-width: 2; }
-        .kora-landing .cycle-arc-fill { fill: none; stroke: var(--olive); stroke-width: 2; transition: stroke-dashoffset 1s ease; }
-        .kora-landing .cycle-node { fill: var(--white); stroke: var(--text-muted); stroke-width: 2; transition: r 0.4s ease, fill 0.4s ease, stroke 0.4s ease; }
-        .kora-landing .cycle-node.active { fill: var(--olive); stroke: var(--olive); }
-        .kora-landing .cycle-node-label { font-family: var(--serif); font-size: 13px; fill: var(--text-muted); transition: fill 0.4s ease, font-style 0.4s ease; }
-        .kora-landing .cycle-node-label.active { fill: var(--olive); font-style: italic; }
+        .kora-landing .cycle-diagram { margin-top: 0.25rem; }
+        .kora-landing .cycle-arc-svg { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; overflow: visible; }
+        .kora-landing .cycle-arc-bg { fill: none; stroke: var(--olive); stroke-width: 2; opacity: 0.35; }
+        .kora-landing .cycle-node { fill: var(--white); stroke: var(--text-muted); stroke-width: 2; transition: fill 0.5s ease, stroke 0.5s ease, filter 0.5s ease; }
+        .kora-landing .cycle-node.active { fill: var(--olive); stroke: var(--olive); filter: drop-shadow(0 0 5px rgba(92, 107, 85, 0.65)); }
+        .kora-landing .cycle-node-label { font-family: var(--serif); font-size: 13px; fill: var(--text-muted); transition: fill 0.5s ease, filter 0.5s ease; }
+        .kora-landing .cycle-node-label.active { fill: var(--olive); filter: drop-shadow(0 0 4px rgba(92, 107, 85, 0.45)); }
         .kora-landing .cycle-word { font-family: var(--serif); font-size: 0.85rem; color: var(--text-muted); letter-spacing: 0.02em; transition: color 0.4s ease; }
         .kora-landing .cycle-word.active { color: var(--olive); }
         .kora-landing .cycle-arrow { font-size: 0.65rem; color: var(--text-muted); opacity: 0.4; }
@@ -374,21 +365,12 @@ const Landing = () => {
           <div className={`cycle-diagram reveal reveal-delay-3 ${isRevealed("cycle-arc") ? "visible" : ""}`} data-reveal-id="cycle-arc">
             <svg viewBox="0 0 600 210" className="cycle-arc-svg">
               <path className="cycle-arc-bg" d={ARC_PATH} />
-              <path
-                ref={arcFillRef}
-                className="cycle-arc-fill"
-                d={ARC_PATH}
-                style={{
-                  strokeDasharray: arcLength,
-                  strokeDashoffset: arcLength - (arcLength * cycleIndex) / (CYCLE_WORDS.length - 1),
-                }}
-              />
               {CYCLE_NODES.map((node, i) => (
                 <g key={CYCLE_WORDS[i]}>
                   <circle
                     cx={node.x}
                     cy={node.y}
-                    r={i === cycleIndex ? 7 : 4.5}
+                    r={5}
                     className={`cycle-node ${i === cycleIndex ? "active" : ""}`}
                   />
                   <text x={node.x} y={node.y + 30} textAnchor="middle" className={`cycle-node-label ${i === cycleIndex ? "active" : ""}`}>
