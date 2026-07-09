@@ -156,9 +156,10 @@ const Index = () => {
           --olive-light: #6B7D63;
           --text-primary: #2A2A28;
           --text-secondary: #8A857E;
+          --white: #FDFCFA;
           --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
           --sans: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
-          background: var(--cream);
+          background: var(--white);
           font-family: var(--sans);
         }
         .kora-planner .planner-content {
