@@ -194,7 +194,7 @@ const Landing = () => {
         .kora-landing .lotus-wrap.blooming svg { animation: lotusBreathe 5s ease-in-out 2s infinite; }
         @keyframes lotusBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
         .kora-landing .hero-badge {
-          font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--olive);
+          font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #46523F;
           background: var(--olive-muted); padding: 0.5rem 1.2rem; border-radius: 2px; margin-bottom: 2rem;
           opacity: 0; animation: fadeUp 0.8s ease 1.1s forwards;
         }
@@ -207,13 +207,13 @@ const Landing = () => {
           letter-spacing: 0.02em; opacity: 0; animation: fadeUp 0.8s ease 1.4s forwards;
         }
         .kora-landing .hero-description {
-          font-size: 1rem; color: var(--text-secondary); max-width: 460px; margin-top: 2rem; line-height: 1.7;
+          font-size: 1rem; color: var(--text-secondary); max-width: 460px; margin-top: 2.75rem; line-height: 1.7;
           opacity: 0; animation: fadeUp 0.8s ease 1.55s forwards; text-wrap: pretty;
         }
         .kora-landing .hero-cta { margin-top: 3rem; opacity: 0; animation: fadeUp 0.8s ease 1.7s forwards; }
         .kora-landing .hero-cta button {
           font-family: var(--sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
-          color: var(--white); background: var(--olive); border: none; padding: 1rem 2.5rem; border-radius: 2px;
+          color: var(--white); background: var(--olive); border: none; padding: 1.3rem 2.5rem; border-radius: 2px;
           cursor: pointer; transition: all 0.3s ease;
         }
         .kora-landing .hero-cta button:hover { background: var(--olive-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(92, 107, 85, 0.2); }
@@ -317,7 +317,7 @@ const Landing = () => {
           </svg>
           <span>Kora</span>
         </div>
-        <button className="nav-cta" onClick={goToPlanner}>Generate a Class</button>
+        <button className="nav-cta" onClick={goToPlanner}>Plan a Class</button>
       </nav>
 
       <section className="hero">
@@ -333,24 +333,24 @@ const Landing = () => {
           </svg>
         </div>
 
-        <div className="hero-badge">Built for Fitness Instructors</div>
+        <div className="hero-badge">Built for Yoga Instructors</div>
         <h1>Kora</h1>
         <p className="hero-tagline">Plan less. Teach better.</p>
         <p className="hero-description">
-          The AI-powered class planning assistant that generates intelligent, structured flows in minutes — not a workout app for consumers, a teaching tool for you.
+          Create thoughtful yoga sequences in minutes. Whether you're planning a Vinyasa flow, restorative session, or themed practice, Kora helps you turn your ideas into balanced class plans that still feel like your own.
         </p>
         <div className="hero-cta">
-          <button onClick={goToPlanner}>Generate a Class</button>
+          <button onClick={goToPlanner}>Plan a Class</button>
         </div>
       </section>
 
       <section className="problem">
         <div className="problem-inner">
           <h2 className={`section-heading reveal ${isRevealed("problem-h") ? "visible" : ""}`} data-reveal-id="problem-h">
-            You spend hours planning classes each week.<br />Kora does it in under a minute.
+            Planning your next class shouldn't feel overwhelming.
           </h2>
           <p className={`section-body reveal reveal-delay-1 ${isRevealed("problem-p") ? "visible" : ""}`} data-reveal-id="problem-p">
-            Repeating the same sequences, scrambling for modifications, improvising without a plan — the tools that exist were built for clients. Kora is built for the person leading the class.
+            Whether you're teaching every day or a few times a week, creating fresh classes takes time and creative energy. Kora provides a structured starting point that you can adapt to your students, teaching style, and class goals.
           </p>
         </div>
       </section>
@@ -496,7 +496,7 @@ const Landing = () => {
             Starting with Vinyasa yoga. Expanding to every format you teach. No sign-up required — just generate.
           </p>
           <div className={`cta-section-button reveal reveal-delay-3 ${isRevealed("cta-btn") ? "visible" : ""}`} data-reveal-id="cta-btn">
-            <button onClick={goToPlanner}>Generate a Class</button>
+            <button onClick={goToPlanner}>Plan a Class</button>
           </div>
         </div>
       </section>
