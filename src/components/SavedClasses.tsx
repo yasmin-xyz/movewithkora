@@ -12,10 +12,19 @@ interface SavedClass {
   class_content: string | null;
   created_at: string | null;
   archived: boolean | null;
+  yoga_style: string | null;
+  inspiration: string | null;
 }
 
 interface SavedClassesProps {
-  onLoadClass?: (peakPose: string, length: number, content: string, date: string | null) => void;
+  onLoadClass?: (
+    peakPose: string,
+    length: number,
+    content: string,
+    date: string | null,
+    yogaStyle?: string | null,
+    inspiration?: string | null
+  ) => void;
 }
 
 const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
@@ -93,8 +102,16 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                   {cls.peak_pose || "Untitled"}
                 </p>
                 <p className="font-body text-xs text-muted-foreground">
-                  {cls.class_length} min · {formatDate(cls.created_at)}
+                  {cls.class_length} min
+                  {cls.yoga_style ? ` · ${cls.yoga_style}` : ""}
+                  {" · "}
+                  {formatDate(cls.created_at)}
                 </p>
+                {cls.inspiration && (
+                  <p className="font-body text-xs text-muted-foreground/80 italic truncate">
+                    "{cls.inspiration}"
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <Button
@@ -115,7 +132,9 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                         cls.peak_pose || "",
                         cls.class_length || 60,
                         cls.class_content || "",
-                        cls.created_at
+                        cls.created_at,
+                        cls.yoga_style,
+                        cls.inspiration
                       )
                     }
                   >
@@ -145,7 +164,13 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                   </h3>
                   <p className="font-body text-sm text-foreground/80">
                     {viewedClass.class_length} minutes
+                    {viewedClass.yoga_style ? ` · ${viewedClass.yoga_style}` : ""}
                   </p>
+                  {viewedClass.inspiration && (
+                    <p className="font-body text-xs text-muted-foreground italic">
+                      "{viewedClass.inspiration}"
+                    </p>
+                  )}
                   <p className="font-body text-[11px] font-light text-muted-foreground/70">
                     Saved {formatDate(viewedClass.created_at)}
                   </p>
