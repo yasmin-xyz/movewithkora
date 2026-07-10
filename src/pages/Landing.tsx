@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Switch } from "@/components/ui/switch";
 import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
 
 const CYCLE_WORDS = ["Arrival", "Build", "Peak", "Return", "Completion"];
@@ -289,10 +290,9 @@ const Landing = () => {
           color: var(--olive); background: var(--olive-muted); padding: 0.4rem 0.9rem; border-radius: 2px;
         }
         .kora-landing .sanskrit-toggle {
-          display: flex; align-items: center; gap: 0.5rem; cursor: pointer;
-          font-size: 0.7rem; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.02em;
+          display: flex; align-items: center; gap: 0.6rem; cursor: pointer;
+          font-size: 0.7rem; font-weight: 600; color: #5C6B55; letter-spacing: 0.02em;
         }
-        .kora-landing .sanskrit-toggle input { accent-color: var(--olive); width: 14px; height: 14px; cursor: pointer; }
         .kora-landing .pose-icon { width: 56px; height: 56px; flex-shrink: 0; background: var(--cream); border-radius: 3px; overflow: hidden; }
         .kora-landing .pose-icon img { width: 100%; height: 100%; object-fit: contain; }
         @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.06); opacity: 1; } }
@@ -469,12 +469,8 @@ const Landing = () => {
             <div className="preview-example-badge-row">
               <div className="preview-example-badge">Example — Warm-Up Flow</div>
               <label className="sanskrit-toggle">
-                <span>Sanskrit Names</span>
-                <input
-                  type="checkbox"
-                  checked={showSanskrit}
-                  onChange={(e) => setShowSanskrit(e.target.checked)}
-                />
+                <span>Show Sanskrit Names</span>
+                <Switch checked={showSanskrit} onCheckedChange={setShowSanskrit} />
               </label>
             </div>
             <div className="preview-header">
