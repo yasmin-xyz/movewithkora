@@ -2,7 +2,9 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { ChevronDown } from "lucide-react";
+import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
 
 
 interface ClassPlanProps {
@@ -311,6 +313,19 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
   const [media, setMedia] = useState<PoseMedia[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const [openKeys, setOpenKeys] = useState<Set<string>>(new Set());
+  const [showSanskrit, setShowSanskrit] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(SANSKRIT_STORAGE_KEY) === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem(SANSKRIT_STORAGE_KEY, String(showSanskrit));
+  }, [showSanskrit]);
+
+  const displayName = (name: string) => {
+    if (!showSanskrit) return name;
+    return getSanskritName(name) || name;
+  };
 
   useEffect(() => {
     supabase
@@ -444,6 +459,12 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
 
   return (
     <div className="mt-12 border-t border-border pt-10 space-y-12">
+      {sections.length > 0 && (
+        <div className="flex items-center justify-end gap-2 -mt-4">
+          <span className="font-body text-xs text-muted-foreground">Show Sanskrit Names</span>
+          <Switch checked={showSanskrit} onCheckedChange={setShowSanskrit} />
+        </div>
+      )}
       {sections.map((section, si) => {
         const sectionMinutes = section.blocks.reduce((sum, b) => {
           const m = b.duration.match(/(\d+)/);
@@ -510,7 +531,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                                 <div key={key} className="py-1.5 px-3">
                                   <div className="border-t border-border/40 mb-1.5" />
                                   <p className="font-body text-[12px] font-medium text-muted-foreground/70">
-                                    Vinyasa: {pose.sideFlowVinyasaLabel || pose.name}
+                                    Vinyasa: {displayName(pose.sideFlowVinyasaLabel || pose.name)}
                                   </p>
                                   {pose.cue && (
                                     <p className="font-body text-[11px] text-muted-foreground/60 mt-0.5">
@@ -528,7 +549,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                                 <div key={key} className="py-1.5 px-3">
                                   <div className="border-t border-border/40 mb-1.5" />
                                   <p className="font-body text-[12px] font-medium text-muted-foreground/70">
-                                    Transition: {pose.name}
+                                    Transition: {displayName(pose.name)}
                                   </p>
                                   {pose.breath && (
                                     <p className="font-body text-[11px] text-muted-foreground/60 mt-0.5">
@@ -557,7 +578,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                                       {pose.imageUrl && (
                                         <img
                                           src={pose.imageUrl}
-                                          alt={pose.name}
+                                          alt={displayName(pose.name)}
                                           className="w-[72px] h-[72px] rounded-md object-contain bg-muted/20 flex-shrink-0"
                                         />
                                       )}
@@ -565,7 +586,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                                         <div className="flex items-baseline justify-between gap-2">
                                           <div className="flex items-center gap-2 min-w-0">
                                             <p className="font-body text-base font-medium text-foreground truncate">
-                                              {pose.name}
+                                              {displayName(pose.name)}
                                             </p>
                                             {pose.isSelected && (
                                               <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
@@ -615,19 +636,25 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                                       <div className="border-t border-border px-4 py-2 bg-muted/30 space-y-0.5">
                                         {pose.modifications.length > 0 ? (
                                           <>
-                                            {pose.modifications.map((mod, mi) => (
-                                              <button
-                                                key={mi}
-                                                onClick={() => handleModClick(si, bi, pi, mod)}
-                                                aria-label={`Swap with ${parseModification(mod).name}`}
-                                                className="group w-full rounded-md px-2.5 py-1.5 font-body text-sm text-muted-foreground hover:bg-secondary/60 transition-all duration-150 cursor-pointer flex items-center justify-between"
-                                              >
-                                                <span className="text-left">• {mod}</span>
-                                                <span className="font-body text-[11px] font-medium text-muted-foreground/70 group-hover:text-muted-foreground transition-opacity duration-150 shrink-0 ml-3">
-                                                  Swap
-                                                </span>
-                                              </button>
-                                            ))}
+                                            {pose.modifications.map((mod, mi) => {
+                                              const { name, description } = parseModification(mod);
+                                              const modLabel = description
+                                                ? `${displayName(name)} – ${description}`
+                                                : displayName(name);
+                                              return (
+                                                <button
+                                                  key={mi}
+                                                  onClick={() => handleModClick(si, bi, pi, mod)}
+                                                  aria-label={`Swap with ${name}`}
+                                                  className="group w-full rounded-md px-2.5 py-1.5 font-body text-sm text-muted-foreground hover:bg-secondary/60 transition-all duration-150 cursor-pointer flex items-center justify-between"
+                                                >
+                                                  <span className="text-left">• {modLabel}</span>
+                                                  <span className="font-body text-[11px] font-medium text-muted-foreground/70 group-hover:text-muted-foreground transition-opacity duration-150 shrink-0 ml-3">
+                                                    Swap
+                                                  </span>
+                                                </button>
+                                              );
+                                            })}
                                           </>
                                         ) : (
                                           <p className="font-body text-xs text-muted-foreground">
