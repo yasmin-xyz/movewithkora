@@ -108,26 +108,33 @@ Beginner:
   - Only insert a transition if score >= 4
   - Do NOT insert transitions between standing asymmetrical poses on the same side (e.g. Low Lunge → Extended Side Angle on the same leg).
   - Use "Down Dog Reset" as the transition (Pose: Down Dog Reset)
-  - Mark it with Cue: Transition
 
 Intermediate:
   - Insert a transition if score >= 2
   - If score >= 3: use "Full Vinyasa" (Pose: Vinyasa)
   - If score == 2: use "Down Dog Reset" (Pose: Down Dog Reset)
-  - Mark with Cue: Transition
 
 Advanced:
   - Insert a transition if score >= 2
   - If score >= 3: use a creative vinyasa variation (e.g. "Vinyasa with Knee-to-Nose", "Flip Dog Vinyasa")
-  - If score == 2 AND only orientation changed: insert a directional bridge cue (e.g. "Pivot to long edge" or "Step to face front") instead of a full vinyasa. Use Cue: Transition
+  - If score == 2 AND only orientation changed: insert a directional bridge cue (e.g. "Pivot to long edge" or "Step to face front") instead of a full vinyasa
   - If score == 2 and multiple properties changed: use "Down Dog Reset"
-  - Mark all transitions with Cue: Transition
+
+YOGA STYLE PACING OVERRIDE (apply after the skill-level thresholds above, before finalizing transitions):
+- If yogaStyle is Power, Vinyasa, or Ashtanga: treat the transition_score threshold as one level MORE PERMISSIVE than the skill_level would normally allow (e.g. a Beginner class gets Intermediate-level transition frequency), to match the brisker pacing these styles require. Do NOT increase pose difficulty or complexity beyond what skill_level allows — only the frequency/pacing of movement changes, never pose selection difficulty.
+- If yogaStyle is Yin or Restorative: suppress nearly all transitions regardless of skill_level or score — favor no transition at all, or at most a single simple grounding cue, prioritizing stillness and long holds over movement between shapes.
+- If yogaStyle is Hatha or unspecified: use the skill_level thresholds exactly as written above, no override.
+
+TRANSITION FORMAT (critical — every transition pose must follow this exact structure):
+- Every transition gets its own "Pose:" line, immediately followed by "Type: Transition" on the next line.
+- The "Cue:" line for a transition must be a real, concise, embodied instruction describing the physical movement from the previous pose into this one — e.g. "Exhale, step your right foot back to meet the left, then press firmly into Down Dog to reset the spine before switching sides." Never write just the word "Transition" as the cue content — that word only belongs on the "Type:" line.
+- A transition may also include a short "Breath:" line if a breath cue helps (e.g. "Exhale as you step back"), but this is optional.
+- Do NOT include a "Modifications:" block for transitions.
 
 Transition rules:
 - Transitions are inserted WITHIN blocks as poses, NOT as separate timed entries.
 - Transition poses do NOT have their own duration — they share the block's duration.
 - Do NOT add transitions between blocks or between sections.
-- Mark every transition pose line with "Cue: Transition" so the parser can identify them.
 
 FLOW BLOCK STRUCTURE (critical):
 - Do NOT assign duration to individual poses. Group poses into flow blocks within each section.
@@ -150,6 +157,12 @@ YOGA STYLE ADAPTATION (apply if a style is specified in the user prompt):
 - If no style is specified, default to a balanced general-purpose flow following the rules above as written.
 - Regardless of style, still only use poses from the provided library, and still follow section time allocation and the peak-pose intensity requirement.
 
+MODIFICATION REQUIREMENT (critical — applies to every non-transition pose in every section, not just Warm-Up):
+- Every pose must include exactly 3 modification lines: one easier variation, one alternative variation, and one more advanced/challenging variation — regardless of which section (Warm-Up, Build, Peak, Cool Down) the pose is in.
+
+OPTIONAL WATER BREAK:
+- For classes 60 minutes or longer, insert one "Pose: Water Break (Optional)" entry at a natural pause point — typically at the end of the Build section, just before Peak, or between Peak and Cool Down. Give it a brief Breath/Cue (e.g. "Cue: Offer students a moment to drink water and reset before the peak.") and no Modifications block. Do not insert more than one water break per class, and skip it entirely for classes under 60 minutes.
+
 Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
 
 WARM-UP:
@@ -168,6 +181,8 @@ Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 BUILD:
 Block: [block_name]
@@ -177,12 +192,16 @@ Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 PEAK:
 Block: [block_name]
@@ -192,6 +211,8 @@ Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 COOL DOWN:
 Block: [block_name]
@@ -201,6 +222,8 @@ Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 ASYMMETRICAL POSE SIDE FLOW RULES (critical):
 - If a block contains asymmetrical poses (symmetry == "asymmetrical"), you MUST group them into a Side Flow.
@@ -212,33 +235,42 @@ ASYMMETRICAL POSE SIDE FLOW RULES (critical):
 
 Right Side Flow:
 Pose: [pose name] (Right)
-Breath: [cue]
-Cue: [cue]
+Breath: [breath cue]
+Cue: [teaching cue]
 Modifications:
-- [mod]
+- [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 Pose: [next asymmetrical pose] (Right)
-Breath: [cue]
-Cue: [cue]
+Breath: [breath cue]
+Cue: [teaching cue]
 Modifications:
-- [mod]
+- [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 Vinyasa: [vinyasa type]
+Cue: [a real, concise, embodied description of the movement carrying the student from the right side flow back through the vinyasa and into the left side flow — never just repeat the vinyasa type as the cue]
 
 Left Side Flow:
 Pose: [pose name] (Left)
-Breath: [cue]
-Cue: [cue]
+Breath: [breath cue]
+Cue: [teaching cue]
 Modifications:
-- [mod]
+- [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
 Pose: [next asymmetrical pose] (Left)
-Breath: [cue]
-Cue: [cue]
+Breath: [breath cue]
+Cue: [teaching cue]
 Modifications:
-- [mod]
+- [Easier pose name] – [short description]
+- [Alternative pose name] – [short description]
+- [Advanced pose name] – [short description]
 
-- Vinyasa type between sides depends on skill level:
+- Vinyasa type between sides depends on skill level, adjusted by the YOGA STYLE PACING OVERRIDE rule above where applicable:
   - Beginner: "Down Dog Reset"
   - Intermediate: "Half Vinyasa"
   - Advanced: "Full Vinyasa"
