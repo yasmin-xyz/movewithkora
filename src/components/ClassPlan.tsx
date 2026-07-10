@@ -558,7 +558,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                                         <img
                                           src={pose.imageUrl}
                                           alt={pose.name}
-                                          className="w-[72px] h-[72px] rounded-md object-cover flex-shrink-0"
+                                          className="w-[72px] h-[72px] rounded-md object-contain bg-muted/20 flex-shrink-0"
                                         />
                                       )}
                                       <div className="space-y-1 min-w-0 flex-1">
