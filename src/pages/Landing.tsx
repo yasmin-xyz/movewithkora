@@ -176,7 +176,7 @@ const Landing = () => {
         .kora-landing .hero {
           background: var(--white);
           max-width: 100%;
-          min-height: 100vh; min-height: 100svh; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center;
+          min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center;
           align-items: center; text-align: center; padding: 6rem 1.5rem 4rem; position: relative;
         }
         .kora-landing .lotus-wrap { width: 180px; height: 95px; margin-bottom: 2rem; }
@@ -292,8 +292,8 @@ const Landing = () => {
         .kora-landing .cta-section-button button:hover { background: var(--white); transform: translateY(-1px); }
         .kora-landing footer { background: var(--text-primary); border-top: 1px solid rgba(255, 255, 255, 0.06); padding: 2.5rem 1.5rem; text-align: center; }
         .kora-landing footer .footer-logo { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .kora-landing footer .footer-logo svg { width: 16px; height: 16px; opacity: 0.4; }
-        .kora-landing footer .footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--cream); opacity: 0.4; }
+        .kora-landing footer .footer-logo svg { width: 20px; height: 20px; }
+        .kora-landing footer .footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--cream); opacity: 0.6; }
         .kora-landing footer p { font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); margin-top: 0.75rem; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @media (min-width: 640px) {
@@ -509,14 +509,17 @@ const Landing = () => {
 
       <footer>
         <div className="footer-logo">
-          <svg viewBox="0 0 200 105" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M100 78 C82 66, 32 52, 6 64 C4 72, 28 84, 60 86 C78 86, 94 82, 100 78Z" stroke="var(--cream)" strokeWidth="3" fill="none" opacity="0.25"/>
-            <path d="M100 78 C118 66, 168 52, 194 64 C196 72, 172 84, 140 86 C122 86, 106 82, 100 78Z" stroke="var(--cream)" strokeWidth="3" fill="none" opacity="0.25"/>
-            <path d="M100 76 C86 58, 50 24, 36 12 C30 16, 38 38, 56 56 C70 68, 88 76, 100 76Z" stroke="var(--cream)" strokeWidth="3" fill="none" opacity="0.25"/>
-            <path d="M100 76 C114 58, 150 24, 164 12 C170 16, 162 38, 144 56 C130 68, 112 76, 100 76Z" stroke="var(--cream)" strokeWidth="3" fill="none" opacity="0.25"/>
-            <path d="M100 74 C90 52, 74 18, 68 6 C64 10, 68 32, 78 50 C86 62, 96 72, 100 74Z" stroke="var(--cream)" strokeWidth="3" fill="none" opacity="0.25"/>
-            <path d="M100 74 C110 52, 126 18, 132 6 C136 10, 132 32, 122 50 C114 62, 104 72, 100 74Z" stroke="var(--cream)" strokeWidth="3" fill="none" opacity="0.25"/>
-            <path d="M100 72 C92 48, 86 16, 88 2 C92 -2, 97 10, 100 2 C103 10, 108 -2, 112 2 C114 16, 108 48, 100 72Z" stroke="var(--cream)" strokeWidth="3" fill="none" opacity="0.25"/>
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="100" fill="#5C6B55"/>
+            <g transform="translate(100,100) scale(0.95) translate(-100,-42)" fill="#FFFFFF" stroke="#5C6B55" strokeWidth="2" strokeLinejoin="round">
+              <path d="M100 78 C82 66, 32 52, 6 64 C4 72, 28 84, 60 86 C78 86, 94 82, 100 78Z"/>
+              <path d="M100 78 C118 66, 168 52, 194 64 C196 72, 172 84, 140 86 C122 86, 106 82, 100 78Z"/>
+              <path d="M100 76 C86 58, 50 24, 36 12 C30 16, 38 38, 56 56 C70 68, 88 76, 100 76Z"/>
+              <path d="M100 76 C114 58, 150 24, 164 12 C170 16, 162 38, 144 56 C130 68, 112 76, 100 76Z"/>
+              <path d="M100 74 C90 52, 74 18, 68 6 C64 10, 68 32, 78 50 C86 62, 96 72, 100 74Z"/>
+              <path d="M100 74 C110 52, 126 18, 132 6 C136 10, 132 32, 122 50 C114 62, 104 72, 100 74Z"/>
+              <path d="M100 72 C92 48, 86 16, 88 2 C92 -2, 97 10, 100 2 C103 10, 108 -2, 112 2 C114 16, 108 48, 100 72Z"/>
+            </g>
           </svg>
           <span>Kora</span>
         </div>
