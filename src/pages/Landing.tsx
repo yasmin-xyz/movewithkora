@@ -316,8 +316,9 @@ const Landing = () => {
           .kora-landing .hero {
             min-height: 900px;
             justify-content: flex-start;
-            padding: 5.5rem 1.5rem calc(2rem + env(safe-area-inset-bottom));
+            padding: 4rem 1.5rem calc(3rem + env(safe-area-inset-bottom));
           }
+          .kora-landing .hero h1 { font-size: clamp(4rem, 15vw, 8rem); }
           .kora-landing .lotus-wrap { width: 100px; height: 55px; margin-bottom: 1rem; }
           .kora-landing .hero-badge { margin-bottom: 1.25rem; }
           .kora-landing .hero-tagline { margin-top: 0.5rem; }
