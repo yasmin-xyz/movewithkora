@@ -203,11 +203,12 @@ const Landing = () => {
           line-height: 0.95; color: var(--text-primary); opacity: 0; animation: fadeUp 0.8s ease 1.25s forwards; margin: 0;
         }
         .kora-landing .hero-tagline {
-          font-size: clamp(1.05rem, 2.5vw, 1.25rem); font-weight: 300; color: var(--text-secondary); margin-top: 1.5rem;
-          letter-spacing: 0.02em; opacity: 0; animation: fadeUp 0.8s ease 1.4s forwards;
+          font-family: var(--serif); font-size: clamp(1.4rem, 4.5vw, 1.85rem); font-weight: 500; font-style: italic;
+          color: var(--olive); margin-top: 0.75rem; letter-spacing: -0.01em;
+          opacity: 0; animation: fadeUp 0.8s ease 1.4s forwards;
         }
         .kora-landing .hero-description {
-          font-size: 1rem; color: var(--text-secondary); max-width: 460px; margin-top: 2.75rem; line-height: 1.7;
+          font-size: 0.95rem; color: var(--text-secondary); max-width: 440px; margin-top: 1.75rem; line-height: 1.7;
           opacity: 0; animation: fadeUp 0.8s ease 1.55s forwards; text-wrap: pretty;
         }
         .kora-landing .hero-cta { margin-top: 3rem; opacity: 0; animation: fadeUp 0.8s ease 1.7s forwards; }
@@ -265,10 +266,13 @@ const Landing = () => {
         .kora-landing .pose-cards { padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
         .kora-landing .pose-card { background: var(--white); border: 1px solid var(--card-border); border-radius: 3px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start; transition: transform 0.25s ease; }
         .kora-landing .pose-card:hover { transform: translateX(4px); }
-        .kora-landing .pose-icon { width: 56px; height: 56px; flex-shrink: 0; background: var(--cream); border-radius: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .kora-landing .pose-icon svg { width: 44px; height: 44px; color: var(--text-secondary); animation: breathe 4s ease-in-out infinite; }
-        .kora-landing .pose-card:nth-child(2) .pose-icon svg { animation-delay: -1.3s; }
-        .kora-landing .pose-card:nth-child(3) .pose-icon svg { animation-delay: -2.6s; }
+        .kora-landing .preview-example-badge {
+          display: inline-block; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+          color: var(--olive); background: var(--olive-muted); padding: 0.4rem 0.9rem; border-radius: 2px;
+          margin: 1.75rem 1.5rem 0;
+        }
+        .kora-landing .pose-icon { width: 56px; height: 56px; flex-shrink: 0; background: var(--cream); border-radius: 3px; overflow: hidden; }
+        .kora-landing .pose-icon img { width: 100%; height: 100%; object-fit: contain; }
         @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.06); opacity: 1; } }
         .kora-landing .pose-info { flex: 1; min-width: 0; }
         .kora-landing .pose-info h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem; }
@@ -296,6 +300,13 @@ const Landing = () => {
           .kora-landing section { padding: 8rem 2rem; }
           .kora-landing .problem, .kora-landing .preview, .kora-landing .cta-section { padding: 8rem 2rem; }
           .kora-landing .meaning { padding: 6rem 2rem; }
+        }
+        @media (min-width: 1024px) {
+          .kora-landing .lotus-wrap { width: 230px; height: 121px; }
+          .kora-landing .hero h1 { font-size: clamp(3.5rem, 12vw, 9.5rem); }
+          .kora-landing .hero-tagline { font-size: clamp(1.4rem, 4.5vw, 2.1rem); }
+          .kora-landing .hero-description { max-width: 500px; font-size: 1.05rem; }
+          .kora-landing .hero-badge { font-size: 0.72rem; padding: 0.6rem 1.4rem; }
         }
         @media (max-width: 480px) {
           .kora-landing .lotus-wrap { width: 130px; height: 72px; }
@@ -431,6 +442,7 @@ const Landing = () => {
           </p>
 
           <div className={`preview-card reveal reveal-delay-3 ${isRevealed("preview-card") ? "visible" : ""}`} data-reveal-id="preview-card">
+            <div className="preview-example-badge">Example — Warm-Up Flow</div>
             <div className="preview-header">
               <span className="preview-phase">Warm-Up</span>
               <span className="preview-time">10 Min</span>
@@ -440,48 +452,36 @@ const Landing = () => {
             <div className="pose-cards">
               <div className="pose-card">
                 <div className="pose-icon">
-                  <svg viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 42c6-2 12-8 18-12s14-4 22 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <circle cx="18" cy="40" r="5" stroke="currentColor" strokeWidth="2"/>
-                    <path d="M38 30c-2 4-4 10-4 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
+                  <img src="https://xuxzhkcjdexcynvcpjka.supabase.co/storage/v1/object/public/poses//childs-pose.png" alt="Child's Pose" />
                 </div>
                 <div className="pose-info">
                   <h4>Child's Pose</h4>
                   <p className="pose-meta">Breath: Inhale into the back ribs</p>
-                  <p className="pose-cue">Sink hips to heels and reach fingertips forward to create length in the spine.</p>
+                  <p className="pose-cue">Sink hips to heels and reach fingertips forward to create length through the spine. Let the forehead rest heavy — this is a moment to arrive, not to work.</p>
                 </div>
                 <span className="modify-tag">Modify</span>
               </div>
 
               <div className="pose-card">
                 <div className="pose-icon">
-                  <svg viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15 35c8-10 18-14 25-10s15 4 25-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <circle cx="14" cy="34" r="4" stroke="currentColor" strokeWidth="2"/>
-                    <path d="M62 24c2 2 3 4 3 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
+                  <img src="https://xuxzhkcjdexcynvcpjka.supabase.co/storage/v1/object/public/poses//cat-cow.png" alt="Cat-Cow" />
                 </div>
                 <div className="pose-info">
                   <h4>Cat-Cow</h4>
                   <p className="pose-meta">Breath: Inhale to look up, exhale to round</p>
-                  <p className="pose-cue">Move segmentally through the vertebrae to hydrate the spine and engage the core.</p>
+                  <p className="pose-cue">Move segmentally through the vertebrae, one bone at a time, syncing each movement to a breath to hydrate the spine and wake up the core.</p>
                 </div>
                 <span className="modify-tag">Modify</span>
               </div>
 
               <div className="pose-card">
                 <div className="pose-icon">
-                  <svg viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18 50l14-30 30 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M62 20l4 30" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <circle cx="32" cy="17" r="4" stroke="currentColor" strokeWidth="2"/>
-                  </svg>
+                  <img src="https://xuxzhkcjdexcynvcpjka.supabase.co/storage/v1/object/public/poses//downward-facing-dog.png" alt="Downward Facing Dog" />
                 </div>
                 <div className="pose-info">
                   <h4>Downward Facing Dog</h4>
                   <p className="pose-meta">Breath: Exhale as you lift the hips</p>
-                  <p className="pose-cue">Press firmly through the index fingers to stabilise the shoulders for later weight-bearing.</p>
+                  <p className="pose-cue">Press firmly through the index knuckles to stabilize the shoulders, and pedal the feet to warm up the hamstrings ahead of standing work.</p>
                 </div>
                 <span className="modify-tag">Modify</span>
               </div>
