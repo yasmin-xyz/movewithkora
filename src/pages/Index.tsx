@@ -19,6 +19,7 @@ const Index = () => {
   const [classPlan, setClassPlan] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [justCompleted, setJustCompleted] = useState(false);
+  const [showResult, setShowResult] = useState(false);
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isViewingLoaded, setIsViewingLoaded] = useState(false);
@@ -94,6 +95,14 @@ const Index = () => {
     });
   };
 
+  const handleReveal = () => {
+    setShowResult(true);
+    setJustCompleted(false);
+    setTimeout(() => {
+      resultsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
+
   const handleGenerate = async () => {
     if (!peakMovement.trim()) {
       toast.error("Please enter a peak movement or focus");
@@ -102,6 +111,7 @@ const Index = () => {
 
     setIsLoading(true);
     setJustCompleted(false);
+    setShowResult(false);
     setClassPlan("");
     abortRef.current = new AbortController();
 
@@ -368,14 +378,14 @@ const Index = () => {
                 onGenerate={handleGenerate}
                 isLoading={isLoading}
                 justCompleted={justCompleted}
-                onScrollToResult={() => resultsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                onScrollToResult={handleReveal}
               />
 
               <div ref={resultsAnchorRef} />
 
-              {classPlan && <ClassPlan content={classPlan} isLoading={isLoading} onContentChange={setClassPlan} />}
+              {classPlan && showResult && <ClassPlan content={classPlan} isLoading={isLoading} onContentChange={setClassPlan} />}
 
-              {classPlan && !isLoading && (
+              {classPlan && showResult && !isLoading && (
                 <div className="mt-8">
                   <Button
                     variant="outline"
