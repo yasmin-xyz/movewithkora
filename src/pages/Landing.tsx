@@ -314,6 +314,10 @@ const Landing = () => {
           .kora-landing .cycle-word { font-size: 0.75rem; }
           .kora-landing .problem { padding-left: 1rem; padding-right: 1rem; }
           .kora-landing .problem .section-heading { text-wrap: pretty; max-width: 100%; }
+          .kora-landing .hero {
+            min-height: 92svh;
+            padding: 5.5rem 1.5rem calc(2.5rem + env(safe-area-inset-bottom));
+          }
         }
       `}</style>
 
