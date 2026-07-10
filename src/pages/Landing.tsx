@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Switch } from "@/components/ui/switch";
 import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
+import SiteNav from "@/components/SiteNav";
 
 const CYCLE_WORDS = ["Arrival", "Build", "Peak", "Return", "Completion"];
 const CYCLE_NODES = [
@@ -20,8 +21,6 @@ const Landing = () => {
   const meaningInnerRef = useRef<HTMLDivElement>(null);
   const [cycleIndex, setCycleIndex] = useState(0);
   const [revealedEls, setRevealedEls] = useState<Set<string>>(new Set());
-  const [navScrolled, setNavScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showSanskrit, setShowSanskrit] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem(SANSKRIT_STORAGE_KEY) === "true";
@@ -35,16 +34,6 @@ const Landing = () => {
     if (!showSanskrit) return name;
     return getSanskritName(name) || name;
   };
-
-  // Nav becomes opaque once the user scrolls past the hero
-  useEffect(() => {
-    const handleScroll = () => {
-      setNavScrolled(window.scrollY > 40);
-    };
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Scroll reveal observer for .reveal / .step elements
   useEffect(() => {
@@ -169,63 +158,6 @@ const Landing = () => {
         .kora-landing .reveal-delay-1 { transition-delay: 0.1s; }
         .kora-landing .reveal-delay-2 { transition-delay: 0.2s; }
         .kora-landing .reveal-delay-3 { transition-delay: 0.35s; }
-        .kora-landing nav {
-          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center;
-          background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none;
-          border-bottom: 1px solid transparent;
-          transition: background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease;
-        }
-        .kora-landing nav.scrolled {
-          background: rgba(245, 240, 235, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid var(--card-border);
-        }
-        .kora-landing .nav-logo { display: flex; align-items: center; gap: 0.6rem; }
-        .kora-landing .nav-logo svg { width: 22px; height: 22px; }
-        .kora-landing .nav-logo span { font-family: var(--serif); font-size: 1.5rem; color: var(--text-primary); letter-spacing: -0.02em; }
-        .kora-landing .nav-cta {
-          font-family: var(--sans); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
-          color: var(--white); background: var(--olive); border: none; padding: 0.6rem 1.4rem; border-radius: 2px;
-          cursor: pointer; transition: all 0.25s ease;
-        }
-        .kora-landing .nav-cta:hover { background: var(--olive-light); transform: translateY(-1px); }
-        .kora-landing .nav-right { display: flex; align-items: center; gap: 1.1rem; }
-        .kora-landing .nav-links-desktop { display: flex; align-items: center; gap: 0.6rem; }
-        .kora-landing .nav-link {
-          font-family: var(--sans); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-          color: var(--olive); background: var(--olive-muted); border: 1px solid transparent;
-          padding: 0.55rem 1.1rem; border-radius: 2px; cursor: pointer; transition: all 0.25s ease;
-        }
-        .kora-landing .nav-link:hover {
-          background: var(--white); border-color: var(--olive);
-          box-shadow: 0 0 0 3px rgba(92, 107, 85, 0.15), 0 4px 14px rgba(92, 107, 85, 0.18);
-          transform: translateY(-1px) scale(1.03);
-        }
-        .kora-landing .nav-hamburger {
-          display: none; background: none; border: none; font-size: 1.3rem; line-height: 1;
-          color: var(--text-primary); cursor: pointer; padding: 0.3rem;
-        }
-        .kora-landing .nav-mobile-panel {
-          position: absolute; top: 100%; right: 1.5rem; margin-top: 0.5rem;
-          background: var(--cream); border: 1px solid var(--card-border); border-radius: 4px;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden; z-index: 200;
-          min-width: 180px;
-        }
-        .kora-landing .nav-mobile-panel button {
-          font-family: var(--sans); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em;
-          color: var(--olive); background: none; border: none; padding: 0.9rem 1.75rem; text-align: left;
-          cursor: pointer; white-space: nowrap; transition: background 0.15s ease;
-        }
-        .kora-landing .nav-mobile-panel button:hover { background: var(--olive-muted); }
-        .kora-landing .nav-mobile-panel .nav-mobile-cta {
-          background: var(--olive); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.72rem;
-        }
-        .kora-landing .nav-mobile-panel .nav-mobile-cta:hover { background: var(--olive-light); }
-        @media (max-width: 767px) {
-          .kora-landing .nav-links-desktop { display: none; }
-          .kora-landing .nav-hamburger { display: block; }
-          .kora-landing .nav-cta-desktop { display: none; }
-        }
         .kora-landing .hero {
           background: var(--white);
           max-width: 100%;
@@ -377,48 +309,7 @@ const Landing = () => {
         }
       `}</style>
 
-      <nav className={navScrolled ? "scrolled" : ""}>
-        <div className="nav-logo">
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="100" cy="100" r="100" fill="#5C6B55"/>
-            <g transform="translate(100,100) scale(0.95) translate(-100,-42)" fill="#FFFFFF" stroke="#5C6B55" strokeWidth="2" strokeLinejoin="round">
-              <path d="M100 78 C82 66, 32 52, 6 64 C4 72, 28 84, 60 86 C78 86, 94 82, 100 78Z"/>
-              <path d="M100 78 C118 66, 168 52, 194 64 C196 72, 172 84, 140 86 C122 86, 106 82, 100 78Z"/>
-              <path d="M100 76 C86 58, 50 24, 36 12 C30 16, 38 38, 56 56 C70 68, 88 76, 100 76Z"/>
-              <path d="M100 76 C114 58, 150 24, 164 12 C170 16, 162 38, 144 56 C130 68, 112 76, 100 76Z"/>
-              <path d="M100 74 C90 52, 74 18, 68 6 C64 10, 68 32, 78 50 C86 62, 96 72, 100 74Z"/>
-              <path d="M100 74 C110 52, 126 18, 132 6 C136 10, 132 32, 122 50 C114 62, 104 72, 100 74Z"/>
-              <path d="M100 72 C92 48, 86 16, 88 2 C92 -2, 97 10, 100 2 C103 10, 108 -2, 112 2 C114 16, 108 48, 100 72Z"/>
-            </g>
-          </svg>
-          <span>Kora</span>
-        </div>
-
-        <div className="nav-right">
-          <div className="nav-links-desktop">
-            <button className="nav-link" onClick={() => navigate("/pose-library")}>Pose Library</button>
-            <button className="nav-link" onClick={() => navigate("/feedback")}>Feedback</button>
-          </div>
-          <button
-            className="nav-hamburger"
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileMenuOpen ? "✕" : "☰"}
-          </button>
-          <button className="nav-cta nav-cta-desktop" onClick={goToPlanner}>Plan a Class</button>
-        </div>
-
-        {mobileMenuOpen && (
-          <div className="nav-mobile-panel">
-            <button className="nav-mobile-cta" onClick={() => { setMobileMenuOpen(false); goToPlanner(); }}>Plan a Class</button>
-            <button onClick={() => { setMobileMenuOpen(false); navigate("/pose-library"); }}>Pose Library</button>
-            <button onClick={() => { setMobileMenuOpen(false); navigate("/feedback"); }}>Feedback</button>
-          </div>
-        )}
-      </nav>
-
-
+      <SiteNav />
 
       <section className="hero">
         <div className="lotus-wrap" id="lotus" ref={lotusRef}>
