@@ -197,6 +197,16 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
       continue;
     }
 
+    // Explicit type marker (used for transitions with real descriptive cues)
+    const typeMatch = trimmed.match(/^Type:\s*(.+)/i);
+    if (typeMatch && currentBlock) {
+      const last = currentBlock.poses[currentBlock.poses.length - 1];
+      if (last && /transition/i.test(typeMatch[1])) {
+        last.isTransition = true;
+      }
+      continue;
+    }
+
     // Side Flow markers
     const rightFlowMatch = trimmed.match(/^Right Side Flow:?$/i);
     if (rightFlowMatch) {
@@ -233,9 +243,10 @@ function parsePlan(raw: string, media: PoseMedia[]): Section[] {
     const cueMatch = trimmed.match(/^Cue:\s*(.+)/i);
     if (cueMatch) {
       last.cue = cueMatch[1].trim();
-      // Mark as transition if cue says "Transition"
+      // Backward-compat: still catch the old literal placeholder if it ever appears
       if (/^transition$/i.test(last.cue.trim())) {
         last.isTransition = true;
+        last.cue = ""; // don't display the bare word as a cue
       }
       continue;
     }
@@ -264,9 +275,11 @@ function serializeSections(sections: Section[]): string {
         lastSideFlow = pose.sideFlow;
         if (pose.isSideFlowVinyasa) {
           lines.push(`Vinyasa: ${pose.sideFlowVinyasaLabel || pose.name}`);
+          if (pose.cue) lines.push(`Cue: ${pose.cue}`);
           continue;
         }
         lines.push(`Pose: ${pose.name}`);
+        if (pose.isTransition) lines.push(`Type: Transition`);
         if (pose.breath) lines.push(`Breath: ${pose.breath}`);
         if (pose.cue) lines.push(`Cue: ${pose.cue}`);
         if (pose.modifications.length > 0) {
@@ -494,12 +507,17 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                             // Side flow vinyasa
                             if (pose.isSideFlowVinyasa) {
                               elements.push(
-                                <div key={key} className="py-1">
-                                  <div className="border-t border-border/40" />
-                                  <p className="font-body text-[11px] text-muted-foreground/50 py-1.5 px-3">
+                                <div key={key} className="py-1.5 px-3">
+                                  <div className="border-t border-border/40 mb-1.5" />
+                                  <p className="font-body text-[12px] font-medium text-muted-foreground/70">
                                     Vinyasa: {pose.sideFlowVinyasaLabel || pose.name}
                                   </p>
-                                  <div className="border-b border-border/40" />
+                                  {pose.cue && (
+                                    <p className="font-body text-[11px] text-muted-foreground/60 mt-0.5">
+                                      {pose.cue}
+                                    </p>
+                                  )}
+                                  <div className="border-b border-border/40 mt-1.5" />
                                 </div>
                               );
                               return;
@@ -507,12 +525,22 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
 
                             if (pose.isTransition) {
                               elements.push(
-                                <div key={key} className="py-1">
-                                  <div className="border-t border-border/40" />
-                                  <p className="font-body text-[11px] text-muted-foreground/50 py-1.5 px-3">
+                                <div key={key} className="py-1.5 px-3">
+                                  <div className="border-t border-border/40 mb-1.5" />
+                                  <p className="font-body text-[12px] font-medium text-muted-foreground/70">
                                     Transition: {pose.name}
                                   </p>
-                                  <div className="border-b border-border/40" />
+                                  {pose.breath && (
+                                    <p className="font-body text-[11px] text-muted-foreground/60 mt-0.5">
+                                      Breath: {pose.breath}
+                                    </p>
+                                  )}
+                                  {pose.cue && (
+                                    <p className="font-body text-[11px] text-muted-foreground/60 mt-0.5">
+                                      {pose.cue}
+                                    </p>
+                                  )}
+                                  <div className="border-b border-border/40 mt-1.5" />
                                 </div>
                               );
                               return;
