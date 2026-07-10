@@ -80,6 +80,7 @@ export type Database = {
           id: string
           peak_pose: string | null
           skill_level: string | null
+          user_id: string | null
         }
         Insert: {
           archived?: boolean | null
@@ -89,6 +90,7 @@ export type Database = {
           id?: string
           peak_pose?: string | null
           skill_level?: string | null
+          user_id?: string | null
         }
         Update: {
           archived?: boolean | null
@@ -98,6 +100,7 @@ export type Database = {
           id?: string
           peak_pose?: string | null
           skill_level?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

@@ -6,6 +6,8 @@ import ClassForm from "@/components/ClassForm";
 import ClassPlan from "@/components/ClassPlan";
 import SavedClasses from "@/components/SavedClasses";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { LoginDialog, MagicLinkForm } from "@/components/Auth";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -17,6 +19,8 @@ const Index = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isViewingLoaded, setIsViewingLoaded] = useState(false);
   const [loadedDate, setLoadedDate] = useState<string | null>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const { user } = useAuth();
   const abortRef = useRef<AbortController | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
@@ -132,11 +136,17 @@ const Index = () => {
   };
 
   const handleSave = async () => {
+    if (!user) {
+      setLoginOpen(true);
+      return;
+    }
+
     setIsSaving(true);
     const { error } = await supabase.from("saved_classes").insert({
       peak_pose: peakMovement.trim(),
       class_length: parseInt(classLength),
       class_content: classPlan,
+      user_id: user.id,
     });
     setIsSaving(false);
 
@@ -146,6 +156,12 @@ const Index = () => {
       toast.success("Class saved successfully.");
     }
   };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    handleBackToLibrary();
+  };
+
 
   return (
     <div className="kora-planner min-h-screen">
@@ -299,11 +315,40 @@ const Index = () => {
                 </div>
               )}
 
-              <SavedClasses onLoadClass={handleLoadClass} />
+              <div className="mt-16 border-t border-border pt-10">
+                {user ? (
+                  <>
+                    <div className="mb-6 flex items-center justify-between gap-4">
+                      <p className="font-body text-xs text-muted-foreground truncate">
+                        Signed in as{" "}
+                        <span className="font-medium text-foreground">{user.email}</span>
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="font-body text-xs tracking-wide uppercase flex-shrink-0"
+                        onClick={handleLogout}
+                      >
+                        Log out
+                      </Button>
+                    </div>
+                    <SavedClasses onLoadClass={handleLoadClass} />
+                  </>
+                ) : (
+                  <div className="mx-auto max-w-sm">
+                    <MagicLinkForm
+                      title="Save your classes"
+                      subtitle="Sign in with your email to save classes and revisit them anytime. We'll send a magic link — no password needed."
+                    />
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
       </div>
+
+      <LoginDialog open={loginOpen} onOpenChange={setLoginOpen} />
     </div>
   );
 };

@@ -64,7 +64,7 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
   const viewedClass = viewingId ? classes.find((c) => c.id === viewingId) : null;
 
   return (
-    <div className="mt-16 border-t border-border pt-10">
+    <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-heading text-2xl tracking-tight text-foreground">
           Saved Classes
