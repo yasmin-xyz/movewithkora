@@ -78,9 +78,11 @@ export type Database = {
           class_length: number | null
           created_at: string | null
           id: string
+          inspiration: string | null
           peak_pose: string | null
           skill_level: string | null
           user_id: string | null
+          yoga_style: string | null
         }
         Insert: {
           archived?: boolean | null
@@ -88,9 +90,11 @@ export type Database = {
           class_length?: number | null
           created_at?: string | null
           id?: string
+          inspiration?: string | null
           peak_pose?: string | null
           skill_level?: string | null
           user_id?: string | null
+          yoga_style?: string | null
         }
         Update: {
           archived?: boolean | null
@@ -98,9 +102,11 @@ export type Database = {
           class_length?: number | null
           created_at?: string | null
           id?: string
+          inspiration?: string | null
           peak_pose?: string | null
           skill_level?: string | null
           user_id?: string | null
+          yoga_style?: string | null
         }
         Relationships: []
       }
