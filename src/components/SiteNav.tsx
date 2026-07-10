@@ -7,14 +7,11 @@ const SiteNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === "/";
-  const [scrolled, setScrolled] = useState(!isHome);
+  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!isHome) {
-      setScrolled(true);
-      return;
-    }
+    if (!isHome) return;
     const handleScroll = () => setScrolled(window.scrollY > 40);
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -24,7 +21,7 @@ const SiteNav = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className={`kora-nav ${scrolled ? "scrolled" : ""}`}>
+    <nav className={`kora-nav ${isHome ? (scrolled ? "scrolled" : "") : "solid"}`}>
       <style>{`
         .kora-nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
@@ -36,6 +33,9 @@ const SiteNav = () => {
         .kora-nav.scrolled {
           background: rgba(245, 240, 235, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
           border-bottom: 1px solid rgba(42, 42, 40, 0.08);
+        }
+        .kora-nav.solid {
+          background: #FDFCFA; border-bottom: 1px solid rgba(42, 42, 40, 0.08);
         }
         .kora-nav .nav-logo { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; background: none; border: none; padding: 0; }
         .kora-nav .nav-logo svg { width: 22px; height: 22px; }
@@ -53,15 +53,13 @@ const SiteNav = () => {
         .kora-nav .nav-link {
           font-family: 'Source Sans 3', sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
           color: #5C6B55; background: rgba(92, 107, 85, 0.12); border: 1px solid transparent;
-          padding: 0.55rem 1.1rem; border-radius: 2px; cursor: pointer; transition: all 0.25s ease;
+          padding: 0.55rem 1.1rem; border-radius: 2px; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease;
         }
         .kora-nav .nav-link:hover {
           background: #FDFCFA; border-color: #5C6B55;
-          box-shadow: 0 0 0 3px rgba(92, 107, 85, 0.15), 0 4px 14px rgba(92, 107, 85, 0.18);
-          transform: translateY(-1px) scale(1.03);
         }
         .kora-nav .nav-link.active {
-          background: #5C6B55; color: #FDFCFA;
+          background: transparent; border-color: #5C6B55; color: #5C6B55;
         }
         .kora-nav .nav-hamburger {
           display: none; background: none; border: none; font-size: 1.3rem; line-height: 1;
