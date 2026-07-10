@@ -12,6 +12,8 @@ interface ClassPlanProps {
   isLoading: boolean;
   readOnly?: boolean;
   onContentChange?: (content: string) => void;
+  showSanskrit?: boolean;
+  onToggleSanskrit?: (v: boolean) => void;
 }
 
 interface PoseMedia {
@@ -309,18 +311,26 @@ function parseModification(mod: string): { name: string; description: string } {
   return { name: mod, description: "" };
 }
 
-const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: ClassPlanProps) => {
+const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, showSanskrit: showSanskritProp, onToggleSanskrit }: ClassPlanProps) => {
   const [media, setMedia] = useState<PoseMedia[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const [openKeys, setOpenKeys] = useState<Set<string>>(new Set());
-  const [showSanskrit, setShowSanskrit] = useState(() => {
+  const [internalShowSanskrit, setInternalShowSanskrit] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem(SANSKRIT_STORAGE_KEY) === "true";
   });
 
+  // Controlled (from parent) if showSanskrit prop is passed, otherwise falls
+  // back to its own localStorage-backed state (e.g. the read-only preview
+  // dialog in SavedClasses.tsx doesn't pass this prop).
+  const showSanskrit = showSanskritProp ?? internalShowSanskrit;
+  const setShowSanskrit = onToggleSanskrit ?? setInternalShowSanskrit;
+
   useEffect(() => {
-    localStorage.setItem(SANSKRIT_STORAGE_KEY, String(showSanskrit));
-  }, [showSanskrit]);
+    if (showSanskritProp === undefined) {
+      localStorage.setItem(SANSKRIT_STORAGE_KEY, String(internalShowSanskrit));
+    }
+  }, [internalShowSanskrit, showSanskritProp]);
 
   const displayName = (name: string) => {
     if (!showSanskrit) return name;
@@ -461,7 +471,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
     <div className="mt-12 border-t border-border pt-10 space-y-12">
       {sections.length > 0 && (
         <div className="flex items-center justify-end gap-2 -mt-4">
-          <span className="font-body text-xs text-muted-foreground">Show Sanskrit Names</span>
+          <span className="font-body text-xs font-medium" style={{ color: "#5C6B55" }}>Show Sanskrit Names</span>
           <Switch checked={showSanskrit} onCheckedChange={setShowSanskrit} />
         </div>
       )}
