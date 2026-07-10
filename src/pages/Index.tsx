@@ -136,11 +136,17 @@ const Index = () => {
   };
 
   const handleSave = async () => {
+    if (!user) {
+      setLoginOpen(true);
+      return;
+    }
+
     setIsSaving(true);
     const { error } = await supabase.from("saved_classes").insert({
       peak_pose: peakMovement.trim(),
       class_length: parseInt(classLength),
       class_content: classPlan,
+      user_id: user.id,
     });
     setIsSaving(false);
 
@@ -150,6 +156,12 @@ const Index = () => {
       toast.success("Class saved successfully.");
     }
   };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    handleBackToLibrary();
+  };
+
 
   return (
     <div className="kora-planner min-h-screen">
