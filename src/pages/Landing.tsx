@@ -189,14 +189,18 @@ const Landing = () => {
           cursor: pointer; transition: all 0.25s ease;
         }
         .kora-landing .nav-cta:hover { background: var(--olive-light); transform: translateY(-1px); }
-        .kora-landing .nav-links-desktop { display: flex; align-items: center; gap: 1.75rem; }
+        .kora-landing .nav-right { display: flex; align-items: center; gap: 1.1rem; }
+        .kora-landing .nav-links-desktop { display: flex; align-items: center; gap: 0.6rem; }
         .kora-landing .nav-link {
-          font-family: var(--sans); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
-          color: var(--text-secondary); background: none; border: none; cursor: pointer; padding: 0;
-          transition: color 0.2s ease;
+          font-family: var(--sans); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+          color: var(--olive); background: var(--olive-muted); border: 1px solid transparent;
+          padding: 0.55rem 1.1rem; border-radius: 2px; cursor: pointer; transition: all 0.25s ease;
         }
-        .kora-landing .nav-link:hover { color: var(--olive); }
-        .kora-landing .nav-right { display: flex; align-items: center; gap: 0.9rem; }
+        .kora-landing .nav-link:hover {
+          background: var(--white); border-color: var(--olive);
+          box-shadow: 0 0 0 3px rgba(92, 107, 85, 0.15), 0 4px 14px rgba(92, 107, 85, 0.18);
+          transform: translateY(-1px) scale(1.03);
+        }
         .kora-landing .nav-hamburger {
           display: none; background: none; border: none; font-size: 1.3rem; line-height: 1;
           color: var(--text-primary); cursor: pointer; padding: 0.3rem;
@@ -205,6 +209,7 @@ const Landing = () => {
           position: absolute; top: 100%; right: 1.5rem; margin-top: 0.5rem;
           background: var(--cream); border: 1px solid var(--card-border); border-radius: 4px;
           box-shadow: 0 8px 24px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden; z-index: 200;
+          min-width: 180px;
         }
         .kora-landing .nav-mobile-panel button {
           font-family: var(--sans); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em;
@@ -212,9 +217,14 @@ const Landing = () => {
           cursor: pointer; white-space: nowrap; transition: background 0.15s ease;
         }
         .kora-landing .nav-mobile-panel button:hover { background: var(--olive-muted); }
+        .kora-landing .nav-mobile-panel .nav-mobile-cta {
+          background: var(--olive); color: var(--white); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.72rem;
+        }
+        .kora-landing .nav-mobile-panel .nav-mobile-cta:hover { background: var(--olive-light); }
         @media (max-width: 767px) {
           .kora-landing .nav-links-desktop { display: none; }
           .kora-landing .nav-hamburger { display: block; }
+          .kora-landing .nav-cta-desktop { display: none; }
         }
         .kora-landing .hero {
           background: var(--white);
@@ -384,12 +394,11 @@ const Landing = () => {
           <span>Kora</span>
         </div>
 
-        <div className="nav-links-desktop">
-          <button className="nav-link" onClick={() => navigate("/pose-library")}>Pose Library</button>
-          <button className="nav-link" onClick={() => navigate("/feedback")}>Feedback</button>
-        </div>
-
         <div className="nav-right">
+          <div className="nav-links-desktop">
+            <button className="nav-link" onClick={() => navigate("/pose-library")}>Pose Library</button>
+            <button className="nav-link" onClick={() => navigate("/feedback")}>Feedback</button>
+          </div>
           <button
             className="nav-hamburger"
             onClick={() => setMobileMenuOpen((v) => !v)}
@@ -397,11 +406,12 @@ const Landing = () => {
           >
             {mobileMenuOpen ? "✕" : "☰"}
           </button>
-          <button className="nav-cta" onClick={goToPlanner}>Plan a Class</button>
+          <button className="nav-cta nav-cta-desktop" onClick={goToPlanner}>Plan a Class</button>
         </div>
 
         {mobileMenuOpen && (
           <div className="nav-mobile-panel">
+            <button className="nav-mobile-cta" onClick={() => { setMobileMenuOpen(false); goToPlanner(); }}>Plan a Class</button>
             <button onClick={() => { setMobileMenuOpen(false); navigate("/pose-library"); }}>Pose Library</button>
             <button onClick={() => { setMobileMenuOpen(false); navigate("/feedback"); }}>Feedback</button>
           </div>
