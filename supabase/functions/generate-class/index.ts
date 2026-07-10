@@ -157,6 +157,19 @@ YOGA STYLE ADAPTATION (apply if a style is specified in the user prompt):
 - If no style is specified, default to a balanced general-purpose flow following the rules above as written.
 - Regardless of style, still only use poses from the provided library, and still follow section time allocation and the peak-pose intensity requirement.
 
+SUN SALUTATION RULES (critical — apply automatically when yogaStyle is Vinyasa, Power, or Ashtanga; skip entirely for all other styles or when no style is specified):
+- Sun Salutation A and Sun Salutation B are FIXED traditional sequences, not something to construct via the normal metadata continuity rules. Use these exact pose orders:
+
+  Sun Salutation A: Mountain Pose → Standing Forward Fold → Half Forward Fold → Plank Pose → Chaturanga → Upward Facing Dog → Downward Facing Dog → Half Forward Fold → Standing Forward Fold → Mountain Pose
+
+  Sun Salutation B: Mountain Pose → Chair Pose → Standing Forward Fold → Half Forward Fold → Plank Pose → Chaturanga → Upward Facing Dog → Downward Facing Dog → Warrior I (Right) → Downward Facing Dog → Warrior I (Left) → Downward Facing Dog → Half Forward Fold → Standing Forward Fold → Chair Pose → Mountain Pose
+
+- Insert Sun Salutations as the opening block(s) of the WARM-UP section, formatted as a normal Block (e.g. "Block: Sun Salutation A") with each pose in the fixed order listed as a normal "Pose:" entry with its own Breath/Cue/Modifications, exactly like any other pose.
+- Do NOT apply the standard delta-based transition scoring or insert extra Down Dog Resets/vinyasas within a Sun Salutation round — the sequence itself IS the transition, poses flow directly into each other in the fixed order given.
+- Number of rounds by class length: 45 min → 2 rounds of Sun Salutation A. 60 min → 2 rounds of A, optionally + 1 round of B. 75–90 min → 2 rounds of A + 1–2 rounds of B.
+- After the Sun Salutation block(s), continue into the rest of WARM-UP and BUILD normally, using the standard metadata-driven sequencing rules from that point forward.
+- Do not repeat Sun Salutations later in the class — they belong only in the Warm-Up opening.
+
 MODIFICATION REQUIREMENT (critical — applies to every non-transition pose in every section, not just Warm-Up):
 - Every pose must include exactly 3 modification lines: one easier variation, one alternative variation, and one more advanced/challenging variation — regardless of which section (Warm-Up, Build, Peak, Cool Down) the pose is in.
 
