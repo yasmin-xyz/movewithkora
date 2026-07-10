@@ -7,7 +7,9 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
+import { getSanskritName } from "@/lib/sanskritNames";
 
 // All confirmed to exist in pose_library, so results are always accurate.
 // Curated to poses that make sense as a class "peak" — arm balances,
@@ -54,6 +56,8 @@ interface ClassFormProps {
   isLoading: boolean;
   justCompleted?: boolean;
   onScrollToResult?: () => void;
+  showSanskrit?: boolean;
+  onToggleSanskrit?: (v: boolean) => void;
 }
 
 const ClassForm = ({
@@ -71,7 +75,12 @@ const ClassForm = ({
   isLoading,
   justCompleted = false,
   onScrollToResult,
+  showSanskrit = false,
+  onToggleSanskrit,
 }: ClassFormProps) => {
+  const peakLabel = (englishName: string) =>
+    showSanskrit ? getSanskritName(englishName) || englishName : englishName;
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -92,9 +101,19 @@ const ClassForm = ({
       </div>
 
       <div className="space-y-2">
-        <label className="font-body text-sm font-medium text-foreground tracking-wide uppercase">
-          Peak Movement or Focus
-        </label>
+        <div className="flex items-center justify-between gap-2">
+          <label className="font-body text-sm font-medium text-foreground tracking-wide uppercase">
+            Peak Movement or Focus
+          </label>
+          {onToggleSanskrit && (
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className="font-body text-xs font-medium normal-case" style={{ color: "#5C6B55" }}>
+                Show Sanskrit Names
+              </span>
+              <Switch checked={showSanskrit} onCheckedChange={onToggleSanskrit} />
+            </label>
+          )}
+        </div>
         <Select value={peakMovement} onValueChange={onPeakMovementChange}>
           <SelectTrigger className="h-12 bg-card border-border font-body text-foreground">
             <SelectValue placeholder="Select a peak pose" />
@@ -102,7 +121,7 @@ const ClassForm = ({
           <SelectContent>
             {PEAK_OPTIONS.map((opt) => (
               <SelectItem key={opt} value={opt}>
-                {opt}
+                {peakLabel(opt)}
               </SelectItem>
             ))}
           </SelectContent>
