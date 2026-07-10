@@ -276,6 +276,17 @@ const Index = () => {
           color: var(--olive);
           transform: translateX(-2px);
         }
+        .kora-planner .planner-footer-nav {
+          display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+          border-top: 1px solid rgba(42, 42, 40, 0.08);
+        }
+        .kora-planner .planner-footer-nav button {
+          font-family: var(--sans); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+          color: var(--text-secondary); background: none; border: none; cursor: pointer; padding: 0;
+          transition: color 0.2s ease;
+        }
+        .kora-planner .planner-footer-nav button:hover { color: var(--olive); }
+        .kora-planner .planner-footer-nav span { color: var(--text-secondary); font-size: 0.7rem; }
         .kora-planner .planner-heading {
           font-family: var(--serif) !important;
         }
@@ -430,6 +441,14 @@ const Index = () => {
               )}
             </>
           )}
+        </div>
+
+        <div className="mx-auto max-w-2xl px-6 pb-12 pt-6 planner-footer-nav">
+          <button onClick={() => navigate("/")}>Home</button>
+          <span aria-hidden="true">·</span>
+          <button onClick={() => navigate("/pose-library")}>Pose Library</button>
+          <span aria-hidden="true">·</span>
+          <button onClick={() => navigate("/feedback")}>Feedback</button>
         </div>
       </div>
 
