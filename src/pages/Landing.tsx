@@ -176,7 +176,7 @@ const Landing = () => {
         .kora-landing .hero {
           background: var(--white);
           max-width: 100%;
-          min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center;
+          min-height: 100vh; min-height: 100svh; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center;
           align-items: center; text-align: center; padding: 6rem 1.5rem 4rem; position: relative;
         }
         .kora-landing .lotus-wrap { width: 180px; height: 95px; margin-bottom: 2rem; }
@@ -199,11 +199,11 @@ const Landing = () => {
           opacity: 0; animation: fadeUp 0.8s ease 1.1s forwards;
         }
         .kora-landing .hero h1 {
-          font-family: var(--serif); font-size: clamp(3.5rem, 12vw, 8rem); font-weight: 400; letter-spacing: -0.03em;
+          font-family: var(--serif); font-size: clamp(4.4rem, 15vw, 8rem); font-weight: 400; letter-spacing: -0.03em;
           line-height: 0.95; color: var(--text-primary); opacity: 0; animation: fadeUp 0.8s ease 1.25s forwards; margin: 0;
         }
         .kora-landing .hero-tagline {
-          font-family: var(--serif); font-size: clamp(1.4rem, 4.5vw, 1.85rem); font-weight: 500; font-style: italic;
+          font-family: var(--serif); font-size: clamp(1.85rem, 6vw, 1.85rem); font-weight: 500; font-style: italic;
           color: var(--olive); margin-top: 0.75rem; letter-spacing: -0.01em;
           opacity: 0; animation: fadeUp 0.8s ease 1.4s forwards;
         }
@@ -312,6 +312,8 @@ const Landing = () => {
           .kora-landing .lotus-wrap { width: 130px; height: 72px; }
           .kora-landing .cycle-arc { gap: 0.3rem; }
           .kora-landing .cycle-word { font-size: 0.75rem; }
+          .kora-landing .problem { padding-left: 1rem; padding-right: 1rem; }
+          .kora-landing .problem .section-heading { text-wrap: pretty; max-width: 100%; }
         }
       `}</style>
 
