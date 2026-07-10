@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
 
 const CYCLE_WORDS = ["Arrival", "Build", "Peak", "Return", "Completion"];
 const CYCLE_NODES = [
@@ -19,6 +20,19 @@ const Landing = () => {
   const [cycleIndex, setCycleIndex] = useState(0);
   const [revealedEls, setRevealedEls] = useState<Set<string>>(new Set());
   const [navScrolled, setNavScrolled] = useState(false);
+  const [showSanskrit, setShowSanskrit] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(SANSKRIT_STORAGE_KEY) === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem(SANSKRIT_STORAGE_KEY, String(showSanskrit));
+  }, [showSanskrit]);
+
+  const displayName = (name: string) => {
+    if (!showSanskrit) return name;
+    return getSanskritName(name) || name;
+  };
 
   // Nav becomes opaque once the user scrolls past the hero
   useEffect(() => {
@@ -266,11 +280,19 @@ const Landing = () => {
         .kora-landing .pose-cards { padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
         .kora-landing .pose-card { background: var(--white); border: 1px solid var(--card-border); border-radius: 3px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start; transition: transform 0.25s ease; }
         .kora-landing .pose-card:hover { transform: translateX(4px); }
+        .kora-landing .preview-example-badge-row {
+          display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+          margin: 1.75rem 1.5rem 0;
+        }
         .kora-landing .preview-example-badge {
           display: inline-block; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
           color: var(--olive); background: var(--olive-muted); padding: 0.4rem 0.9rem; border-radius: 2px;
-          margin: 1.75rem 1.5rem 0;
         }
+        .kora-landing .sanskrit-toggle {
+          display: flex; align-items: center; gap: 0.5rem; cursor: pointer;
+          font-size: 0.7rem; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.02em;
+        }
+        .kora-landing .sanskrit-toggle input { accent-color: var(--olive); width: 14px; height: 14px; cursor: pointer; }
         .kora-landing .pose-icon { width: 56px; height: 56px; flex-shrink: 0; background: var(--cream); border-radius: 3px; overflow: hidden; }
         .kora-landing .pose-icon img { width: 100%; height: 100%; object-fit: contain; }
         @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.06); opacity: 1; } }
@@ -444,7 +466,17 @@ const Landing = () => {
           </p>
 
           <div className={`preview-card reveal reveal-delay-3 ${isRevealed("preview-card") ? "visible" : ""}`} data-reveal-id="preview-card">
-            <div className="preview-example-badge">Example — Warm-Up Flow</div>
+            <div className="preview-example-badge-row">
+              <div className="preview-example-badge">Example — Warm-Up Flow</div>
+              <label className="sanskrit-toggle">
+                <span>Sanskrit Names</span>
+                <input
+                  type="checkbox"
+                  checked={showSanskrit}
+                  onChange={(e) => setShowSanskrit(e.target.checked)}
+                />
+              </label>
+            </div>
             <div className="preview-header">
               <span className="preview-phase">Warm-Up</span>
               <span className="preview-time">10 Min</span>
@@ -457,7 +489,7 @@ const Landing = () => {
                   <img src="https://xuxzhkcjdexcynvcpjka.supabase.co/storage/v1/object/public/poses//childs-pose.png" alt="Child's Pose" />
                 </div>
                 <div className="pose-info">
-                  <h4>Child's Pose</h4>
+                  <h4>{displayName("Child's Pose")}</h4>
                   <p className="pose-meta">Breath: Inhale into the back ribs</p>
                   <p className="pose-cue">Sink hips to heels and reach fingertips forward to create length through the spine. Let the forehead rest heavy — this is a moment to arrive, not to work.</p>
                 </div>
@@ -469,7 +501,7 @@ const Landing = () => {
                   <img src="https://xuxzhkcjdexcynvcpjka.supabase.co/storage/v1/object/public/poses//cat-cow.png" alt="Cat-Cow" />
                 </div>
                 <div className="pose-info">
-                  <h4>Cat-Cow</h4>
+                  <h4>{displayName("Cat-Cow")}</h4>
                   <p className="pose-meta">Breath: Inhale to look up, exhale to round</p>
                   <p className="pose-cue">Move segmentally through the vertebrae, one bone at a time, syncing each movement to a breath to hydrate the spine and wake up the core.</p>
                 </div>
@@ -481,7 +513,7 @@ const Landing = () => {
                   <img src="https://xuxzhkcjdexcynvcpjka.supabase.co/storage/v1/object/public/poses//downward-facing-dog.png" alt="Downward Facing Dog" />
                 </div>
                 <div className="pose-info">
-                  <h4>Downward Facing Dog</h4>
+                  <h4>{displayName("Downward Facing Dog")}</h4>
                   <p className="pose-meta">Breath: Exhale as you lift the hips</p>
                   <p className="pose-cue">Press firmly through the index knuckles to stabilize the shoulders, and pedal the feet to warm up the hamstrings ahead of standing work.</p>
                 </div>
