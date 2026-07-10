@@ -309,21 +309,11 @@ const Landing = () => {
           .kora-landing .hero-badge { font-size: 0.72rem; padding: 0.6rem 1.4rem; }
         }
         @media (max-width: 480px) {
+          .kora-landing .lotus-wrap { width: 130px; height: 72px; }
           .kora-landing .cycle-arc { gap: 0.3rem; }
           .kora-landing .cycle-word { font-size: 0.75rem; }
           .kora-landing .problem { padding-left: 1rem; padding-right: 1rem; }
           .kora-landing .problem .section-heading { text-wrap: pretty; max-width: 100%; }
-          .kora-landing .hero {
-            min-height: 900px;
-            justify-content: flex-start;
-            padding: 4rem 1.5rem calc(3rem + env(safe-area-inset-bottom));
-          }
-          .kora-landing .hero h1 { font-size: clamp(4rem, 15vw, 8rem); }
-          .kora-landing .lotus-wrap { width: 100px; height: 55px; margin-bottom: 1rem; }
-          .kora-landing .hero-badge { margin-bottom: 1.25rem; }
-          .kora-landing .hero-tagline { margin-top: 0.5rem; }
-          .kora-landing .hero-description { margin-top: 1.25rem; }
-          .kora-landing .hero-cta { margin-top: 1.75rem; }
         }
       `}</style>
 
