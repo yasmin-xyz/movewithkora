@@ -14,6 +14,8 @@ const Index = () => {
   const [classLength, setClassLength] = useState("60");
   const [peakMovement, setPeakMovement] = useState("");
   const [skillLevel, setSkillLevel] = useState("Intermediate");
+  const [yogaStyle, setYogaStyle] = useState("");
+  const [inspiration, setInspiration] = useState("");
   const [classPlan, setClassPlan] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -36,11 +38,20 @@ const Index = () => {
     };
   }, []);
 
-  const handleLoadClass = (peakPose: string, length: number, content: string, date: string | null) => {
+  const handleLoadClass = (
+    peakPose: string,
+    length: number,
+    content: string,
+    date: string | null,
+    loadedYogaStyle?: string | null,
+    loadedInspiration?: string | null
+  ) => {
     setClassLength(String(length));
     setPeakMovement(peakPose);
     setClassPlan(content);
     setLoadedDate(date);
+    setYogaStyle(loadedYogaStyle || "");
+    setInspiration(loadedInspiration || "");
     setIsViewingLoaded(true);
     headerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -83,6 +94,8 @@ const Index = () => {
             classLength: parseInt(classLength),
             peakMovement: peakMovement.trim(),
             skillLevel,
+            yogaStyle: yogaStyle || null,
+            inspiration: inspiration.trim() || null,
           }),
           signal: abortRef.current.signal,
         }
@@ -147,6 +160,8 @@ const Index = () => {
       class_length: parseInt(classLength),
       class_content: classPlan,
       user_id: user.id,
+      yoga_style: yogaStyle || null,
+      inspiration: inspiration.trim() || null,
     });
     setIsSaving(false);
 
@@ -228,8 +243,8 @@ const Index = () => {
           stroke-linejoin: round;
           opacity: 0;
           transform-origin: 100px 78px;
-          transform: scale(0.92);
           transition: opacity 1.2s ease, transform 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transform: scale(0.92);
         }
         .kora-planner .planner-lotus.blooming .lotus-petal {
           opacity: 1;
@@ -282,8 +297,15 @@ const Index = () => {
                   {peakMovement || "Untitled"}
                 </h2>
                 <p className="font-body text-sm text-muted-foreground">
-                  {classLength} min{loadedDate ? ` · Saved ${formatDate(loadedDate)}` : ""}
+                  {classLength} min
+                  {yogaStyle ? ` · ${yogaStyle}` : ""}
+                  {loadedDate ? ` · Saved ${formatDate(loadedDate)}` : ""}
                 </p>
+                {inspiration && (
+                  <p className="font-body text-sm text-muted-foreground italic">
+                    "{inspiration}"
+                  </p>
+                )}
               </div>
               <ClassPlan content={classPlan} isLoading={false} onContentChange={setClassPlan} />
             </>
@@ -296,6 +318,10 @@ const Index = () => {
                 onPeakMovementChange={setPeakMovement}
                 skillLevel={skillLevel}
                 onSkillLevelChange={setSkillLevel}
+                yogaStyle={yogaStyle}
+                onYogaStyleChange={setYogaStyle}
+                inspiration={inspiration}
+                onInspirationChange={setInspiration}
                 onGenerate={handleGenerate}
                 isLoading={isLoading}
               />
