@@ -6,6 +6,8 @@ import ClassForm from "@/components/ClassForm";
 import ClassPlan from "@/components/ClassPlan";
 import SavedClasses from "@/components/SavedClasses";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { LoginDialog, MagicLinkForm } from "@/components/Auth";
 
 const Index = () => {
   const navigate = useNavigate();
