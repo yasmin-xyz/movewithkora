@@ -66,6 +66,7 @@ export const SANSKRIT_NAMES: Record<string, string> = {
   "Handstand": "Adho Mukha Vrksasana",
   "Side Crow": "Parsva Bakasana",
   "Flying Pigeon": "Eka Pada Galavasana",
+  "Garland Pose": "Malasana",
 };
 
 function normalize(name: string): string {
