@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import SiteNav from "@/components/SiteNav";
 
 const CATEGORIES = ["Bug", "Suggestion", "Other"];
 
 const Feedback = () => {
-  const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [blooming, setBlooming] = useState(false);
   const [category, setCategory] = useState("Suggestion");
@@ -59,7 +58,7 @@ const Feedback = () => {
           --card-border: rgba(42, 42, 40, 0.08);
           --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
           --sans: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
-          background: var(--cream);
+          background: var(--white);
           font-family: var(--sans);
         }
         .kora-feedback .fb-content {
@@ -68,14 +67,6 @@ const Feedback = () => {
           transition: opacity 0.6s ease, transform 0.6s ease;
         }
         .kora-feedback .fb-content.mounted { opacity: 1; transform: translateY(0); }
-        .kora-feedback .back-link {
-          display: inline-flex; align-items: center; gap: 0.4rem;
-          font-family: var(--sans); font-size: 0.75rem; font-weight: 600;
-          letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary);
-          background: none; border: none; cursor: pointer; padding: 0;
-          transition: color 0.2s ease, transform 0.2s ease;
-        }
-        .kora-feedback .back-link:hover { color: var(--olive); transform: translateX(-2px); }
         .kora-feedback .fb-lotus { width: 90px; height: 47px; margin: 0 auto 1.25rem; }
         .kora-feedback .fb-lotus svg { width: 100%; height: 100%; overflow: visible; }
         .kora-feedback .fb-lotus .lotus-petal {
@@ -103,7 +94,7 @@ const Feedback = () => {
         .kora-feedback .fb-category-pill {
           flex: 1; font-family: var(--sans); font-size: 0.8rem; font-weight: 600;
           padding: 0.6rem; border-radius: 4px; border: 1px solid var(--card-border);
-          background: var(--white); color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease;
+          background: var(--cream); color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease;
         }
         .kora-feedback .fb-category-pill.active { background: var(--olive); border-color: var(--olive); color: var(--white); }
         .kora-feedback label {
@@ -112,7 +103,7 @@ const Feedback = () => {
         }
         .kora-feedback textarea, .kora-feedback input {
           width: 100%; font-family: var(--sans); font-size: 0.95rem; padding: 0.9rem;
-          border: 1px solid var(--card-border); border-radius: 4px; background: var(--white);
+          border: 1px solid var(--card-border); border-radius: 4px; background: var(--cream);
           color: var(--text-primary); resize: vertical;
         }
         .kora-feedback textarea:focus, .kora-feedback input:focus { outline: 2px solid var(--olive); outline-offset: 1px; }
@@ -128,23 +119,19 @@ const Feedback = () => {
         }
         .kora-feedback .fb-success p { color: var(--text-secondary); margin-top: 0.5rem; }
         .kora-feedback .fb-footer {
-          background: var(--text-primary); border-top: 1px solid rgba(255, 255, 255, 0.06);
+          background: var(--white); border-top: 1px solid var(--card-border);
           padding: 2.5rem 1.5rem; text-align: center;
         }
         .kora-feedback .fb-footer-logo { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
         .kora-feedback .fb-footer-logo svg { width: 20px; height: 20px; }
-        .kora-feedback .fb-footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--cream); opacity: 0.6; }
-        .kora-feedback .fb-footer p { font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); margin-top: 0.75rem; }
+        .kora-feedback .fb-footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--text-primary); opacity: 0.5; }
+        .kora-feedback .fb-footer p { font-size: 0.75rem; color: var(--text-secondary); opacity: 0.6; margin-top: 0.75rem; }
       `}</style>
 
-      <div className={`fb-content ${mounted ? "mounted" : ""}`}>
-        <div className="mx-auto max-w-2xl px-6 pt-8">
-          <button className="back-link" onClick={() => navigate("/")}>
-            ← Back to Homepage
-          </button>
-        </div>
+      <SiteNav />
 
-        <div className="mx-auto max-w-2xl px-6 pt-10">
+      <div className={`fb-content ${mounted ? "mounted" : ""}`}>
+        <div className="mx-auto max-w-2xl px-6 pt-28">
           <div className={`fb-lotus ${blooming ? "blooming" : ""}`}>
             <svg viewBox="0 0 200 105" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path className="lotus-petal petal-back" d="M100 78 C82 66, 32 52, 6 64 C4 72, 28 84, 60 86 C78 86, 94 82, 100 78Z"/>
