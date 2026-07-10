@@ -19,6 +19,15 @@ const PEAK_OPTIONS = [
   "Custom",
 ];
 
+const YOGA_STYLE_OPTIONS = [
+  "Vinyasa",
+  "Hatha",
+  "Yin",
+  "Restorative",
+  "Power",
+  "Ashtanga",
+];
+
 interface ClassFormProps {
   classLength: string;
   onClassLengthChange: (v: string) => void;
@@ -26,6 +35,10 @@ interface ClassFormProps {
   onPeakMovementChange: (v: string) => void;
   skillLevel: string;
   onSkillLevelChange: (v: string) => void;
+  yogaStyle: string;
+  onYogaStyleChange: (v: string) => void;
+  inspiration: string;
+  onInspirationChange: (v: string) => void;
   onGenerate: () => void;
   isLoading: boolean;
 }
@@ -37,6 +50,10 @@ const ClassForm = ({
   onPeakMovementChange,
   skillLevel,
   onSkillLevelChange,
+  yogaStyle,
+  onYogaStyleChange,
+  inspiration,
+  onInspirationChange,
   onGenerate,
   isLoading,
 }: ClassFormProps) => {
@@ -136,6 +153,37 @@ const ClassForm = ({
         </Select>
       </div>
 
+      <div className="space-y-2">
+        <label className="font-body text-sm font-medium text-foreground tracking-wide uppercase">
+          Style of Yoga
+        </label>
+        <Select value={yogaStyle} onValueChange={onYogaStyleChange}>
+          <SelectTrigger className="h-12 bg-card border-border font-body text-foreground">
+            <SelectValue placeholder="Select a style" />
+          </SelectTrigger>
+          <SelectContent>
+            {YOGA_STYLE_OPTIONS.map((opt) => (
+              <SelectItem key={opt} value={opt}>
+                {opt}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <label className="font-body text-sm font-medium text-foreground tracking-wide uppercase">
+          Inspiration or Theme <span className="normal-case text-muted-foreground">(optional)</span>
+        </label>
+        <Input
+          className="h-12 bg-card border-border font-body text-foreground placeholder:text-muted-foreground"
+          placeholder="e.g. grounding, hip-openers, Dharma Mittra's inversion philosophy"
+          value={inspiration}
+          onChange={(e) => onInspirationChange(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && !isLoading && onGenerate()}
+        />
+      </div>
+
       <Button
         className="w-full h-12 font-body text-sm font-medium tracking-wide uppercase"
         onClick={onGenerate}
@@ -144,10 +192,10 @@ const ClassForm = ({
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Generating…
+            Planning…
           </>
         ) : (
-          "Generate Class"
+          "Plan This Class"
         )}
       </Button>
     </div>
