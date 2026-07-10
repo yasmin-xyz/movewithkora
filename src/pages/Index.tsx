@@ -7,7 +7,7 @@ import ClassPlan from "@/components/ClassPlan";
 import SavedClasses from "@/components/SavedClasses";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { LoginDialog, MagicLinkForm } from "@/components/Auth";
+import { LoginDialog } from "@/components/Auth";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -28,6 +28,13 @@ const Index = () => {
 
   const [mounted, setMounted] = useState(false);
   const [blooming, setBlooming] = useState(false);
+  const resultsAnchorRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll position on entering the planner — client-side navigation
+  // doesn't do this automatically like a traditional page load would.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     const t1 = setTimeout(() => setMounted(true), 20);
@@ -80,6 +87,11 @@ const Index = () => {
     setIsLoading(true);
     setClassPlan("");
     abortRef.current = new AbortController();
+
+    // Give the loading state a moment to render, then scroll to it smoothly.
+    setTimeout(() => {
+      resultsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
 
     try {
       const resp = await fetch(
@@ -257,10 +269,18 @@ const Index = () => {
       `}</style>
 
       <div className={`planner-content ${mounted ? "mounted" : ""}`}>
-        <div className="mx-auto max-w-2xl px-6 pt-8">
+        <div className="mx-auto max-w-2xl px-6 pt-8 flex items-center justify-between">
           <button className="back-link" onClick={() => navigate("/")}>
             ← Back to Homepage
           </button>
+          {!user && (
+            <button
+              className="font-body text-xs text-muted-foreground hover:text-foreground transition-colors duration-150 underline underline-offset-2"
+              onClick={() => setLoginOpen(true)}
+            >
+              Sign in to save classes
+            </button>
+          )}
         </div>
 
         <div className="mx-auto max-w-2xl px-6 pb-16 pt-8 sm:pb-24">
@@ -326,6 +346,8 @@ const Index = () => {
                 isLoading={isLoading}
               />
 
+              <div ref={resultsAnchorRef} />
+
               {classPlan && <ClassPlan content={classPlan} isLoading={isLoading} onContentChange={setClassPlan} />}
 
               {classPlan && !isLoading && (
@@ -341,34 +363,25 @@ const Index = () => {
                 </div>
               )}
 
-              <div className="mt-16 border-t border-border pt-10">
-                {user ? (
-                  <>
-                    <div className="mb-6 flex items-center justify-between gap-4">
-                      <p className="font-body text-xs text-muted-foreground truncate">
-                        Signed in as{" "}
-                        <span className="font-medium text-foreground">{user.email}</span>
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="font-body text-xs tracking-wide uppercase flex-shrink-0"
-                        onClick={handleLogout}
-                      >
-                        Log out
-                      </Button>
-                    </div>
-                    <SavedClasses onLoadClass={handleLoadClass} />
-                  </>
-                ) : (
-                  <div className="mx-auto max-w-sm">
-                    <MagicLinkForm
-                      title="Save your classes"
-                      subtitle="Sign in with your email to save classes and revisit them anytime. We'll send a magic link — no password needed."
-                    />
+              {user && (
+                <div className="mt-16 border-t border-border pt-10">
+                  <div className="mb-6 flex items-center justify-between gap-4">
+                    <p className="font-body text-xs text-muted-foreground truncate">
+                      Signed in as{" "}
+                      <span className="font-medium text-foreground">{user.email}</span>
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="font-body text-xs tracking-wide uppercase flex-shrink-0"
+                      onClick={handleLogout}
+                    >
+                      Log out
+                    </Button>
                   </div>
-                )}
-              </div>
+                  <SavedClasses onLoadClass={handleLoadClass} />
+                </div>
+              )}
             </>
           )}
         </div>
