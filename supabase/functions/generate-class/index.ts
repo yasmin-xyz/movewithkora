@@ -13,7 +13,13 @@ serve(async (req) => {
   }
 
   try {
-    const { classLength, peakMovement, skillLevel = "Intermediate" } = await req.json();
+    const {
+      classLength,
+      peakMovement,
+      skillLevel = "Intermediate",
+      yogaStyle,
+      inspiration,
+    } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -134,6 +140,16 @@ SECTION TIME ALLOCATION:
 - PEAK: 10–15% of total class time
 - COOL DOWN: remaining time
 
+YOGA STYLE ADAPTATION (apply if a style is specified in the user prompt):
+- Vinyasa: favor more frequent vinyasa/transition poses between blocks, brisk pacing, breath-linked movement.
+- Hatha: fewer transitions, longer holds per pose, slower and more deliberate pacing.
+- Yin: minimal transitions (avoid vinyasas/Down Dog Resets entirely where possible), long passive holds, prioritize seated/floor-based poses, de-emphasize the intensity-build requirement in favor of stillness and surrender.
+- Restorative: very few poses overall, long holds, gentle low-intensity poses throughout, minimal transitions, cues should emphasize rest and ease over effort.
+- Power: brisk pacing, more frequent vinyasas, favor higher-intensity and strength-based poses throughout, less holding time per pose.
+- Ashtanga: consistent breath-linked vinyasa between every pose, traditional structural feel, steady disciplined pacing.
+- If no style is specified, default to a balanced general-purpose flow following the rules above as written.
+- Regardless of style, still only use poses from the provided library, and still follow section time allocation and the peak-pose intensity requirement.
+
 Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
 
 WARM-UP:
@@ -237,7 +253,17 @@ Rules:
 - Tone: supportive, clear, instructor-guiding. No long paragraphs.
 - Nothing else outside this format.`;
 
-    const userPrompt = `Create a ${classLength}-minute yoga class plan for a ${skillLevel.toLowerCase()}-level practitioner that builds toward "${peakMovement}" as the peak pose. Adjust pose complexity and cues to match the ${skillLevel.toLowerCase()} skill level. Include Warm-Up, Build, Peak, and Cool Down sections. Output only the structured format.`;
+    let userPrompt = `Create a ${classLength}-minute yoga class plan for a ${skillLevel.toLowerCase()}-level practitioner that builds toward "${peakMovement}" as the peak pose. Adjust pose complexity and cues to match the ${skillLevel.toLowerCase()} skill level. Include Warm-Up, Build, Peak, and Cool Down sections.`;
+
+    if (yogaStyle) {
+      userPrompt += ` This class should be taught in the ${yogaStyle} style — apply the YOGA STYLE ADAPTATION rules above for ${yogaStyle} to pacing, transition frequency, and hold style, while still following all other sequencing and formatting rules.`;
+    }
+
+    if (inspiration) {
+      userPrompt += ` Let the following theme, philosophy, or influence guide the pose choices and the language used in cues throughout (while only using poses from the provided library): "${inspiration}".`;
+    }
+
+    userPrompt += ` Output only the structured format.`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
