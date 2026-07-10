@@ -39,6 +39,7 @@ const PoseLibrary = () => {
   const [activeFamilies, setActiveFamilies] = useState<Set<string>>(new Set());
   const [activeSkills, setActiveSkills] = useState<Set<string>>(new Set());
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const filterWrapRef = useRef<HTMLDivElement>(null);
   const [showSanskrit, setShowSanskrit] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -89,6 +90,12 @@ const PoseLibrary = () => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => setShowBackToTop(window.scrollY > 500);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const displayName = (name: string) => {
@@ -178,7 +185,7 @@ const PoseLibrary = () => {
           text-align: center; color: var(--text-secondary); font-size: 1rem; margin-top: 0.5rem;
         }
         .kora-pose-library .filters-bar {
-          max-width: 900px; margin: 2.5rem auto 0; padding: 0 1.5rem;
+          max-width: 1100px; margin: 2.5rem auto 0; padding: 0 1.5rem;
           display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
         }
         .kora-pose-library .filters-bar-left { display: flex; align-items: center; gap: 0.75rem; position: relative; }
@@ -265,6 +272,19 @@ const PoseLibrary = () => {
         .kora-pose-library .plib-footer-logo svg { width: 20px; height: 20px; }
         .kora-pose-library .plib-footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--text-primary); opacity: 0.5; }
         .kora-pose-library .plib-footer p { font-size: 0.75rem; color: var(--text-secondary); opacity: 0.6; margin-top: 0.75rem; }
+        .kora-pose-library .back-to-top {
+          position: fixed; bottom: 2rem; right: 2rem; z-index: 90;
+          width: 44px; height: 44px; border-radius: 50%;
+          background: var(--olive); color: var(--white); border: none;
+          display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+          cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+          opacity: 0; pointer-events: none; transform: translateY(10px);
+          transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease;
+        }
+        .kora-pose-library .back-to-top.visible {
+          opacity: 1; pointer-events: auto; transform: translateY(0);
+        }
+        .kora-pose-library .back-to-top:hover { background: var(--olive-light); }
       `}</style>
 
       <SiteNav />
@@ -389,6 +409,14 @@ const PoseLibrary = () => {
         </div>
         <p>&copy; 2026 Kora. Built for instructors.</p>
       </footer>
+
+      <button
+        className={`back-to-top ${showBackToTop ? "visible" : ""}`}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Back to top"
+      >
+        ↑
+      </button>
     </div>
   );
 };
