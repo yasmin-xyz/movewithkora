@@ -315,11 +315,40 @@ const Index = () => {
                 </div>
               )}
 
-              <SavedClasses onLoadClass={handleLoadClass} />
+              <div className="mt-16 border-t border-border pt-10">
+                {user ? (
+                  <>
+                    <div className="mb-6 flex items-center justify-between gap-4">
+                      <p className="font-body text-xs text-muted-foreground truncate">
+                        Signed in as{" "}
+                        <span className="font-medium text-foreground">{user.email}</span>
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="font-body text-xs tracking-wide uppercase flex-shrink-0"
+                        onClick={handleLogout}
+                      >
+                        Log out
+                      </Button>
+                    </div>
+                    <SavedClasses onLoadClass={handleLoadClass} />
+                  </>
+                ) : (
+                  <div className="mx-auto max-w-sm">
+                    <MagicLinkForm
+                      title="Save your classes"
+                      subtitle="Sign in with your email to save classes and revisit them anytime. We'll send a magic link — no password needed."
+                    />
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
       </div>
+
+      <LoginDialog open={loginOpen} onOpenChange={setLoginOpen} />
     </div>
   );
 };
