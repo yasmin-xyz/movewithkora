@@ -19,6 +19,8 @@ const Index = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isViewingLoaded, setIsViewingLoaded] = useState(false);
   const [loadedDate, setLoadedDate] = useState<string | null>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const { user } = useAuth();
   const abortRef = useRef<AbortController | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
