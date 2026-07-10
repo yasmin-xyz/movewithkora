@@ -8,6 +8,7 @@ import SavedClasses from "@/components/SavedClasses";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginDialog } from "@/components/Auth";
+import { SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -20,7 +21,15 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [justCompleted, setJustCompleted] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [showSanskrit, setShowSanskrit] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(SANSKRIT_STORAGE_KEY) === "true";
+  });
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem(SANSKRIT_STORAGE_KEY, String(showSanskrit));
+  }, [showSanskrit]);
   const [isSaving, setIsSaving] = useState(false);
   const [isViewingLoaded, setIsViewingLoaded] = useState(false);
   const [loadedDate, setLoadedDate] = useState<string | null>(null);
@@ -360,7 +369,7 @@ const Index = () => {
                   </p>
                 )}
               </div>
-              <ClassPlan content={classPlan} isLoading={false} onContentChange={setClassPlan} />
+              <ClassPlan content={classPlan} isLoading={false} onContentChange={setClassPlan} showSanskrit={showSanskrit} onToggleSanskrit={setShowSanskrit} />
             </>
           ) : (
             <>
@@ -379,11 +388,13 @@ const Index = () => {
                 isLoading={isLoading}
                 justCompleted={justCompleted}
                 onScrollToResult={handleReveal}
+                showSanskrit={showSanskrit}
+                onToggleSanskrit={setShowSanskrit}
               />
 
               <div ref={resultsAnchorRef} />
 
-              {classPlan && showResult && <ClassPlan content={classPlan} isLoading={isLoading} onContentChange={setClassPlan} />}
+              {classPlan && showResult && <ClassPlan content={classPlan} isLoading={isLoading} onContentChange={setClassPlan} showSanskrit={showSanskrit} onToggleSanskrit={setShowSanskrit} />}
 
               {classPlan && showResult && !isLoading && (
                 <div className="mt-8">
