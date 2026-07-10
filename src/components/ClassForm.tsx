@@ -41,6 +41,8 @@ interface ClassFormProps {
   onInspirationChange: (v: string) => void;
   onGenerate: () => void;
   isLoading: boolean;
+  justCompleted?: boolean;
+  onScrollToResult?: () => void;
 }
 
 const ClassForm = ({
@@ -56,6 +58,8 @@ const ClassForm = ({
   onInspirationChange,
   onGenerate,
   isLoading,
+  justCompleted = false,
+  onScrollToResult,
 }: ClassFormProps) => {
   const [peakSelect, setPeakSelect] = useState(
     PEAK_OPTIONS.includes(peakMovement) ? peakMovement : peakMovement ? "Custom" : ""
@@ -186,7 +190,7 @@ const ClassForm = ({
 
       <Button
         className="w-full h-12 font-body text-sm font-medium tracking-wide uppercase"
-        onClick={onGenerate}
+        onClick={justCompleted ? onScrollToResult : onGenerate}
         disabled={isLoading}
       >
         {isLoading ? (
@@ -194,6 +198,8 @@ const ClassForm = ({
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Planning…
           </>
+        ) : justCompleted ? (
+          "Scroll Down to View Your Flow ↓"
         ) : (
           "Plan This Class"
         )}
