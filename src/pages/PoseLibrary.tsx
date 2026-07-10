@@ -39,6 +39,7 @@ const PoseLibrary = () => {
   const [blooming, setBlooming] = useState(false);
   const [activeFamilies, setActiveFamilies] = useState<Set<string>>(new Set());
   const [activeSkills, setActiveSkills] = useState<Set<string>>(new Set());
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [showSanskrit, setShowSanskrit] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem(SANSKRIT_STORAGE_KEY) === "true";
@@ -101,6 +102,13 @@ const PoseLibrary = () => {
       return next;
     });
   };
+
+  const resetFilters = () => {
+    setActiveFamilies(new Set());
+    setActiveSkills(new Set());
+  };
+
+  const activeFilterCount = activeFamilies.size + activeSkills.size;
 
   const filteredPoses = poses.filter((p) => {
     const familyMatch =
@@ -173,14 +181,36 @@ const PoseLibrary = () => {
           display: flex; align-items: center; gap: 0.6rem; cursor: pointer;
           font-size: 0.75rem; font-weight: 600; color: var(--olive);
         }
-        .kora-pose-library .filters {
-          max-width: 900px; margin: 2.5rem auto 0; display: flex; flex-direction: column; gap: 0.75rem;
+        .kora-pose-library .filters-bar {
+          max-width: 900px; margin: 2.5rem auto 0; display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+        }
+        .kora-pose-library .filters-toggle {
+          display: inline-flex; align-items: center; gap: 0.5rem;
+          font-family: var(--sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+          color: var(--olive); background: var(--olive-muted); border: 1px solid transparent;
+          padding: 0.6rem 1.3rem; border-radius: 2px; cursor: pointer; transition: all 0.25s ease;
+        }
+        .kora-pose-library .filters-toggle:hover { background: var(--white); border-color: var(--olive); }
+        .kora-pose-library .filters-count-badge {
+          background: var(--olive); color: var(--white); font-size: 0.65rem; font-weight: 700;
+          border-radius: 999px; padding: 0.1rem 0.5rem;
+        }
+        .kora-pose-library .filters-reset {
+          font-family: var(--sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em;
+          color: var(--text-secondary); background: none; border: none; cursor: pointer; text-decoration: underline;
+          text-underline-offset: 2px; transition: color 0.2s ease;
+        }
+        .kora-pose-library .filters-reset:hover { color: var(--olive); }
+        .kora-pose-library .filters-panel {
+          max-width: 900px; margin: 1.25rem auto 0; padding: 1.5rem;
+          background: var(--white); border: 1px solid var(--card-border); border-radius: 6px;
+          display: flex; flex-direction: column; gap: 0.75rem;
         }
         .kora-pose-library .filter-row { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
         .kora-pose-library .filter-pill {
           font-family: var(--sans); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.02em;
           padding: 0.45rem 1rem; border-radius: 999px; border: 1px solid var(--card-border);
-          background: var(--white); color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease;
+          background: var(--cream); color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease;
         }
         .kora-pose-library .filter-pill.active {
           background: var(--olive); border-color: var(--olive); color: var(--white);
@@ -217,6 +247,14 @@ const PoseLibrary = () => {
         .kora-pose-library .plib-empty {
           text-align: center; color: var(--text-secondary); padding: 4rem 1.5rem; grid-column: 1 / -1;
         }
+        .kora-pose-library .plib-footer {
+          background: var(--text-primary); border-top: 1px solid rgba(255, 255, 255, 0.06);
+          padding: 2.5rem 1.5rem; text-align: center;
+        }
+        .kora-pose-library .plib-footer-logo { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .kora-pose-library .plib-footer-logo svg { width: 20px; height: 20px; }
+        .kora-pose-library .plib-footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--cream); opacity: 0.6; }
+        .kora-pose-library .plib-footer p { font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); margin-top: 0.75rem; }
       `}</style>
 
       <div className={`plib-content ${mounted ? "mounted" : ""}`}>
@@ -248,30 +286,44 @@ const PoseLibrary = () => {
           </div>
         </div>
 
-        <div className="filters">
-          <div className="filter-row">
-            {FAMILY_FILTERS.map((f) => (
-              <button
-                key={f.label}
-                className={`filter-pill ${activeFamilies.has(f.label) ? "active" : ""}`}
-                onClick={() => toggleFamily(f.label)}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-          <div className="filter-row">
-            {SKILL_FILTERS.map((s) => (
-              <button
-                key={s}
-                className={`filter-pill ${activeSkills.has(s) ? "active" : ""}`}
-                onClick={() => toggleSkill(s)}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
+        <div className="filters-bar">
+          <button className="filters-toggle" onClick={() => setFiltersOpen((v) => !v)}>
+            {filtersOpen ? "Hide Filters" : "Show Filters"}
+            {activeFilterCount > 0 && <span className="filters-count-badge">{activeFilterCount}</span>}
+          </button>
+          {activeFilterCount > 0 && (
+            <button className="filters-reset" onClick={resetFilters}>
+              Reset Filters
+            </button>
+          )}
         </div>
+
+        {filtersOpen && (
+          <div className="filters-panel">
+            <div className="filter-row">
+              {FAMILY_FILTERS.map((f) => (
+                <button
+                  key={f.label}
+                  className={`filter-pill ${activeFamilies.has(f.label) ? "active" : ""}`}
+                  onClick={() => toggleFamily(f.label)}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <div className="filter-row">
+              {SKILL_FILTERS.map((s) => (
+                <button
+                  key={s}
+                  className={`filter-pill ${activeSkills.has(s) ? "active" : ""}`}
+                  onClick={() => toggleSkill(s)}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="plib-grid">
           {loading ? (
@@ -304,6 +356,25 @@ const PoseLibrary = () => {
           )}
         </div>
       </div>
+
+      <footer className="plib-footer">
+        <div className="plib-footer-logo">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="100" fill="#5C6B55"/>
+            <g transform="translate(100,100) scale(0.95) translate(-100,-42)" fill="#FFFFFF" stroke="#5C6B55" strokeWidth="2" strokeLinejoin="round">
+              <path d="M100 78 C82 66, 32 52, 6 64 C4 72, 28 84, 60 86 C78 86, 94 82, 100 78Z"/>
+              <path d="M100 78 C118 66, 168 52, 194 64 C196 72, 172 84, 140 86 C122 86, 106 82, 100 78Z"/>
+              <path d="M100 76 C86 58, 50 24, 36 12 C30 16, 38 38, 56 56 C70 68, 88 76, 100 76Z"/>
+              <path d="M100 76 C114 58, 150 24, 164 12 C170 16, 162 38, 144 56 C130 68, 112 76, 100 76Z"/>
+              <path d="M100 74 C90 52, 74 18, 68 6 C64 10, 68 32, 78 50 C86 62, 96 72, 100 74Z"/>
+              <path d="M100 74 C110 52, 126 18, 132 6 C136 10, 132 32, 122 50 C114 62, 104 72, 100 74Z"/>
+              <path d="M100 72 C92 48, 86 16, 88 2 C92 -2, 97 10, 100 2 C103 10, 108 -2, 112 2 C114 16, 108 48, 100 72Z"/>
+            </g>
+          </svg>
+          <span>Kora</span>
+        </div>
+        <p>&copy; 2026 Kora. Built for instructors.</p>
+      </footer>
     </div>
   );
 };
