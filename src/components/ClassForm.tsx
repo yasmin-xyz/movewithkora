@@ -199,7 +199,7 @@ const ClassForm = ({
             Planning…
           </>
         ) : justCompleted ? (
-          "Scroll Down to View Your Flow ↓"
+          "Click to View Your Flow ↓"
         ) : (
           "Plan This Class"
         )}
