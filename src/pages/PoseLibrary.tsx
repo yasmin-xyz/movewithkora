@@ -70,10 +70,11 @@ const PoseLibrary = () => {
         supabase.from("pose_media").select("pose_name, image_url"),
       ]);
 
-      const mediaMap = new Map((media || []).map((m: any) => [m.pose_name.toLowerCase(), m.image_url]));
+      const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
+      const mediaMap = new Map((media || []).map((m: any) => [normalize(m.pose_name), m.image_url]));
       const merged = (library || []).map((p: any) => ({
         ...p,
-        image_url: mediaMap.get(p.pose_name.toLowerCase()),
+        image_url: mediaMap.get(normalize(p.pose_name)),
       }));
       setPoses(merged);
       setLoading(false);
