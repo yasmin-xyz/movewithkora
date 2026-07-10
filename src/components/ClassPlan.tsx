@@ -552,7 +552,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange }: Cl
                                   open={openKeys.has(key)}
                                   onOpenChange={(open) => toggleOpen(key, open)}
                                 >
-                                  <div className={`rounded-lg border border-border bg-card overflow-hidden ${pose.sideFlow ? 'ml-3' : ''}`}>
+                                  <div className="rounded-lg border border-border bg-card overflow-hidden">
                                     <div className="flex items-center gap-4 p-3">
                                       {pose.imageUrl && (
                                         <img
