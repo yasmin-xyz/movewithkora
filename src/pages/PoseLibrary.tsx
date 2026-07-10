@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
+import SiteNav from "@/components/SiteNav";
 
 interface Pose {
   pose_name: string;
@@ -32,7 +32,6 @@ const FAMILY_FILTERS: { label: string; values: string[] }[] = [
 const SKILL_FILTERS = ["Beginner", "Intermediate", "Advanced"];
 
 const PoseLibrary = () => {
-  const navigate = useNavigate();
   const [poses, setPoses] = useState<Pose[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -40,6 +39,7 @@ const PoseLibrary = () => {
   const [activeFamilies, setActiveFamilies] = useState<Set<string>>(new Set());
   const [activeSkills, setActiveSkills] = useState<Set<string>>(new Set());
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const filterWrapRef = useRef<HTMLDivElement>(null);
   const [showSanskrit, setShowSanskrit] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem(SANSKRIT_STORAGE_KEY) === "true";
@@ -78,6 +78,17 @@ const PoseLibrary = () => {
       setLoading(false);
     };
     load();
+  }, []);
+
+  // Close the filter dropdown when clicking outside it
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filterWrapRef.current && !filterWrapRef.current.contains(e.target as Node)) {
+        setFiltersOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const displayName = (name: string) => {
@@ -135,7 +146,7 @@ const PoseLibrary = () => {
           --card-border: rgba(42, 42, 40, 0.08);
           --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
           --sans: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
-          background: var(--cream);
+          background: var(--white);
           font-family: var(--sans);
         }
         .kora-pose-library .plib-content {
@@ -147,14 +158,6 @@ const PoseLibrary = () => {
           opacity: 1;
           transform: translateY(0);
         }
-        .kora-pose-library .back-link {
-          display: inline-flex; align-items: center; gap: 0.4rem;
-          font-family: var(--sans); font-size: 0.75rem; font-weight: 600;
-          letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary);
-          background: none; border: none; cursor: pointer; padding: 0;
-          transition: color 0.2s ease, transform 0.2s ease;
-        }
-        .kora-pose-library .back-link:hover { color: var(--olive); transform: translateX(-2px); }
         .kora-pose-library .plib-lotus { width: 90px; height: 47px; margin: 0 auto 1.25rem; }
         .kora-pose-library .plib-lotus svg { width: 100%; height: 100%; overflow: visible; }
         .kora-pose-library .plib-lotus .lotus-petal {
@@ -174,16 +177,11 @@ const PoseLibrary = () => {
         .kora-pose-library .plib-tagline {
           text-align: center; color: var(--text-secondary); font-size: 1rem; margin-top: 0.5rem;
         }
-        .kora-pose-library .plib-toggle-row {
-          display: flex; justify-content: center; margin-top: 1.5rem;
-        }
-        .kora-pose-library .sanskrit-toggle {
-          display: flex; align-items: center; gap: 0.6rem; cursor: pointer;
-          font-size: 0.75rem; font-weight: 600; color: var(--olive);
-        }
         .kora-pose-library .filters-bar {
-          max-width: 900px; margin: 2.5rem auto 0; display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+          max-width: 900px; margin: 2.5rem auto 0; padding: 0 1.5rem;
+          display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
         }
+        .kora-pose-library .filters-bar-left { display: flex; align-items: center; gap: 0.75rem; position: relative; }
         .kora-pose-library .filters-toggle {
           display: inline-flex; align-items: center; gap: 0.5rem;
           font-family: var(--sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
@@ -201,36 +199,48 @@ const PoseLibrary = () => {
           text-underline-offset: 2px; transition: color 0.2s ease;
         }
         .kora-pose-library .filters-reset:hover { color: var(--olive); }
-        .kora-pose-library .filters-panel {
-          max-width: 900px; margin: 1.25rem auto 0; padding: 1.5rem;
+        .kora-pose-library .sanskrit-toggle {
+          display: flex; align-items: center; gap: 0.6rem; cursor: pointer;
+          font-size: 0.75rem; font-weight: 600; color: var(--olive);
+        }
+        .kora-pose-library .filters-dropdown {
+          position: absolute; top: 100%; left: 0; margin-top: 0.5rem; z-index: 50;
+          width: 320px; max-height: 360px; overflow-y: auto;
           background: var(--white); border: 1px solid var(--card-border); border-radius: 6px;
-          display: flex; flex-direction: column; gap: 0.75rem;
+          box-shadow: 0 12px 32px rgba(0,0,0,0.1); padding: 1.25rem;
         }
-        .kora-pose-library .filter-row { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
-        .kora-pose-library .filter-pill {
-          font-family: var(--sans); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.02em;
-          padding: 0.45rem 1rem; border-radius: 999px; border: 1px solid var(--card-border);
-          background: var(--cream); color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease;
+        .kora-pose-library .filters-group-label {
+          font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+          color: var(--text-primary); margin: 0.75rem 0 0.5rem;
         }
-        .kora-pose-library .filter-pill.active {
-          background: var(--olive); border-color: var(--olive); color: var(--white);
+        .kora-pose-library .filters-group-label:first-child { margin-top: 0; }
+        .kora-pose-library .filter-checkbox-row {
+          display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0; cursor: pointer;
+        }
+        .kora-pose-library .filter-checkbox-row input { accent-color: var(--olive); width: 15px; height: 15px; cursor: pointer; }
+        .kora-pose-library .filter-checkbox-row span { font-size: 0.85rem; color: var(--text-primary); }
+        .kora-pose-library .plib-grid-wrap {
+          max-width: 1100px; margin: 3rem auto 6rem; padding: 0 1.5rem;
+          min-height: 50vh;
         }
         .kora-pose-library .plib-grid {
-          max-width: 1100px; margin: 3rem auto 6rem; padding: 0 1.5rem;
           display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
         }
         @media (max-width: 900px) {
           .kora-pose-library .plib-grid { grid-template-columns: 1fr; }
         }
         .kora-pose-library .pose-card {
-          background: var(--white); border: 1px solid var(--card-border); border-radius: 6px;
+          background: var(--cream); border: 1px solid var(--card-border); border-radius: 6px;
           padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;
         }
         .kora-pose-library .pose-card img {
-          width: 100%; height: 160px; object-fit: contain; background: var(--cream); border-radius: 4px;
+          width: 100%; height: 160px; object-fit: contain; background: var(--white); border-radius: 4px;
         }
         .kora-pose-library .pose-card-name {
           font-family: var(--serif); font-size: 1.25rem; color: var(--text-primary); margin: 0;
+        }
+        .kora-pose-library .pose-card-name .english-aside {
+          font-style: italic; font-weight: 400; font-size: 0.85rem; color: var(--text-secondary); margin-left: 0.4rem;
         }
         .kora-pose-library .pose-card-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
         .kora-pose-library .pose-card-tag {
@@ -248,23 +258,19 @@ const PoseLibrary = () => {
           text-align: center; color: var(--text-secondary); padding: 4rem 1.5rem; grid-column: 1 / -1;
         }
         .kora-pose-library .plib-footer {
-          background: var(--text-primary); border-top: 1px solid rgba(255, 255, 255, 0.06);
+          background: var(--white); border-top: 1px solid var(--card-border);
           padding: 2.5rem 1.5rem; text-align: center;
         }
         .kora-pose-library .plib-footer-logo { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
         .kora-pose-library .plib-footer-logo svg { width: 20px; height: 20px; }
-        .kora-pose-library .plib-footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--cream); opacity: 0.6; }
-        .kora-pose-library .plib-footer p { font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); margin-top: 0.75rem; }
+        .kora-pose-library .plib-footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--text-primary); opacity: 0.5; }
+        .kora-pose-library .plib-footer p { font-size: 0.75rem; color: var(--text-secondary); opacity: 0.6; margin-top: 0.75rem; }
       `}</style>
 
-      <div className={`plib-content ${mounted ? "mounted" : ""}`}>
-        <div className="mx-auto max-w-6xl px-6 pt-8">
-          <button className="back-link" onClick={() => navigate("/")}>
-            ← Back to Homepage
-          </button>
-        </div>
+      <SiteNav />
 
-        <div className="mx-auto max-w-2xl px-6 pt-10 text-center">
+      <div className={`plib-content ${mounted ? "mounted" : ""}`}>
+        <div className="mx-auto max-w-2xl px-6 pt-28 text-center">
           <div className={`plib-lotus ${blooming ? "blooming" : ""}`}>
             <svg viewBox="0 0 200 105" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path className="lotus-petal petal-back" d="M100 78 C82 66, 32 52, 6 64 C4 72, 28 84, 60 86 C78 86, 94 82, 100 78Z"/>
@@ -278,82 +284,90 @@ const PoseLibrary = () => {
           </div>
           <h1>Pose Library</h1>
           <p className="plib-tagline">Every pose Kora knows, ready to browse.</p>
-          <div className="plib-toggle-row">
-            <label className="sanskrit-toggle">
-              <span>Show Sanskrit Names</span>
-              <Switch checked={showSanskrit} onCheckedChange={setShowSanskrit} />
-            </label>
-          </div>
         </div>
 
         <div className="filters-bar">
-          <button className="filters-toggle" onClick={() => setFiltersOpen((v) => !v)}>
-            {filtersOpen ? "Hide Filters" : "Show Filters"}
-            {activeFilterCount > 0 && <span className="filters-count-badge">{activeFilterCount}</span>}
-          </button>
-          {activeFilterCount > 0 && (
-            <button className="filters-reset" onClick={resetFilters}>
-              Reset Filters
+          <div className="filters-bar-left" ref={filterWrapRef}>
+            <button className="filters-toggle" onClick={() => setFiltersOpen((v) => !v)}>
+              {filtersOpen ? "Hide Filters" : "Show Filters"}
+              {activeFilterCount > 0 && <span className="filters-count-badge">{activeFilterCount}</span>}
             </button>
-          )}
+            {activeFilterCount > 0 && (
+              <button className="filters-reset" onClick={resetFilters}>
+                Reset Filters
+              </button>
+            )}
+
+            {filtersOpen && (
+              <div className="filters-dropdown">
+                <p className="filters-group-label">Pose Family</p>
+                {FAMILY_FILTERS.map((f) => (
+                  <label className="filter-checkbox-row" key={f.label}>
+                    <input
+                      type="checkbox"
+                      checked={activeFamilies.has(f.label)}
+                      onChange={() => toggleFamily(f.label)}
+                    />
+                    <span>{f.label}</span>
+                  </label>
+                ))}
+                <p className="filters-group-label">Skill Level</p>
+                {SKILL_FILTERS.map((s) => (
+                  <label className="filter-checkbox-row" key={s}>
+                    <input
+                      type="checkbox"
+                      checked={activeSkills.has(s)}
+                      onChange={() => toggleSkill(s)}
+                    />
+                    <span>{s}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <label className="sanskrit-toggle">
+            <span>Show Sanskrit Names</span>
+            <Switch checked={showSanskrit} onCheckedChange={setShowSanskrit} />
+          </label>
         </div>
 
-        {filtersOpen && (
-          <div className="filters-panel">
-            <div className="filter-row">
-              {FAMILY_FILTERS.map((f) => (
-                <button
-                  key={f.label}
-                  className={`filter-pill ${activeFamilies.has(f.label) ? "active" : ""}`}
-                  onClick={() => toggleFamily(f.label)}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-            <div className="filter-row">
-              {SKILL_FILTERS.map((s) => (
-                <button
-                  key={s}
-                  className={`filter-pill ${activeSkills.has(s) ? "active" : ""}`}
-                  onClick={() => toggleSkill(s)}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="plib-grid">
-          {loading ? (
-            <div className="plib-empty">Loading poses…</div>
-          ) : filteredPoses.length === 0 ? (
-            <div className="plib-empty">No poses match these filters.</div>
-          ) : (
-            filteredPoses.map((pose) => (
-              <div className="pose-card" key={pose.pose_name}>
-                {pose.image_url && <img src={pose.image_url} alt={displayName(pose.pose_name)} />}
-                <h3 className="pose-card-name">{displayName(pose.pose_name)}</h3>
-                <div className="pose-card-tags">
-                  <span className="pose-card-tag">{pose.family.replace(/_/g, " ")}</span>
-                  <span className="pose-card-tag">{pose.difficulty_level}</span>
+        <div className="plib-grid-wrap">
+          <div className="plib-grid">
+            {loading ? (
+              <div className="plib-empty">Loading poses…</div>
+            ) : filteredPoses.length === 0 ? (
+              <div className="plib-empty">No poses match these filters.</div>
+            ) : (
+              filteredPoses.map((pose) => (
+                <div className="pose-card" key={pose.pose_name}>
+                  {pose.image_url && <img src={pose.image_url} alt={pose.pose_name} />}
+                  <h3 className="pose-card-name">
+                    {displayName(pose.pose_name)}
+                    {showSanskrit && getSanskritName(pose.pose_name) && (
+                      <span className="english-aside">({pose.pose_name})</span>
+                    )}
+                  </h3>
+                  <div className="pose-card-tags">
+                    <span className="pose-card-tag">{pose.family.replace(/_/g, " ")}</span>
+                    <span className="pose-card-tag">{pose.difficulty_level}</span>
+                  </div>
+                  {pose.how_to_cue && (
+                    <>
+                      <p className="pose-card-section-label">How to Cue</p>
+                      <p className="pose-card-text">{pose.how_to_cue}</p>
+                    </>
+                  )}
+                  {pose.purpose_value && (
+                    <>
+                      <p className="pose-card-section-label">Purpose / Value</p>
+                      <p className="pose-card-text">{pose.purpose_value}</p>
+                    </>
+                  )}
                 </div>
-                {pose.how_to_cue && (
-                  <>
-                    <p className="pose-card-section-label">How to Cue</p>
-                    <p className="pose-card-text">{pose.how_to_cue}</p>
-                  </>
-                )}
-                {pose.purpose_value && (
-                  <>
-                    <p className="pose-card-section-label">Purpose / Value</p>
-                    <p className="pose-card-text">{pose.purpose_value}</p>
-                  </>
-                )}
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       </div>
 
