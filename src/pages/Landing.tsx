@@ -497,7 +497,7 @@ const Landing = () => {
             Your next class,<br />planned in a minute.
           </h2>
           <p className={`section-body reveal reveal-delay-2 ${isRevealed("cta-p") ? "visible" : ""}`} data-reveal-id="cta-p">
-            Starting with Vinyasa yoga. Expanding to every format you teach. No sign-up required — just generate.
+            Vinyasa, Hatha, Yin, Restorative, and more — matched to your students, your teaching style, and your class goals. Generate instantly. Save your favorites anytime with a free account.
           </p>
           <div className={`cta-section-button reveal reveal-delay-3 ${isRevealed("cta-btn") ? "visible" : ""}`} data-reveal-id="cta-btn">
             <button onClick={goToPlanner}>Plan a Class</button>
