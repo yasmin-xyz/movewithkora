@@ -18,6 +18,8 @@ const Index = () => {
   const [inspiration, setInspiration] = useState("");
   const [classPlan, setClassPlan] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [justCompleted, setJustCompleted] = useState(false);
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isViewingLoaded, setIsViewingLoaded] = useState(false);
   const [loadedDate, setLoadedDate] = useState<string | null>(null);
@@ -35,6 +37,20 @@ const Index = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Scroll to the results area once generation begins. Tied to isLoading
+  // (rather than an arbitrary setTimeout) so it fires after React has
+  // actually committed the loading state to the DOM.
+  useEffect(() => {
+    if (isLoading) {
+      resultsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [isLoading]);
+
+  // Once the user changes any input, the previous "class ready" state is stale.
+  useEffect(() => {
+    setJustCompleted(false);
+  }, [classLength, peakMovement, skillLevel, yogaStyle, inspiration]);
 
   useEffect(() => {
     const t1 = setTimeout(() => setMounted(true), 20);
@@ -85,13 +101,9 @@ const Index = () => {
     }
 
     setIsLoading(true);
+    setJustCompleted(false);
     setClassPlan("");
     abortRef.current = new AbortController();
-
-    // Give the loading state a moment to render, then scroll to it smoothly.
-    setTimeout(() => {
-      resultsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 50);
 
     try {
       const resp = await fetch(
@@ -125,6 +137,14 @@ const Index = () => {
       let buffer = "";
       let fullText = "";
 
+      const markContentReceived = () => {
+        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+        idleTimerRef.current = setTimeout(() => {
+          setIsLoading(false);
+          setJustCompleted(true);
+        }, 1200);
+      };
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -144,6 +164,7 @@ const Index = () => {
             if (content) {
               fullText += content;
               setClassPlan(fullText);
+              markContentReceived();
             }
           } catch {
             buffer = line + "\n" + buffer;
@@ -156,7 +177,9 @@ const Index = () => {
         toast.error(e.message || "Something went wrong");
       }
     } finally {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
       setIsLoading(false);
+      setJustCompleted(true);
     }
   };
 
@@ -344,6 +367,8 @@ const Index = () => {
                 onInspirationChange={setInspiration}
                 onGenerate={handleGenerate}
                 isLoading={isLoading}
+                justCompleted={justCompleted}
+                onScrollToResult={() => resultsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
               />
 
               <div ref={resultsAnchorRef} />
