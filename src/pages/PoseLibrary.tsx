@@ -50,14 +50,18 @@ const PoseLibrary = () => {
     localStorage.setItem(SANSKRIT_STORAGE_KEY, String(showSanskrit));
   }, [showSanskrit]);
 
+  // Only begin the entrance fade once poses have actually finished loading —
+  // ties the animation to real readiness instead of a fixed guess-timer.
   useEffect(() => {
-    const t1 = setTimeout(() => setMounted(true), 20);
-    const t2 = setTimeout(() => setBlooming(true), 200);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, []);
+    if (!loading) {
+      const t1 = setTimeout(() => setMounted(true), 20);
+      const t2 = setTimeout(() => setBlooming(true), 250);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+  }, [loading]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -159,8 +163,8 @@ const PoseLibrary = () => {
         }
         .kora-pose-library .plib-content {
           opacity: 0;
-          transform: translateY(20px);
-          transition: opacity 0.6s ease, transform 0.6s ease;
+          transform: translateY(35px);
+          transition: opacity 0.9s ease, transform 0.9s ease;
         }
         .kora-pose-library .plib-content.mounted {
           opacity: 1;
@@ -262,6 +266,9 @@ const PoseLibrary = () => {
         }
         .kora-pose-library .pose-card-text {
           font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0.2rem 0 0;
+        }
+        .kora-pose-library .pose-card-text-cue {
+          min-height: 5.6em;
         }
         .kora-pose-library .plib-empty {
           text-align: center; color: var(--text-secondary); padding: 4rem 1.5rem; grid-column: 1 / -1;
@@ -377,7 +384,7 @@ const PoseLibrary = () => {
                   {pose.how_to_cue && (
                     <div className="pose-card-block">
                       <p className="pose-card-section-label">How to Cue</p>
-                      <p className="pose-card-text">{pose.how_to_cue}</p>
+                      <p className="pose-card-text pose-card-text-cue">{pose.how_to_cue}</p>
                     </div>
                   )}
                   {pose.purpose_value && (
