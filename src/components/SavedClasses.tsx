@@ -99,7 +99,7 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0 space-y-0.5">
                 <p className="font-body text-sm font-medium text-foreground truncate">
-                  {cls.peak_pose || "Untitled"}
+                  {cls.peak_pose === "None" ? "General Flow" : (cls.peak_pose || "Untitled")}
                 </p>
                 <p className="font-body text-xs text-muted-foreground">
                   {cls.class_length} min
@@ -160,7 +160,7 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
               <div className="flex items-start justify-between mb-6">
                 <div className="space-y-1.5">
                   <h3 className="font-heading text-2xl tracking-tight text-foreground">
-                    {viewedClass.peak_pose || "Untitled"}
+                    {viewedClass.peak_pose === "None" ? "General Flow" : (viewedClass.peak_pose || "Untitled")}
                   </h3>
                   <p className="font-body text-sm text-foreground/80">
                     {viewedClass.class_length} minutes
