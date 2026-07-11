@@ -618,6 +618,11 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                                           <div className="flex items-center gap-2 flex-wrap min-w-0">
                                             <p className="font-body text-base font-medium text-foreground">
                                               {displayName(pose.name)}
+                                              {showSanskrit && getSanskritName(pose.name) && (
+                                                <span className="italic font-normal text-sm text-muted-foreground">
+                                                  {" "}({pose.name.replace(/\s*\((Right|Left)\)\s*$/i, "")})
+                                                </span>
+                                              )}
                                             </p>
                                             {pose.isSelected && (
                                               <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
