@@ -593,9 +593,9 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                                         />
                                       )}
                                       <div className="space-y-1 min-w-0 flex-1">
-                                        <div className="flex items-baseline justify-between gap-2">
-                                          <div className="flex items-center gap-2 min-w-0">
-                                            <p className="font-body text-base font-medium text-foreground truncate">
+                                        <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
+                                          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                                            <p className="font-body text-base font-medium text-foreground sm:truncate">
                                               {displayName(pose.name)}
                                             </p>
                                             {pose.isSelected && (
