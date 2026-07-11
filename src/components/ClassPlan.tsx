@@ -583,7 +583,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                                   open={openKeys.has(key)}
                                   onOpenChange={(open) => toggleOpen(key, open)}
                                 >
-                                  <div className="rounded-lg border border-border bg-card overflow-hidden">
+                                  <div className={`rounded-lg border border-border overflow-hidden ${pose.modifications.length === 0 ? "bg-muted/20" : "bg-card"}`}>
                                     <div className="flex items-center gap-4 p-3">
                                       {pose.imageUrl && (
                                         <img
@@ -605,7 +605,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                                             )}
                                           </div>
                                           <div className="flex items-center gap-2 flex-shrink-0">
-                                            {!readOnly && (
+                                            {!readOnly && pose.modifications.length > 0 && (
                                               <>
                                                 <CollapsibleTrigger asChild>
                                                   <Button
