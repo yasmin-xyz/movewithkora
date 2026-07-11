@@ -14,16 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      feedback: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          message: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          message: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          message?: string
+        }
+        Relationships: []
+      }
       pose_library: {
         Row: {
           base: string | null
           created_at: string | null
           difficulty_level: string | null
           family: string | null
+          how_to_cue: string | null
           id: string
           intensity_level: number | null
           orientation: string | null
           pose_name: string
+          purpose_value: string | null
           symmetry: string | null
           weight_bearing: string | null
         }
@@ -32,10 +58,12 @@ export type Database = {
           created_at?: string | null
           difficulty_level?: string | null
           family?: string | null
+          how_to_cue?: string | null
           id?: string
           intensity_level?: number | null
           orientation?: string | null
           pose_name: string
+          purpose_value?: string | null
           symmetry?: string | null
           weight_bearing?: string | null
         }
@@ -44,10 +72,12 @@ export type Database = {
           created_at?: string | null
           difficulty_level?: string | null
           family?: string | null
+          how_to_cue?: string | null
           id?: string
           intensity_level?: number | null
           orientation?: string | null
           pose_name?: string
+          purpose_value?: string | null
           symmetry?: string | null
           weight_bearing?: string | null
         }
