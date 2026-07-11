@@ -70,6 +70,11 @@ const SiteNav = () => {
           background: #F5F0EB; border: 1px solid rgba(42, 42, 40, 0.08); border-radius: 4px;
           box-shadow: 0 8px 24px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden; z-index: 200;
           min-width: 180px;
+          opacity: 0; transform: translateY(-8px); pointer-events: none;
+          transition: opacity 0.22s ease, transform 0.22s ease;
+        }
+        .kora-nav .nav-mobile-panel.open {
+          opacity: 1; transform: translateY(0); pointer-events: auto;
         }
         .kora-nav .nav-mobile-panel button {
           font-family: 'Source Sans 3', sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em;
@@ -130,25 +135,23 @@ const SiteNav = () => {
         <button className="nav-cta nav-cta-desktop" onClick={() => navigate("/planner")}>Plan a Class</button>
       </div>
 
-      {mobileMenuOpen && (
-        <div className="nav-mobile-panel">
-          <button className="nav-mobile-cta" onClick={() => { setMobileMenuOpen(false); navigate("/planner"); }}>
-            Plan a Class
-          </button>
-          <button
-            className={isActive("/pose-library") ? "active" : ""}
-            onClick={() => { setMobileMenuOpen(false); navigate("/pose-library"); }}
-          >
-            Pose Library
-          </button>
-          <button
-            className={isActive("/feedback") ? "active" : ""}
-            onClick={() => { setMobileMenuOpen(false); navigate("/feedback"); }}
-          >
-            Feedback
-          </button>
-        </div>
-      )}
+      <div className={`nav-mobile-panel ${mobileMenuOpen ? "open" : ""}`}>
+        <button className="nav-mobile-cta" onClick={() => { setMobileMenuOpen(false); navigate("/planner"); }}>
+          Plan a Class
+        </button>
+        <button
+          className={isActive("/pose-library") ? "active" : ""}
+          onClick={() => { setMobileMenuOpen(false); navigate("/pose-library"); }}
+        >
+          Pose Library
+        </button>
+        <button
+          className={isActive("/feedback") ? "active" : ""}
+          onClick={() => { setMobileMenuOpen(false); navigate("/feedback"); }}
+        >
+          Feedback
+        </button>
+      </div>
     </nav>
   );
 };
