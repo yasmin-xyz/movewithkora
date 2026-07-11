@@ -268,7 +268,7 @@ const Landing = () => {
         @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.06); opacity: 1; } }
         .kora-landing .pose-info { flex: 1; min-width: 0; }
         .kora-landing .pose-info h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem; }
-        .kora-landing .pose-info h4 .english-aside { font-style: italic; font-weight: 400; font-size: 0.82rem; color: var(--text-secondary); }
+        .kora-landing .pose-info h4 .english-aside { display: block; font-style: italic; font-weight: 400; font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.1rem; }
         .kora-landing .pose-meta { font-size: 0.8rem; color: var(--olive); font-weight: 500; margin-bottom: 0.25rem; }
         .kora-landing .pose-cue { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; font-style: italic; }
         .kora-landing .modify-tag { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.08em; color: var(--text-muted); flex-shrink: 0; align-self: flex-start; padding-top: 0.15rem; }
