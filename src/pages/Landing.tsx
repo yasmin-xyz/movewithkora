@@ -341,7 +341,7 @@ const Landing = () => {
             Planning your next class shouldn't feel overwhelming.
           </h2>
           <p className={`section-body reveal reveal-delay-1 ${isRevealed("problem-p") ? "visible" : ""}`} data-reveal-id="problem-p">
-            Whether you're teaching every day or a few times a week, creating fresh classes takes time and creative energy. Kora provides a structured starting point that you can adapt to your students, teaching style, and class goals.
+            Every instructor has days when inspiration comes easily—and days when it doesn't. Kora gives you a thoughtful starting point that you can adapt to your students, teaching style, and class goals—helping you spend less time figuring out what to teach, and more time refining how you'll teach it.
           </p>
         </div>
       </section>
@@ -351,7 +351,7 @@ const Landing = () => {
           <p className={`meaning-origin reveal ${isRevealed("meaning-origin") ? "visible" : ""}`} data-reveal-id="meaning-origin">The Name</p>
           <h2 className={`meaning-name reveal reveal-delay-1 ${isRevealed("meaning-name") ? "visible" : ""}`} data-reveal-id="meaning-name">Kora</h2>
           <p className={`meaning-text reveal reveal-delay-2 ${isRevealed("meaning-text") ? "visible" : ""}`} data-reveal-id="meaning-text">
-            In Tibetan tradition, a kora is a circular pilgrimage — an intentional journey around a sacred site. The word means to move in a complete arc. Every great class follows its own cycle. Kora is the intelligent structure behind that flow.
+            In Tibetan tradition, a kora is a circular pilgrimage — an intentional journey around a sacred site. The word means to move in a complete arc. Every great class follows its own cycle — Kora is the intelligent structure behind that flow.
           </p>
           <div className={`cycle-diagram reveal reveal-delay-3 ${isRevealed("cycle-arc") ? "visible" : ""}`} data-reveal-id="cycle-arc">
             <svg viewBox="0 0 600 210" className="cycle-arc-svg">
