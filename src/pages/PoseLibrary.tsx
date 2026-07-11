@@ -32,6 +32,61 @@ const FAMILY_FILTERS: { label: string; values: string[] }[] = [
 
 const SKILL_FILTERS = ["Beginner", "Intermediate", "Advanced"];
 
+// Well-known poses NOT currently in the curated library, tagged with the
+// family they'd belong to — lets us suggest genuinely similar poses even
+// when the exact searched pose isn't something we teach yet.
+const KNOWN_POSES_NOT_IN_LIBRARY: { name: string; family: string }[] = [
+  { name: "Peacock Pose", family: "arm_balance" },
+  { name: "Firefly Pose", family: "arm_balance" },
+  { name: "Grasshopper Pose", family: "arm_balance" },
+  { name: "One-Legged Crow Pose", family: "arm_balance" },
+  { name: "Scale Pose", family: "arm_balance" },
+  { name: "Rooster Pose", family: "arm_balance" },
+  { name: "Eight-Angle Pose", family: "arm_balance" },
+  { name: "Scorpion Pose", family: "inversion" },
+  { name: "Feathered Peacock Pose", family: "inversion" },
+  { name: "Tripod Headstand", family: "inversion" },
+  { name: "Lotus Pose", family: "seated" },
+  { name: "Turtle Pose", family: "seated" },
+  { name: "Sleeping Turtle Pose", family: "fold" },
+  { name: "Compass Pose", family: "twist" },
+  { name: "Revolved Head-to-Knee Pose", family: "twist" },
+  { name: "Noose Pose", family: "twist" },
+  { name: "Superman Pose", family: "backbend" },
+  { name: "Frog Backbend", family: "backbend" },
+  { name: "Scorpion Handstand", family: "backbend" },
+  { name: "Splits", family: "lunge" },
+  { name: "Monkey Pose", family: "lunge" },
+  { name: "Star Pose", family: "standing_pose" },
+  { name: "Toe Stand", family: "standing_pose" },
+  { name: "Reverse Prayer Pose", family: "bind" },
+  { name: "Cow Face Pose", family: "bind" },
+  { name: "Extended Puppy Pose", family: "fold" },
+  { name: "Anantasana", family: "side_bend" },
+  { name: "Crocodile Pose", family: "rest" },
+  { name: "Yogic Sleep Pose", family: "rest" },
+];
+
+// Recognizable category words mapped to a family value — lets a search like
+// "twist" or "backbend" surface relevant poses even with no specific pose name typed.
+const CATEGORY_KEYWORDS: { keywords: string[]; family: string }[] = [
+  { keywords: ["hip opener", "hip", "groin"], family: "hip_opener" },
+  { keywords: ["standing"], family: "standing_pose" },
+  { keywords: ["backbend", "back bend", "heart opener", "chest opener"], family: "backbend" },
+  { keywords: ["twist", "spinal twist", "rotation"], family: "twist" },
+  { keywords: ["arm balance", "arm balancing"], family: "arm_balance" },
+  { keywords: ["inversion", "invert", "upside down"], family: "inversion" },
+  { keywords: ["core", "abs", "abdominal"], family: "core" },
+  { keywords: ["seated", "sitting"], family: "seated" },
+  { keywords: ["forward fold", "fold", "forward bend"], family: "fold" },
+  { keywords: ["lunge"], family: "lunge" },
+  { keywords: ["bind", "binding"], family: "bind" },
+  { keywords: ["side bend", "side stretch"], family: "side_bend" },
+  { keywords: ["rest", "restorative", "relax", "calming"], family: "rest" },
+  { keywords: ["balance", "balancing"], family: "standing_pose" },
+];
+
+
 const PoseLibrary = () => {
   const [poses, setPoses] = useState<Pose[]>([]);
   const [loading, setLoading] = useState(true);
@@ -185,6 +240,37 @@ const PoseLibrary = () => {
   const suggestedPoses = (() => {
     const nq = normalizeSearch(searchQuery);
     if (!nq || filteredPoses.length > 0) return [];
+
+    const posesInFamily = (family: string, limit: number) =>
+      poses.filter((p) => p.family === family).slice(0, limit);
+
+    // Priority 1: does the search match a well-known pose we don't teach?
+    // If so, suggest our poses from that same family.
+    let bestKnown: { name: string; family: string } | null = null;
+    let bestKnownDist = Infinity;
+    for (const known of KNOWN_POSES_NOT_IN_LIBRARY) {
+      const nKnown = normalizeSearch(known.name);
+      const dist = nKnown.includes(nq) || nq.includes(nKnown) ? 0 : levenshtein(nq, nKnown);
+      const maxLen = Math.max(nq.length, nKnown.length);
+      if (dist <= Math.min(3, Math.floor(maxLen * 0.35)) && dist < bestKnownDist) {
+        bestKnownDist = dist;
+        bestKnown = known;
+      }
+    }
+    if (bestKnown) {
+      const matches = posesInFamily(bestKnown.family, 3);
+      if (matches.length > 0) return matches;
+    }
+
+    // Priority 2: does the search contain a recognizable category keyword?
+    for (const cat of CATEGORY_KEYWORDS) {
+      if (cat.keywords.some((kw) => nq.includes(normalizeSearch(kw)))) {
+        const matches = posesInFamily(cat.family, 3);
+        if (matches.length > 0) return matches;
+      }
+    }
+
+    // Priority 3: fall back to pure spelling-distance against our own library.
     return poses
       .map((p) => ({ pose: p, dist: levenshtein(nq, normalizeSearch(p.pose_name)) }))
       .sort((a, b) => a.dist - b.dist)
