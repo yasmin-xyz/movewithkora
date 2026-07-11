@@ -85,6 +85,11 @@ For each adjacent pose pair within a block, calculate a transition_score:
   +1 if symmetry changes (e.g. bilateral → unilateral)
   +1 if weight_bearing changes (e.g. feet → hands)
 
+CROSS-BLOCK AND CROSS-SECTION TRANSITIONS (critical — this applies in addition to within-block transitions, and is frequently missed):
+- The transition_score must ALSO be calculated between the LAST pose of one block and the FIRST pose of the NEXT block — including entering a new section (e.g. the start of PEAK) and including the first pose of a Right Side Flow that opens a new block.
+- Never let a block or section begin cold. A pose like Water Break, or the final pose of a Build block, still has a real body position — evaluate the transition into whatever comes next exactly as you would for two adjacent poses inside one block, using the same scoring and skill-level thresholds.
+- This is especially important entering PEAK: if the peak sequence's Right Side Flow begins with a lead-in pose or the peak pose itself, there must be a real transition connecting it to whatever pose (or Water Break) preceded it — never a direct cut with no bridge.
+
 STANDING CONTINUITY RULE (highest priority — overrides all other transition rules):
 If BOTH the previous pose AND the next pose have base == "standing":
   - Do NOT insert Down Dog Reset.
@@ -149,6 +154,12 @@ SECTION TIME ALLOCATION:
 - PEAK: 10–15% of total class time
 - COOL DOWN: remaining time
 
+TIMING REALISM (critical):
+- Every block's assigned Duration must realistically reflect the actual time needed to move through everything listed inside it — never an arbitrary round number disconnected from the content.
+- A single pass through a short flowing sequence (like one round of Sun Salutation A) takes roughly 45-75 seconds, not several minutes. A block with only 2-3 poses and no specified holds should be brief (often 2-4 minutes at most), not padded out to fill a larger number.
+- A block containing a pose with a specified multi-minute hold (e.g. "Hold for 3 breaths" is short; "Hold for 2 minutes" is long) must have its Duration reflect that hold time realistically, not understate it.
+- If a block's realistic content time doesn't match the section's target percentage from SECTION TIME ALLOCATION, adjust the number of poses or rounds in that block until the content and the stated duration genuinely agree — do not just write a duration that "sounds right" for the section without the content to back it up.
+
 YOGA STYLE ADAPTATION (apply if a style is specified in the user prompt):
 - Vinyasa: favor more frequent vinyasa/transition poses between blocks, brisk pacing, breath-linked movement.
 - Hatha: fewer transitions, longer holds per pose, slower and more deliberate pacing.
@@ -168,9 +179,10 @@ SUN SALUTATION RULES (critical — apply automatically when yogaStyle is Vinyasa
 
   Sun Salutation B: Mountain Pose → Chair Pose → Standing Forward Fold → Half Forward Fold → Plank Pose → Chaturanga → Upward Facing Dog → Downward Facing Dog → Warrior I (Right) → Downward Facing Dog → Warrior I (Left) → Downward Facing Dog → Half Forward Fold → Standing Forward Fold → Chair Pose → Mountain Pose
 
-- Insert Sun Salutations as the opening block(s) of the WARM-UP section, formatted as a normal Block (e.g. "Block: Sun Salutation A") with each pose in the fixed order listed as a normal "Pose:" entry with its own Breath/Cue/Modifications, exactly like any other pose.
+- Insert Sun Salutations as the opening block(s) of the WARM-UP section, formatted as a normal Block with each pose in the fixed order listed as a normal "Pose:" entry with its own Breath/Cue/Modifications, exactly like any other pose. The block name MUST include the round count directly, e.g. "Block: Sun Salutation A (Repeat 3x)" — this makes the repeat count visible to the instructor at a glance, not just an invisible assumption behind the duration.
 - Do NOT apply the standard delta-based transition scoring or insert extra Down Dog Resets/vinyasas within a Sun Salutation round — the sequence itself IS the transition, poses flow directly into each other in the fixed order given.
-- ROUNDS MUST BE FULLY WRITTEN OUT, not just counted. Number of rounds by class length: 45 min → 2 rounds of Sun Salutation A. 60 min → 2 rounds of A, optionally + 1 round of B. 75–90 min → 2 rounds of A + 1–2 rounds of B. A "round" means the complete pose sequence listed as full "Pose:" entries one full time through — for 2 rounds, list the entire Sun Salutation A sequence twice in a row within the block (20 total pose entries for 2 rounds of the 10-pose sequence), not once with a note saying "repeat 2x". Never abbreviate a round.
+- ROUNDS MUST BE FULLY WRITTEN OUT, not just counted. A "round" means the complete pose sequence listed as full "Pose:" entries one full time through — for 3 rounds, list the entire Sun Salutation A sequence three times in a row within the block, not once with a note saying "repeat 3x" instead of writing it out. Never abbreviate a round in the actual pose list, even though the round count also appears in the block name per the rule above.
+- TIMING: one round of Sun Salutation A realistically takes 45-75 seconds including brief cueing pauses. Choose the number of rounds so the REAL total time of that many rounds reasonably matches the Duration you assign to the block — do not assign a duration disconnected from the actual round count (see TIMING REALISM above). As a starting reference: 3 rounds ≈ 3-4 minutes, 4 rounds ≈ 4-5 minutes. Adjust the round count up or down so the block's stated Duration and its actual content genuinely agree, rather than defaulting to a fixed round count regardless of the assigned time.
 - After the Sun Salutation block(s), continue into the rest of WARM-UP and BUILD normally, using the standard metadata-driven sequencing rules from that point forward.
 - Do not repeat Sun Salutations later in the class — they belong only in the Warm-Up opening.
 
@@ -190,6 +202,7 @@ MODIFICATION REQUIREMENT (critical — applies to every non-transition pose in e
 
 OPTIONAL WATER BREAK:
 - For classes 60 minutes or longer, insert exactly one "Pose: Water Break (Optional)" entry as the LAST entry of the BUILD section, immediately before the PEAK section begins. Do not place it inside Peak, after Peak, or between Peak and Cool Down — it must come before Peak so the cue text ("reset before the peak") is accurate. Give it a brief Breath/Cue (e.g. "Cue: Offer students a moment to drink water and reset before the peak.") and no Modifications block. Do not insert more than one water break per class, and skip it entirely for classes under 60 minutes.
+- A Water Break does not exempt what comes after it from needing a real transition (see CROSS-BLOCK AND CROSS-SECTION TRANSITIONS above). Students are still in a real body position after a water pause — evaluate the transition into the next pose normally.
 
 Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
 
@@ -262,6 +275,7 @@ ASYMMETRICAL POSE SIDE FLOW RULES (critical):
 
 PEAK SEQUENCE FLOW (critical — applies specifically to the PEAK section when the peak pose is asymmetrical):
 - Never present the peak pose as the only, isolated entry in a Right/Left Side Flow. A peak pose must feel earned, not appear cold.
+- The FIRST pose of the Right Side Flow (whether that's a lead-in pose or the peak pose itself) must be connected to whatever came immediately before it — the last pose of Build, or a Water Break — via a real transition, following CROSS-BLOCK AND CROSS-SECTION TRANSITIONS above. Do not let Peak begin with a cold cut.
 - Within each side of the Peak's side flow, include 1-2 lead-in poses (sharing orientation, base, or family with the peak pose) BEFORE the peak pose itself, so the peak pose is the natural final entry of that side's sequence — not standing alone.
 - These lead-in poses should follow the same metadata continuity rules as everywhere else (orientation/base/family/intensity progression), building smoothly into the peak pose's shape and intensity.
 - The peak pose itself MUST be output as a normal full pose entry with its own Breath, Cue, and 3 Modifications — exactly like every other pose. Do NOT mark the peak pose as "Type: Transition" under any circumstances, even though it is the pose you are "flowing into." Only the lead-in poses before it (if genuinely a connector movement, not a named asana) may ever be transitions — the peak pose is always a real, fully-detailed pose entry, with its image and modifications intact.
