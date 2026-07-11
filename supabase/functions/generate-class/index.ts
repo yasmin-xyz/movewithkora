@@ -177,6 +177,7 @@ HOLD AND REPETITION GUIDANCE (critical):
 
 MODIFICATION REQUIREMENT (critical — applies to every non-transition pose in every section, not just Warm-Up):
 - Every pose must include exactly 3 modification lines: one easier variation, one alternative variation, and one more advanced/challenging variation — regardless of which section (Warm-Up, Build, Peak, Cool Down) the pose is in.
+- Each modification line MUST follow this exact format: "- [Pose name] – Breath: [breath cue] – [short description]". The breath cue is required for every single modification option, not optional — if a student switches to that variation, they need their own accurate breath instruction, not the original pose's breath cue. Never omit the "Breath:" segment.
 
 OPTIONAL WATER BREAK:
 - For classes 60 minutes or longer, insert exactly one "Pose: Water Break (Optional)" entry as the LAST entry of the BUILD section, immediately before the PEAK section begins. Do not place it inside Peak, after Peak, or between Peak and Cool Down — it must come before Peak so the cue text ("reset before the peak") is accurate. Give it a brief Breath/Cue (e.g. "Cue: Offer students a moment to drink water and reset before the peak.") and no Modifications block. Do not insert more than one water break per class, and skip it entirely for classes under 60 minutes.
@@ -190,17 +191,17 @@ Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue with light anatomical reasoning if relevant]
 Modifications:
-- [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+- [Easier pose name] – Breath: [breath cue] – [short description]
+- [Alternative pose name] – Breath: [breath cue] – [short description]
+- [Advanced pose name] – Breath: [breath cue] – [short description]
 
 Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
-- [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+- [Easier pose name] – Breath: [breath cue] – [short description]
+- [Alternative pose name] – Breath: [breath cue] – [short description]
+- [Advanced pose name] – Breath: [breath cue] – [short description]
 
 BUILD:
 Block: [block_name]
@@ -209,17 +210,17 @@ Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
-- [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+- [Easier pose name] – Breath: [breath cue] – [short description]
+- [Alternative pose name] – Breath: [breath cue] – [short description]
+- [Advanced pose name] – Breath: [breath cue] – [short description]
 
 Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
-- [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+- [Easier pose name] – Breath: [breath cue] – [short description]
+- [Alternative pose name] – Breath: [breath cue] – [short description]
+- [Advanced pose name] – Breath: [breath cue] – [short description]
 
 PEAK:
 Block: [block_name]
@@ -228,9 +229,9 @@ Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
-- [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+- [Easier pose name] – Breath: [breath cue] – [short description]
+- [Alternative pose name] – Breath: [breath cue] – [short description]
+- [Advanced pose name] – Breath: [breath cue] – [short description]
 
 COOL DOWN:
 Block: [block_name]
@@ -239,9 +240,9 @@ Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
-- [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+- [Easier pose name] – Breath: [breath cue] – [short description]
+- [Alternative pose name] – Breath: [breath cue] – [short description]
+- [Advanced pose name] – Breath: [breath cue] – [short description]
 
 ASYMMETRICAL POSE SIDE FLOW RULES (critical):
 - If a block contains asymmetrical poses (symmetry == "asymmetrical"), you MUST group them into a Side Flow.
@@ -261,17 +262,17 @@ Pose: [pose name] (Right)
 Breath: [breath cue]
 Cue: [teaching cue]
 Modifications:
-- [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+- [Easier pose name] – Breath: [breath cue] – [short description]
+- [Alternative pose name] – Breath: [breath cue] – [short description]
+- [Advanced pose name] – Breath: [breath cue] – [short description]
 
 Pose: [next asymmetrical pose] (Right)
 Breath: [breath cue]
 Cue: [teaching cue]
 Modifications:
-- [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+- [Easier pose name] – Breath: [breath cue] – [short description]
+- [Alternative pose name] – Breath: [breath cue] – [short description]
+- [Advanced pose name] – Breath: [breath cue] – [short description]
 
 Vinyasa: [vinyasa type]
 Cue: [a real, concise, embodied description of the movement carrying the student from the right side flow back through the vinyasa and into the left side flow — never just repeat the vinyasa type as the cue]
@@ -281,17 +282,17 @@ Pose: [pose name] (Left)
 Breath: [breath cue]
 Cue: [teaching cue]
 Modifications:
-- [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+- [Easier pose name] – Breath: [breath cue] – [short description]
+- [Alternative pose name] – Breath: [breath cue] – [short description]
+- [Advanced pose name] – Breath: [breath cue] – [short description]
 
 Pose: [next asymmetrical pose] (Left)
 Breath: [breath cue]
 Cue: [teaching cue]
 Modifications:
-- [Easier pose name] – [short description]
-- [Alternative pose name] – [short description]
-- [Advanced pose name] – [short description]
+- [Easier pose name] – Breath: [breath cue] – [short description]
+- [Alternative pose name] – Breath: [breath cue] – [short description]
+- [Advanced pose name] – Breath: [breath cue] – [short description]
 
 - Vinyasa type between sides depends on skill level, adjusted by the YOGA STYLE PACING OVERRIDE rule above where applicable:
   - Beginner: "Down Dog Reset"
