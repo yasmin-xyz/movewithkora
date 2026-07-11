@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -10,6 +11,26 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 import { getSanskritName } from "@/lib/sanskritNames";
+
+// Rotates while generating. Ordered to mirror the real build sequence first,
+// then a few "behind the scenes" extras for longer waits, then holds on a
+// calm closing line rather than looping back to the start.
+const LOADING_MESSAGES = [
+  "Warming up your sequence…",
+  "Grounding into the opening poses…",
+  "Building toward your peak…",
+  "Layering in your transitions…",
+  "Shaping your peak pose…",
+  "Easing into cool-down…",
+  "Settling the final stretch…",
+  "Writing cues for every breath…",
+  "Adding modifications for every level…",
+  "Balancing your timing…",
+  "Checking the flow feels right…",
+  "Reviewing the arc, start to finish…",
+];
+const LOADING_MESSAGE_INTERVAL_MS = 4500;
+const LOADING_MESSAGE_HOLD = "Almost ready for you…";
 
 // All confirmed to exist in pose_library, so results are always accurate.
 // Curated to poses that make sense as a class "peak" — arm balances,
@@ -78,6 +99,28 @@ const ClassForm = ({
   showSanskrit = false,
   onToggleSanskrit,
 }: ClassFormProps) => {
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const loadingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (isLoading) {
+      setLoadingMessageIndex(0);
+      loadingIntervalRef.current = setInterval(() => {
+        setLoadingMessageIndex((i) => Math.min(i + 1, LOADING_MESSAGES.length));
+      }, LOADING_MESSAGE_INTERVAL_MS);
+    } else if (loadingIntervalRef.current) {
+      clearInterval(loadingIntervalRef.current);
+    }
+    return () => {
+      if (loadingIntervalRef.current) clearInterval(loadingIntervalRef.current);
+    };
+  }, [isLoading]);
+
+  const currentLoadingMessage =
+    loadingMessageIndex < LOADING_MESSAGES.length
+      ? LOADING_MESSAGES[loadingMessageIndex]
+      : LOADING_MESSAGE_HOLD;
+
   const peakLabel = (englishName: string) =>
     showSanskrit ? getSanskritName(englishName) || englishName : englishName;
 
@@ -176,16 +219,28 @@ const ClassForm = ({
         />
       </div>
 
+      <style>{`
+        @keyframes classFormMsgFadeIn {
+          from { opacity: 0; transform: translateY(3px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .classform-loading-msg {
+          animation: classFormMsgFadeIn 0.5s ease;
+        }
+      `}</style>
+
       <Button
-        className="w-full h-12 font-body text-sm font-medium tracking-wide uppercase"
+        className="w-full h-12 font-body text-sm font-medium tracking-wide uppercase overflow-hidden"
         onClick={justCompleted ? onScrollToResult : onGenerate}
         disabled={isLoading}
       >
         {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Planning…
-          </>
+          <span className="flex items-center justify-center">
+            <Loader2 className="mr-2 h-4 w-4 animate-spin flex-shrink-0" />
+            <span key={loadingMessageIndex} className="classform-loading-msg normal-case tracking-normal">
+              {currentLoadingMessage}
+            </span>
+          </span>
         ) : justCompleted ? (
           "Click to View Your Flow ↓"
         ) : (
