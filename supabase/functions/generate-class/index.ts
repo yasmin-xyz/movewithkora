@@ -162,7 +162,9 @@ YOGA STYLE ADAPTATION (apply if a style is specified in the user prompt):
 SUN SALUTATION RULES (critical — apply automatically when yogaStyle is Vinyasa, Power, or Ashtanga; skip entirely for all other styles or when no style is specified):
 - Sun Salutation A and Sun Salutation B are FIXED traditional sequences, not something to construct via the normal metadata continuity rules. Use these exact pose orders:
 
-  Sun Salutation A: Mountain Pose → Standing Forward Fold → Half Forward Fold → Plank Pose → Chaturanga → Upward Facing Dog → Downward Facing Dog → Half Forward Fold → Standing Forward Fold → Mountain Pose
+  Sun Salutation A: Mountain Pose → Upward Salute → Standing Forward Fold → Half Forward Fold → Plank Pose → Chaturanga → Upward Facing Dog → Downward Facing Dog → Half Forward Fold → Standing Forward Fold → Upward Salute → Mountain Pose
+
+  Note: Mountain Pose (arms relaxed at the sides) and Upward Salute (arms reaching overhead) are two distinct poses in the library — never merge them into one entry or reuse "Mountain Pose" with a cue describing raised arms. Use the correct pose name for each step.
 
   Sun Salutation B: Mountain Pose → Chair Pose → Standing Forward Fold → Half Forward Fold → Plank Pose → Chaturanga → Upward Facing Dog → Downward Facing Dog → Warrior I (Right) → Downward Facing Dog → Warrior I (Left) → Downward Facing Dog → Half Forward Fold → Standing Forward Fold → Chair Pose → Mountain Pose
 
