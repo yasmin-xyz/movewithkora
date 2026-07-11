@@ -322,7 +322,7 @@ const Index = () => {
       `}</style>
 
       <div className={`planner-content ${mounted ? "mounted" : ""}`}>
-        <div className="mx-auto max-w-2xl px-6 pt-8 flex items-center justify-between">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6 pt-8 flex items-center justify-between">
           <button className="back-link" onClick={() => navigate("/")}>
             ← Back to Homepage
           </button>
@@ -336,7 +336,7 @@ const Index = () => {
           )}
         </div>
 
-        <div className="mx-auto max-w-2xl px-6 pb-16 pt-8 sm:pb-24">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6 pb-16 pt-8 sm:pb-24">
           <header ref={headerRef} className="mb-16 text-center">
             <div className={`planner-lotus ${blooming ? "blooming" : ""}`}>
               <svg viewBox="0 0 200 105" fill="none" xmlns="http://www.w3.org/2000/svg">
