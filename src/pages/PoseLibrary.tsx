@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
@@ -38,6 +39,7 @@ const PoseLibrary = () => {
   const [blooming, setBlooming] = useState(false);
   const [activeFamilies, setActiveFamilies] = useState<Set<string>>(new Set());
   const [activeSkills, setActiveSkills] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const filterWrapRef = useRef<HTMLDivElement>(null);
@@ -133,6 +135,39 @@ const PoseLibrary = () => {
 
   const activeFilterCount = activeFamilies.size + activeSkills.size;
 
+  const normalizeSearch = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
+
+  const levenshtein = (a: string, b: string): number => {
+    const m = a.length, n = b.length;
+    const dp: number[] = Array.from({ length: n + 1 }, (_, i) => i);
+    for (let i = 1; i <= m; i++) {
+      let prev = i - 1;
+      dp[0] = i;
+      for (let j = 1; j <= n; j++) {
+        const temp = dp[j];
+        dp[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[j], dp[j - 1]);
+        prev = temp;
+      }
+    }
+    return dp[n];
+  };
+
+  const poseMatchesSearch = (p: Pose, query: string): boolean => {
+    const nq = normalizeSearch(query);
+    if (!nq) return true;
+    const nName = normalizeSearch(p.pose_name);
+    const sanskrit = getSanskritName(p.pose_name);
+    const nSanskrit = sanskrit ? normalizeSearch(sanskrit) : "";
+    // Direct substring match (covers partial typing, which is most searches)
+    if (nName.includes(nq) || nq.includes(nName) || (nSanskrit && (nSanskrit.includes(nq) || nq.includes(nSanskrit)))) {
+      return true;
+    }
+    // Fuzzy fallback for typos / close spelling
+    const dist = Math.min(levenshtein(nq, nName), nSanskrit ? levenshtein(nq, nSanskrit) : Infinity);
+    const maxLen = Math.max(nq.length, nName.length);
+    return dist <= Math.min(3, Math.floor(maxLen * 0.3));
+  };
+
   const filteredPoses = poses.filter((p) => {
     const familyMatch =
       activeFamilies.size === 0 ||
@@ -141,8 +176,21 @@ const PoseLibrary = () => {
         return filter?.values.includes(p.family);
       });
     const skillMatch = activeSkills.size === 0 || activeSkills.has(p.difficulty_level);
-    return familyMatch && skillMatch;
+    const searchMatch = poseMatchesSearch(p, searchQuery);
+    return familyMatch && skillMatch && searchMatch;
   });
+
+  // When search comes up empty, suggest the closest-spelled poses anyway,
+  // regardless of the stricter match threshold used for the main results.
+  const suggestedPoses = (() => {
+    const nq = normalizeSearch(searchQuery);
+    if (!nq || filteredPoses.length > 0) return [];
+    return poses
+      .map((p) => ({ pose: p, dist: levenshtein(nq, normalizeSearch(p.pose_name)) }))
+      .sort((a, b) => a.dist - b.dist)
+      .slice(0, 3)
+      .map((x) => x.pose);
+  })();
 
   return (
     <div className="kora-pose-library min-h-screen">
@@ -189,11 +237,30 @@ const PoseLibrary = () => {
         .kora-pose-library .plib-tagline {
           text-align: center; color: var(--text-secondary); font-size: 1rem; margin-top: 0.5rem;
         }
-        .kora-pose-library .filters-bar {
+        .kora-pose-library .controls-row {
           max-width: 1100px; margin: 2.5rem auto 0; padding: 0 1.5rem;
-          display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+          display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem;
         }
-        .kora-pose-library .filters-bar-left { display: flex; align-items: center; gap: 0.75rem; position: relative; }
+        .kora-pose-library .filters-bar-left { display: flex; align-items: center; gap: 0.75rem; position: relative; order: 1; }
+        .kora-pose-library .search-wrap { order: 2; margin-left: auto; position: relative; }
+        .kora-pose-library .search-input {
+          font-family: var(--sans); font-size: 0.85rem; color: var(--text-primary);
+          background: var(--white); border: 1px solid var(--card-border); border-radius: 999px;
+          padding: 0.55rem 1.1rem 0.55rem 2.1rem; width: 220px; transition: border-color 0.2s ease, width 0.2s ease;
+        }
+        .kora-pose-library .search-input:focus { outline: none; border-color: var(--olive); width: 260px; }
+        .kora-pose-library .search-icon {
+          position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%);
+          font-size: 0.8rem; color: var(--text-secondary); pointer-events: none;
+        }
+        .kora-pose-library .sanskrit-wrap { order: 3; flex-basis: 100%; display: flex; justify-content: flex-end; }
+        @media (max-width: 767px) {
+          .kora-pose-library .search-wrap { order: 0; flex-basis: 100%; margin-left: 0; }
+          .kora-pose-library .search-input { width: 100%; }
+          .kora-pose-library .search-input:focus { width: 100%; }
+          .kora-pose-library .filters-bar-left { order: 1; margin-right: auto; }
+          .kora-pose-library .sanskrit-wrap { order: 2; flex-basis: auto; margin-left: auto; }
+        }
         .kora-pose-library .filters-toggle {
           display: inline-flex; align-items: center; gap: 0.5rem;
           font-family: var(--sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
@@ -273,6 +340,27 @@ const PoseLibrary = () => {
         .kora-pose-library .plib-empty {
           text-align: center; color: var(--text-secondary); padding: 4rem 1.5rem; grid-column: 1 / -1;
         }
+        .kora-pose-library .plib-no-results {
+          grid-column: 1 / -1; text-align: center; padding: 4rem 1.5rem; max-width: 480px; margin: 0 auto;
+        }
+        .kora-pose-library .plib-no-results-title {
+          font-family: var(--serif); font-size: 1.4rem; color: var(--text-primary); margin: 0 0 0.75rem;
+        }
+        .kora-pose-library .plib-no-results-text {
+          color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;
+        }
+        .kora-pose-library .plib-inline-link {
+          color: var(--olive); font-weight: 600; text-decoration: underline; text-underline-offset: 2px;
+        }
+        .kora-pose-library .plib-suggestions {
+          display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 1.25rem;
+        }
+        .kora-pose-library .plib-suggestion-pill {
+          font-family: var(--sans); font-size: 0.8rem; font-weight: 500;
+          background: var(--cream); border: 1px solid var(--card-border); border-radius: 999px;
+          padding: 0.5rem 1.1rem; cursor: pointer; color: var(--text-primary); transition: all 0.2s ease;
+        }
+        .kora-pose-library .plib-suggestion-pill:hover { background: var(--olive-muted); border-color: var(--olive); }
         .kora-pose-library .plib-footer {
           background: var(--white); border-top: 1px solid var(--card-border);
           padding: 2.5rem 1.5rem; text-align: center;
@@ -312,10 +400,10 @@ const PoseLibrary = () => {
             </svg>
           </div>
           <h1>Pose Library</h1>
-          <p className="plib-tagline">The poses behind every flow — how to teach them, and why they matter.</p>
+          <p className="plib-tagline">Every pose Kora knows, ready to browse.</p>
         </div>
 
-        <div className="filters-bar">
+        <div className="controls-row">
           <div className="filters-bar-left" ref={filterWrapRef}>
             <button className="filters-toggle" onClick={() => setFiltersOpen((v) => !v)}>
               {filtersOpen ? "Hide Filters" : "Show Filters"}
@@ -355,16 +443,47 @@ const PoseLibrary = () => {
             )}
           </div>
 
-          <label className="sanskrit-toggle">
-            <span>Show Sanskrit Names</span>
-            <Switch checked={showSanskrit} onCheckedChange={setShowSanskrit} />
-          </label>
+          <div className="search-wrap">
+            <span className="search-icon">⚲</span>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search poses…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="sanskrit-wrap">
+            <label className="sanskrit-toggle">
+              <span>Show Sanskrit Names</span>
+              <Switch checked={showSanskrit} onCheckedChange={setShowSanskrit} />
+            </label>
+          </div>
         </div>
 
         <div className="plib-grid-wrap">
           <div className="plib-grid">
             {loading ? (
               <div className="plib-empty">Loading poses…</div>
+            ) : filteredPoses.length === 0 && searchQuery.trim() ? (
+              <div className="plib-no-results">
+                <p className="plib-no-results-title">"{searchQuery}" isn't in our library yet.</p>
+                <p className="plib-no-results-text">
+                  Feel free to{" "}
+                  <Link to="/feedback" className="plib-inline-link">suggest it here</Link>
+                  {suggestedPoses.length > 0 && " — or maybe you'll like one of these in the meantime:"}
+                </p>
+                {suggestedPoses.length > 0 && (
+                  <div className="plib-suggestions">
+                    {suggestedPoses.map((p) => (
+                      <button key={p.pose_name} className="plib-suggestion-pill" onClick={() => setSearchQuery(p.pose_name)}>
+                        {p.pose_name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             ) : filteredPoses.length === 0 ? (
               <div className="plib-empty">No poses match these filters.</div>
             ) : (
