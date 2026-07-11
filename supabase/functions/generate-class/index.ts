@@ -140,6 +140,7 @@ FLOW BLOCK STRUCTURE (critical):
 - Do NOT assign duration to individual poses. Group poses into flow blocks within each section.
 - Assign a duration (in minutes) to each flow block, NOT to each pose.
 - All block durations must add up to exactly the total class length.
+- Block names must accurately describe every pose actually placed inside that block. Do not name a block after a category or theme (e.g. "Standing Balance and Binds") unless the poses within it genuinely belong to that category. If a block only contains simple grounding or transitional poses (e.g. Mountain Pose, Garland Pose), name it descriptively based on what is actually there (e.g. "Centering Before the Peak") rather than reusing a thematic label that doesn't match the contents. Decide the block name only after you know which poses will be in it, never before.
 
 SECTION TIME ALLOCATION:
 - WARM-UP: 10–20% of total class time
@@ -166,15 +167,19 @@ SUN SALUTATION RULES (critical — apply automatically when yogaStyle is Vinyasa
 
 - Insert Sun Salutations as the opening block(s) of the WARM-UP section, formatted as a normal Block (e.g. "Block: Sun Salutation A") with each pose in the fixed order listed as a normal "Pose:" entry with its own Breath/Cue/Modifications, exactly like any other pose.
 - Do NOT apply the standard delta-based transition scoring or insert extra Down Dog Resets/vinyasas within a Sun Salutation round — the sequence itself IS the transition, poses flow directly into each other in the fixed order given.
-- Number of rounds by class length: 45 min → 2 rounds of Sun Salutation A. 60 min → 2 rounds of A, optionally + 1 round of B. 75–90 min → 2 rounds of A + 1–2 rounds of B.
+- ROUNDS MUST BE FULLY WRITTEN OUT, not just counted. Number of rounds by class length: 45 min → 2 rounds of Sun Salutation A. 60 min → 2 rounds of A, optionally + 1 round of B. 75–90 min → 2 rounds of A + 1–2 rounds of B. A "round" means the complete pose sequence listed as full "Pose:" entries one full time through — for 2 rounds, list the entire Sun Salutation A sequence twice in a row within the block (20 total pose entries for 2 rounds of the 10-pose sequence), not once with a note saying "repeat 2x". Never abbreviate a round.
 - After the Sun Salutation block(s), continue into the rest of WARM-UP and BUILD normally, using the standard metadata-driven sequencing rules from that point forward.
 - Do not repeat Sun Salutations later in the class — they belong only in the Warm-Up opening.
+
+HOLD AND REPETITION GUIDANCE (critical):
+- For static holds — especially Peak poses, deep stretches, and balance poses — include a specific hold duration or breath count directly in the Breath or Cue line (e.g. "Breath: Hold for 5 breaths" or "Cue: Hold for 20-30 seconds, breathing steadily"). Do not leave hold length unspecified for poses meant to be held rather than flowed through.
+- Warm-up mobility poses (like Cat-Cow) should specify a repetition count where relevant (e.g. "Breath: Repeat for 5-8 rounds, inhaling to Cow, exhaling to Cat").
 
 MODIFICATION REQUIREMENT (critical — applies to every non-transition pose in every section, not just Warm-Up):
 - Every pose must include exactly 3 modification lines: one easier variation, one alternative variation, and one more advanced/challenging variation — regardless of which section (Warm-Up, Build, Peak, Cool Down) the pose is in.
 
 OPTIONAL WATER BREAK:
-- For classes 60 minutes or longer, insert one "Pose: Water Break (Optional)" entry at a natural pause point — typically at the end of the Build section, just before Peak, or between Peak and Cool Down. Give it a brief Breath/Cue (e.g. "Cue: Offer students a moment to drink water and reset before the peak.") and no Modifications block. Do not insert more than one water break per class, and skip it entirely for classes under 60 minutes.
+- For classes 60 minutes or longer, insert exactly one "Pose: Water Break (Optional)" entry as the LAST entry of the BUILD section, immediately before the PEAK section begins. Do not place it inside Peak, after Peak, or between Peak and Cool Down — it must come before Peak so the cue text ("reset before the peak") is accurate. Give it a brief Breath/Cue (e.g. "Cue: Offer students a moment to drink water and reset before the peak.") and no Modifications block. Do not insert more than one water break per class, and skip it entirely for classes under 60 minutes.
 
 Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
 
@@ -244,6 +249,11 @@ ASYMMETRICAL POSE SIDE FLOW RULES (critical):
 - Do NOT use "Repeat: Left" for individual poses. Mirror the ENTIRE cluster, not pose-by-pose.
 - Only insert ONE vinyasa between the right and left side flows (not between each pose).
 - Bilateral poses in the same block go OUTSIDE the side flow (before or after it).
+
+PEAK SEQUENCE FLOW (critical — applies specifically to the PEAK section when the peak pose is asymmetrical):
+- Never present the peak pose as the only, isolated entry in a Right/Left Side Flow. A peak pose must feel earned, not appear cold.
+- Within each side of the Peak's side flow, include 1-2 lead-in poses (sharing orientation, base, or family with the peak pose) BEFORE the peak pose itself, so the peak pose is the natural final entry of that side's sequence — not standing alone.
+- These lead-in poses should follow the same metadata continuity rules as everywhere else (orientation/base/family/intensity progression), building smoothly into the peak pose's shape and intensity.
 - Format:
 
 Right Side Flow:
