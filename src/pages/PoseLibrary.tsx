@@ -398,6 +398,9 @@ const PoseLibrary = () => {
           background: var(--cream); border: 1px solid var(--card-border); border-radius: 6px;
           padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;
         }
+        @media (max-width: 480px) {
+          .kora-pose-library .pose-card { padding: 1.1rem; }
+        }
         .kora-pose-library .pose-card img {
           width: 100%; height: 160px; object-fit: contain; background: var(--white); border-radius: 4px;
         }
@@ -405,7 +408,7 @@ const PoseLibrary = () => {
           font-family: var(--serif); font-size: 1.25rem; color: var(--text-primary); margin: 0;
         }
         .kora-pose-library .pose-card-name .english-aside {
-          font-style: italic; font-weight: 400; font-size: 0.85rem; color: var(--text-secondary); margin-left: 0.4rem;
+          display: block; font-style: italic; font-weight: 400; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.15rem;
         }
         .kora-pose-library .pose-card-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
         .kora-pose-library .pose-card-tag {
@@ -486,7 +489,7 @@ const PoseLibrary = () => {
             </svg>
           </div>
           <h1>Pose Library</h1>
-          <p className="plib-tagline">The poses behind every flow — how to teach them, and why they matter.</p>
+          <p className="plib-tagline">Every pose Kora knows, ready to browse.</p>
         </div>
 
         <div className="controls-row">
