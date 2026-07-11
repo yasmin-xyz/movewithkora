@@ -367,7 +367,7 @@ const Index = () => {
               </button>
               <div className="mb-8 space-y-1">
                 <h2 className="font-heading text-3xl tracking-tight text-foreground">
-                  {peakMovement || "Untitled"}
+                  {peakMovement === "None" ? "General Flow" : (peakMovement || "Untitled")}
                 </h2>
                 <p className="font-body text-sm text-muted-foreground">
                   {classLength} min
