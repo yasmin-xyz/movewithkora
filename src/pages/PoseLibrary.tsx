@@ -255,12 +255,13 @@ const PoseLibrary = () => {
           font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
           color: var(--olive); background: var(--olive-muted); padding: 0.25rem 0.6rem; border-radius: 2px;
         }
+        .kora-pose-library .pose-card-block { display: flex; flex-direction: column; }
         .kora-pose-library .pose-card-section-label {
           font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-          color: var(--text-primary); margin-top: 0.5rem;
+          color: var(--text-primary);
         }
         .kora-pose-library .pose-card-text {
-          font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0.25rem 0 0;
+          font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0.2rem 0 0;
         }
         .kora-pose-library .plib-empty {
           text-align: center; color: var(--text-secondary); padding: 4rem 1.5rem; grid-column: 1 / -1;
@@ -374,16 +375,16 @@ const PoseLibrary = () => {
                     <span className="pose-card-tag">{pose.difficulty_level}</span>
                   </div>
                   {pose.how_to_cue && (
-                    <>
+                    <div className="pose-card-block">
                       <p className="pose-card-section-label">How to Cue</p>
                       <p className="pose-card-text">{pose.how_to_cue}</p>
-                    </>
+                    </div>
                   )}
                   {pose.purpose_value && (
-                    <>
+                    <div className="pose-card-block">
                       <p className="pose-card-section-label">Purpose / Value</p>
                       <p className="pose-card-text">{pose.purpose_value}</p>
-                    </>
+                    </div>
                   )}
                 </div>
               ))
