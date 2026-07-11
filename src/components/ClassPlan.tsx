@@ -605,25 +605,27 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                                   onOpenChange={(open) => toggleOpen(key, open)}
                                 >
                                   <div className={`rounded-lg border border-border overflow-hidden ${pose.modifications.length === 0 ? "bg-muted/20" : "bg-card"}`}>
-                                    <div className="flex items-start gap-4 p-3">
+                                    <div className="flex items-start gap-2.5 p-2.5 sm:gap-4 sm:p-3">
                                       {pose.imageUrl && (
                                         <img
                                           src={pose.imageUrl}
                                           alt={displayName(pose.name)}
-                                          className="w-[72px] h-[72px] rounded-md object-contain bg-muted/20 flex-shrink-0"
+                                          className="w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-md object-contain bg-muted/20 flex-shrink-0"
                                         />
                                       )}
                                       <div className="space-y-1 min-w-0 flex-1">
                                         <div className="flex items-center justify-between gap-2 flex-wrap">
                                           <div className="flex items-center gap-2 flex-wrap min-w-0">
-                                            <p className="font-body text-base font-medium text-foreground">
-                                              {displayName(pose.name)}
+                                            <div>
+                                              <p className="font-body text-base font-medium text-foreground">
+                                                {displayName(pose.name)}
+                                              </p>
                                               {showSanskrit && getSanskritName(pose.name) && (
-                                                <span className="italic font-normal text-sm text-muted-foreground">
-                                                  {" "}({pose.name.replace(/\s*\((Right|Left)\)\s*$/i, "")})
-                                                </span>
+                                                <p className="italic font-normal text-sm text-muted-foreground">
+                                                  ({pose.name.replace(/\s*\((Right|Left)\)\s*$/i, "")})
+                                                </p>
                                               )}
-                                            </p>
+                                            </div>
                                             {pose.isSelected && (
                                               <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
                                                 Selected
