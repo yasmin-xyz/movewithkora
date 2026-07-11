@@ -319,7 +319,10 @@ Rules:
 - Tone: supportive, clear, instructor-guiding. No long paragraphs.
 - Nothing else outside this format.`;
 
-    let userPrompt = `Create a ${classLength}-minute yoga class plan for a ${skillLevel.toLowerCase()}-level practitioner that builds toward "${peakMovement}" as the peak pose. Adjust pose complexity and cues to match the ${skillLevel.toLowerCase()} skill level. Include Warm-Up, Build, Peak, and Cool Down sections.`;
+    const hasSpecificPeak = peakMovement && peakMovement !== "None";
+    let userPrompt = hasSpecificPeak
+      ? `Create a ${classLength}-minute yoga class plan for a ${skillLevel.toLowerCase()}-level practitioner that builds toward "${peakMovement}" as the peak pose. Adjust pose complexity and cues to match the ${skillLevel.toLowerCase()} skill level. Include Warm-Up, Build, Peak, and Cool Down sections.`
+      : `Create a ${classLength}-minute yoga class plan for a ${skillLevel.toLowerCase()}-level practitioner. No specific peak pose has been requested — instead, design a well-rounded, balanced flow appropriate to the requested style and focus. Choose an appropriate high-point pose for the PEAK section yourself, one that fits naturally from the poses used earlier in the class. If the style is Yin or Restorative, keep the PEAK section itself gentle and low-intensity rather than forcing a demanding climactic pose — a deeper hold or fuller expression of an earlier theme is enough of a "peak" for those styles. Adjust pose complexity and cues to match the ${skillLevel.toLowerCase()} skill level. Include Warm-Up, Build, Peak, and Cool Down sections.`;
 
     if (yogaStyle) {
       userPrompt += ` This class should be taught in the ${yogaStyle} style — apply the YOGA STYLE ADAPTATION rules above for ${yogaStyle} to pacing, transition frequency, and hold style, while still following all other sequencing and formatting rules.`;
