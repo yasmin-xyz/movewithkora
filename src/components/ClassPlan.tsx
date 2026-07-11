@@ -34,6 +34,7 @@ interface PoseEntry {
   sideFlowVinyasaLabel?: string;
   originalName?: string;
   originalCue?: string;
+  originalBreath?: string;
 }
 
 interface FlowBlock {
@@ -299,12 +300,21 @@ function serializeSections(sections: Section[]): string {
   return lines.join("\n");
 }
 
-function parseModification(mod: string): { name: string; description: string } {
-  const dashIdx = mod.indexOf("–");
-  const hyphenIdx = mod.indexOf(" - ");
-  if (dashIdx !== -1) {
-    return { name: mod.slice(0, dashIdx).trim(), description: mod.slice(dashIdx + 1).trim() };
+function parseModification(mod: string): { name: string; breath?: string; description: string } {
+  // New format: "Name – Breath: cue – description"
+  const parts = mod.split("–").map((p) => p.trim());
+  if (parts.length >= 3 && /^breath:/i.test(parts[1])) {
+    return {
+      name: parts[0],
+      breath: parts[1].replace(/^breath:\s*/i, "").trim(),
+      description: parts.slice(2).join(" – ").trim(),
+    };
   }
+  // Backward-compatible fallback: old 2-part format "Name – description", no breath data
+  if (parts.length >= 2) {
+    return { name: parts[0], description: parts.slice(1).join(" – ").trim() };
+  }
+  const hyphenIdx = mod.indexOf(" - ");
   if (hyphenIdx !== -1) {
     return { name: mod.slice(0, hyphenIdx).trim(), description: mod.slice(hyphenIdx + 3).trim() };
   }
@@ -369,19 +379,23 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                       ...b,
                       poses: b.poses.map((p, pi) => {
                         if (pi !== poseIdx) return p;
-                        const { name, description } = parseModification(mod);
-                        const oldLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
+                        const { name, breath, description } = parseModification(mod);
+                        const oldLabel = p.breath
+                          ? `${p.name} – Breath: ${p.breath} – ${p.cue}`
+                          : (p.cue ? `${p.name} – ${p.cue}` : p.name);
                         const newMods = p.modifications.filter((m) => m !== mod);
                         newMods.push(oldLabel);
                         const imageUrl = findPoseImage(name, media);
                         return {
                           ...p,
                           name,
+                          breath: breath ?? p.breath,
                           cue: description || p.cue,
                           modifications: newMods,
                           isSelected: true,
                           originalName: p.originalName || p.name,
                           originalCue: p.originalCue ?? p.cue,
+                          originalBreath: p.originalBreath ?? p.breath,
                           imageUrl,
                         };
                       }),
@@ -416,18 +430,25 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                       ...b,
                       poses: b.poses.map((p, pi) => {
                         if (pi !== poseIdx || !p.originalName) return p;
-                        const currentLabel = p.cue ? `${p.name} – ${p.cue}` : p.name;
-                        const newMods = p.modifications.filter((m) => m !== (p.originalCue ? `${p.originalName} – ${p.originalCue}` : p.originalName));
+                        const currentLabel = p.breath
+                          ? `${p.name} – Breath: ${p.breath} – ${p.cue}`
+                          : (p.cue ? `${p.name} – ${p.cue}` : p.name);
+                        const originalLabel = p.originalBreath
+                          ? `${p.originalName} – Breath: ${p.originalBreath} – ${p.originalCue}`
+                          : (p.originalCue ? `${p.originalName} – ${p.originalCue}` : p.originalName);
+                        const newMods = p.modifications.filter((m) => m !== originalLabel);
                         newMods.push(currentLabel);
                         const imageUrl = findPoseImage(p.originalName, media);
                         return {
                           ...p,
                           name: p.originalName,
+                          breath: p.originalBreath ?? p.breath,
                           cue: p.originalCue || "",
                           modifications: newMods,
                           isSelected: false,
                           originalName: undefined,
                           originalCue: undefined,
+                          originalBreath: undefined,
                           imageUrl,
                         };
                       }),
@@ -584,7 +605,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                                   onOpenChange={(open) => toggleOpen(key, open)}
                                 >
                                   <div className={`rounded-lg border border-border overflow-hidden ${pose.modifications.length === 0 ? "bg-muted/20" : "bg-card"}`}>
-                                    <div className="flex items-center gap-4 p-3">
+                                    <div className="flex items-start gap-4 p-3">
                                       {pose.imageUrl && (
                                         <img
                                           src={pose.imageUrl}
@@ -593,40 +614,15 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                                         />
                                       )}
                                       <div className="space-y-1 min-w-0 flex-1">
-                                        <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
-                                          <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                                            <p className="font-body text-base font-medium text-foreground sm:truncate">
-                                              {displayName(pose.name)}
-                                            </p>
-                                            {pose.isSelected && (
-                                              <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
-                                                Selected
-                                              </span>
-                                            )}
-                                          </div>
-                                          <div className="flex items-center gap-2 flex-shrink-0">
-                                            {!readOnly && pose.modifications.length > 0 && (
-                                              <>
-                                                <CollapsibleTrigger asChild>
-                                                  <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
-                                                  >
-                                                    Modify
-                                                  </Button>
-                                                </CollapsibleTrigger>
-                                                {pose.isSelected && (
-                                                  <button
-                                                    onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
-                                                    className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
-                                                  >
-                                                    Reset
-                                                  </button>
-                                                )}
-                                              </>
-                                            )}
-                                          </div>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <p className="font-body text-base font-medium text-foreground">
+                                            {displayName(pose.name)}
+                                          </p>
+                                          {pose.isSelected && (
+                                            <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
+                                              Selected
+                                            </span>
+                                          )}
                                         </div>
                                         {pose.breath && (
                                           <p className="font-body text-sm text-muted-foreground">
@@ -639,6 +635,27 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                                             <span className="font-medium text-foreground/70">Cue:</span>{" "}
                                             {pose.cue}
                                           </p>
+                                        )}
+                                        {!readOnly && pose.modifications.length > 0 && (
+                                          <div className="flex items-center justify-end gap-3 pt-1">
+                                            {pose.isSelected && (
+                                              <button
+                                                onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
+                                                className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
+                                              >
+                                                Reset
+                                              </button>
+                                            )}
+                                            <CollapsibleTrigger asChild>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
+                                              >
+                                                Modify
+                                              </Button>
+                                            </CollapsibleTrigger>
+                                          </div>
                                         )}
                                       </div>
                                     </div>
