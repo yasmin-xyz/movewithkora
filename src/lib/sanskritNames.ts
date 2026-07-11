@@ -32,7 +32,7 @@ export const SANSKRIT_NAMES: Record<string, string> = {
   "Warrior I": "Virabhadrasana I",
   "Warrior II": "Virabhadrasana II",
   "Reverse Warrior": "Viparita Virabhadrasana",
-  "Skandasana": "Skandasana",
+  "Low Side Lunge": "Skandasana",
   "Triangle Pose": "Trikonasana",
   "Plank Pose": "Phalakasana",
   "Upward Facing Dog": "Urdhva Mukha Svanasana",
@@ -56,7 +56,7 @@ export const SANSKRIT_NAMES: Record<string, string> = {
   "Half Moon Pose": "Ardha Chandrasana",
   "Standing Split": "Urdhva Prasarita Eka Padasana",
   "Dancer's Pose": "Natarajasana",
-  "Marichyasana": "Marichyasana",
+  "Sage Twist Pose": "Marichyasana",
   "Crow Pose": "Bakasana",
   "Shoulder Stand": "Salamba Sarvangasana",
   "Warrior III": "Virabhadrasana III",
@@ -67,6 +67,8 @@ export const SANSKRIT_NAMES: Record<string, string> = {
   "Side Crow": "Parsva Bakasana",
   "Flying Pigeon": "Eka Pada Galavasana",
   "Garland Pose": "Malasana",
+  "Upward Salute": "Urdhva Hastasana",
+  "Wild Thing Pose": "Camatkarasana",
 };
 
 function normalize(name: string): string {
