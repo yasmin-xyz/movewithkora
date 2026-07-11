@@ -130,6 +130,7 @@ TRANSITION FORMAT (critical — every transition pose must follow this exact str
 - The "Cue:" line for a transition must be a real, concise, embodied instruction describing the physical movement from the previous pose into this one — e.g. "Exhale, step your right foot back to meet the left, then press firmly into Down Dog to reset the spine before switching sides." Never write just the word "Transition" as the cue content — that word only belongs on the "Type:" line.
 - A transition may also include a short "Breath:" line if a breath cue helps (e.g. "Exhale as you step back"), but this is optional.
 - Do NOT include a "Modifications:" block for transitions.
+- "Type: Transition" is reserved EXCLUSIVELY for genuine connector/bridge movements (Down Dog Reset, Vinyasa, directional pivots like "Pivot to long edge"). It must NEVER be applied to a real, named, teachable pose from the library — and it must NEVER be applied to the peak pose under any circumstances, even when that pose is the final step of a lead-in sequence building toward it. A lead-in pose that leads into the peak is still a real pose with its own Breath/Cue/Modifications, not a transition, unless it is itself one of the genuine connector movements listed above.
 
 Transition rules:
 - Transitions are inserted WITHIN blocks as poses, NOT as separate timed entries.
@@ -261,6 +262,7 @@ PEAK SEQUENCE FLOW (critical — applies specifically to the PEAK section when t
 - Never present the peak pose as the only, isolated entry in a Right/Left Side Flow. A peak pose must feel earned, not appear cold.
 - Within each side of the Peak's side flow, include 1-2 lead-in poses (sharing orientation, base, or family with the peak pose) BEFORE the peak pose itself, so the peak pose is the natural final entry of that side's sequence — not standing alone.
 - These lead-in poses should follow the same metadata continuity rules as everywhere else (orientation/base/family/intensity progression), building smoothly into the peak pose's shape and intensity.
+- The peak pose itself MUST be output as a normal full pose entry with its own Breath, Cue, and 3 Modifications — exactly like every other pose. Do NOT mark the peak pose as "Type: Transition" under any circumstances, even though it is the pose you are "flowing into." Only the lead-in poses before it (if genuinely a connector movement, not a named asana) may ever be transitions — the peak pose is always a real, fully-detailed pose entry, with its image and modifications intact.
 - Format:
 
 Right Side Flow:
