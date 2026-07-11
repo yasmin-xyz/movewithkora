@@ -119,6 +119,7 @@ const ClassForm = ({
             <SelectValue placeholder="Select a peak pose" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="None">None (General Flow)</SelectItem>
             {PEAK_OPTIONS.map((opt) => (
               <SelectItem key={opt} value={opt}>
                 {peakLabel(opt)}
