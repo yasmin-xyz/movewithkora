@@ -175,9 +175,15 @@ HOLD AND REPETITION GUIDANCE (critical):
 - For static holds — especially Peak poses, deep stretches, and balance poses — include a specific hold duration or breath count directly in the Breath or Cue line (e.g. "Breath: Hold for 5 breaths" or "Cue: Hold for 20-30 seconds, breathing steadily"). Do not leave hold length unspecified for poses meant to be held rather than flowed through.
 - Warm-up mobility poses (like Cat-Cow) should specify a repetition count where relevant (e.g. "Breath: Repeat for 5-8 rounds, inhaling to Cow, exhaling to Cat").
 
+BREATH CUE QUALITY (critical — applies to every Breath line anywhere in the output, including main poses AND every modification option):
+- A breath cue must always describe an action or movement paired with the breath — never output the bare word "Inhale" or "Exhale" alone with nothing else. Every breath cue needs a "to do what": what lifts, lengthens, presses, opens, or releases on that breath.
+- Bad (never do this): "Breath: Inhale" / "Breath: Exhale"
+- Good: "Breath: Inhale to lift the chest" / "Breath: Exhale to fold deeper" / "Breath: Inhale to lengthen the spine, exhale to rotate"
+- This applies with equal weight to modification breath cues — a modification's breath cue must be just as descriptive and pose-specific as a main pose's, never a shortened placeholder.
+
 MODIFICATION REQUIREMENT (critical — applies to every non-transition pose in every section, not just Warm-Up):
 - Every pose must include exactly 3 modification lines: one easier variation, one alternative variation, and one more advanced/challenging variation — regardless of which section (Warm-Up, Build, Peak, Cool Down) the pose is in.
-- Each modification line MUST follow this exact format: "- [Pose name] – Breath: [breath cue] – [short description]". The breath cue is required for every single modification option, not optional — if a student switches to that variation, they need their own accurate breath instruction, not the original pose's breath cue. Never omit the "Breath:" segment.
+- Each modification line MUST follow this exact format: "- [Pose name] – Breath: [breath cue] – [short description]". The breath cue is required for every single modification option, not optional — if a student switches to that variation, they need their own accurate breath instruction, not the original pose's breath cue. Never omit the "Breath:" segment, and never leave it as a bare "Inhale"/"Exhale" — see BREATH CUE QUALITY above.
 
 OPTIONAL WATER BREAK:
 - For classes 60 minutes or longer, insert exactly one "Pose: Water Break (Optional)" entry as the LAST entry of the BUILD section, immediately before the PEAK section begins. Do not place it inside Peak, after Peak, or between Peak and Cool Down — it must come before Peak so the cue text ("reset before the peak") is accurate. Give it a brief Breath/Cue (e.g. "Cue: Offer students a moment to drink water and reset before the peak.") and no Modifications block. Do not insert more than one water break per class, and skip it entirely for classes under 60 minutes.
