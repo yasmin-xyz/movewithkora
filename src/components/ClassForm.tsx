@@ -101,7 +101,7 @@ const ClassForm = ({
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
           <label className="font-body text-sm font-medium text-foreground tracking-wide uppercase">
             Peak Movement or Focus
           </label>
@@ -168,7 +168,7 @@ const ClassForm = ({
         </label>
         <Input
           className="h-12 bg-card border-border font-body text-foreground placeholder:text-muted-foreground"
-          placeholder="e.g. grounding, hip-openers, Dharma Mittra's inversion philosophy"
+          placeholder="e.g. grounding, hip-openers, Dharma Mittra"
           value={inspiration}
           onChange={(e) => onInspirationChange(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && !isLoading && onGenerate()}
