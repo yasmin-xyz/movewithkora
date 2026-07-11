@@ -16,6 +16,7 @@ import { getSanskritName } from "@/lib/sanskritNames";
 // then a few "behind the scenes" extras for longer waits, then holds on a
 // calm closing line rather than looping back to the start.
 const LOADING_MESSAGES = [
+  "Planning…",
   "Warming up your sequence…",
   "Grounding into the opening poses…",
   "Building toward your peak…",
@@ -221,11 +222,11 @@ const ClassForm = ({
 
       <style>{`
         @keyframes classFormMsgFadeIn {
-          from { opacity: 0; transform: translateY(3px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateX(6px); }
+          to { opacity: 1; transform: translateX(0); }
         }
         .classform-loading-msg {
-          animation: classFormMsgFadeIn 0.5s ease;
+          animation: classFormMsgFadeIn 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
       `}</style>
 
