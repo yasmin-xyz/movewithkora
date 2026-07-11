@@ -268,6 +268,7 @@ const Landing = () => {
         @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.06); opacity: 1; } }
         .kora-landing .pose-info { flex: 1; min-width: 0; }
         .kora-landing .pose-info h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem; }
+        .kora-landing .pose-info h4 .english-aside { font-style: italic; font-weight: 400; font-size: 0.82rem; color: var(--text-secondary); }
         .kora-landing .pose-meta { font-size: 0.8rem; color: var(--olive); font-weight: 500; margin-bottom: 0.25rem; }
         .kora-landing .pose-cue { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; font-style: italic; }
         .kora-landing .modify-tag { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.08em; color: var(--text-muted); flex-shrink: 0; align-self: flex-start; padding-top: 0.15rem; }
@@ -300,11 +301,24 @@ const Landing = () => {
           .kora-landing .hero-description { max-width: 500px; font-size: 1.05rem; }
           .kora-landing .hero-badge { font-size: 0.72rem; padding: 0.6rem 1.4rem; }
         }
+        @media (max-width: 640px) {
+          .kora-landing section { padding: 4rem 1.1rem; }
+          .kora-landing .problem { padding: 3.5rem 1.1rem; }
+          .kora-landing .preview { padding: 4rem 1.1rem; }
+          .kora-landing .cta-section { padding: 4rem 1.1rem; }
+          .kora-landing .meaning { padding: 4.5rem 1.1rem 5.5rem; }
+          .kora-landing .hero-description { max-width: 100%; }
+          .kora-landing .pose-card { padding: 1rem 0.85rem; gap: 0.75rem; }
+          .kora-landing .pose-icon { width: 48px; height: 48px; }
+          .kora-landing .step { gap: 1.1rem; }
+          .kora-landing .step-indicator { width: 38px; height: 38px; }
+          .kora-landing .step-indicator span { font-size: 0.95rem; }
+        }
         @media (max-width: 480px) {
           .kora-landing .lotus-wrap { width: 130px; height: 72px; }
           .kora-landing .cycle-arc { gap: 0.3rem; }
           .kora-landing .cycle-word { font-size: 0.75rem; }
-          .kora-landing .problem { padding-left: 1rem; padding-right: 1rem; }
+          .kora-landing .problem { padding-left: 0.9rem; padding-right: 0.9rem; }
           .kora-landing .problem .section-heading { text-wrap: pretty; max-width: 100%; }
         }
       `}</style>
@@ -437,7 +451,12 @@ const Landing = () => {
                   <img src="https://xuxzhkcjdexcynvcpjka.supabase.co/storage/v1/object/public/poses//childs-pose.png" alt="Child's Pose" />
                 </div>
                 <div className="pose-info">
-                  <h4>{displayName("Child's Pose")}</h4>
+                  <h4>
+                    {displayName("Child's Pose")}
+                    {showSanskrit && getSanskritName("Child's Pose") && (
+                      <span className="english-aside"> (Child's Pose)</span>
+                    )}
+                  </h4>
                   <p className="pose-meta">Breath: Inhale into the back ribs</p>
                   <p className="pose-cue">Sink hips to heels and reach fingertips forward to create length through the spine. Let the forehead rest heavy — this is a moment to arrive, not to work.</p>
                 </div>
@@ -449,7 +468,12 @@ const Landing = () => {
                   <img src="https://xuxzhkcjdexcynvcpjka.supabase.co/storage/v1/object/public/poses//cat-cow.png" alt="Cat-Cow" />
                 </div>
                 <div className="pose-info">
-                  <h4>{displayName("Cat-Cow")}</h4>
+                  <h4>
+                    {displayName("Cat-Cow")}
+                    {showSanskrit && getSanskritName("Cat-Cow") && (
+                      <span className="english-aside"> (Cat-Cow)</span>
+                    )}
+                  </h4>
                   <p className="pose-meta">Breath: Inhale to look up, exhale to round</p>
                   <p className="pose-cue">Move segmentally through the vertebrae, one bone at a time, syncing each movement to a breath to hydrate the spine and wake up the core.</p>
                 </div>
@@ -461,7 +485,12 @@ const Landing = () => {
                   <img src="https://xuxzhkcjdexcynvcpjka.supabase.co/storage/v1/object/public/poses//downward-facing-dog.png" alt="Downward Facing Dog" />
                 </div>
                 <div className="pose-info">
-                  <h4>{displayName("Downward Facing Dog")}</h4>
+                  <h4>
+                    {displayName("Downward Facing Dog")}
+                    {showSanskrit && getSanskritName("Downward Facing Dog") && (
+                      <span className="english-aside"> (Downward Facing Dog)</span>
+                    )}
+                  </h4>
                   <p className="pose-meta">Breath: Exhale as you lift the hips</p>
                   <p className="pose-cue">Press firmly through the index knuckles to stabilize the shoulders, and pedal the feet to warm up the hamstrings ahead of standing work.</p>
                 </div>
