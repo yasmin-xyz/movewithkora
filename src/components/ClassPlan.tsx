@@ -614,14 +614,37 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                                         />
                                       )}
                                       <div className="space-y-1 min-w-0 flex-1">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                          <p className="font-body text-base font-medium text-foreground">
-                                            {displayName(pose.name)}
-                                          </p>
-                                          {pose.isSelected && (
-                                            <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
-                                              Selected
-                                            </span>
+                                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                                          <div className="flex items-center gap-2 flex-wrap min-w-0">
+                                            <p className="font-body text-base font-medium text-foreground">
+                                              {displayName(pose.name)}
+                                            </p>
+                                            {pose.isSelected && (
+                                              <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
+                                                Selected
+                                              </span>
+                                            )}
+                                          </div>
+                                          {!readOnly && pose.modifications.length > 0 && (
+                                            <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
+                                              <CollapsibleTrigger asChild>
+                                                <Button
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
+                                                >
+                                                  Modify
+                                                </Button>
+                                              </CollapsibleTrigger>
+                                              {pose.isSelected && (
+                                                <button
+                                                  onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
+                                                  className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
+                                                >
+                                                  Reset
+                                                </button>
+                                              )}
+                                            </div>
                                           )}
                                         </div>
                                         {pose.breath && (
@@ -637,7 +660,7 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                                           </p>
                                         )}
                                         {!readOnly && pose.modifications.length > 0 && (
-                                          <div className="flex items-center justify-end gap-3 pt-1">
+                                          <div className="flex sm:hidden items-center justify-end gap-3 pt-1">
                                             {pose.isSelected && (
                                               <button
                                                 onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
