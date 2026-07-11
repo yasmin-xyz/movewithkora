@@ -122,9 +122,6 @@ const ClassForm = ({
       ? LOADING_MESSAGES[loadingMessageIndex]
       : LOADING_MESSAGE_HOLD;
 
-  const peakLabel = (englishName: string) =>
-    showSanskrit ? getSanskritName(englishName) || englishName : englishName;
-
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -166,7 +163,14 @@ const ClassForm = ({
             <SelectItem value="None">None (General Flow)</SelectItem>
             {PEAK_OPTIONS.map((opt) => (
               <SelectItem key={opt} value={opt}>
-                {peakLabel(opt)}
+                {showSanskrit && getSanskritName(opt) ? (
+                  <>
+                    {getSanskritName(opt)}
+                    <span className="italic font-normal text-muted-foreground"> ({opt})</span>
+                  </>
+                ) : (
+                  opt
+                )}
               </SelectItem>
             ))}
           </SelectContent>
