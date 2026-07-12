@@ -408,7 +408,7 @@ const PoseLibrary = () => {
           font-family: var(--serif); font-size: 1.25rem; color: var(--text-primary); margin: 0;
         }
         .kora-pose-library .pose-card-name .english-aside {
-          display: block; font-style: italic; font-weight: 400; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.15rem;
+          white-space: nowrap; font-style: italic; font-weight: 400; font-size: 0.85rem; color: var(--text-secondary); margin-left: 0.4rem;
         }
         .kora-pose-library .pose-card-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
         .kora-pose-library .pose-card-tag {
