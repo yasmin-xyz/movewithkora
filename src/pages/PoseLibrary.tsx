@@ -61,7 +61,6 @@ const KNOWN_POSES_NOT_IN_LIBRARY: { name: string; family: string }[] = [
   { name: "Toe Stand", family: "standing_pose" },
   { name: "Reverse Prayer Pose", family: "bind" },
   { name: "Cow Face Pose", family: "bind" },
-  { name: "Extended Puppy Pose", family: "fold" },
   { name: "Anantasana", family: "side_bend" },
   { name: "Crocodile Pose", family: "rest" },
   { name: "Yogic Sleep Pose", family: "rest" },
