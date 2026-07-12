@@ -209,12 +209,12 @@ const Landing = () => {
         .kora-landing .section-body { font-size: 1rem; color: var(--text-secondary); line-height: 1.75; max-width: 580px; text-wrap: pretty; }
         .kora-landing .problem { background: var(--cream); max-width: 100%; padding: 5rem 1.5rem; }
         .kora-landing .problem-inner { max-width: 720px; margin: 0 auto; text-align: center; }
-        .kora-landing .problem .section-heading, .kora-landing .problem .section-body { max-width: 600px; margin-left: auto; margin-right: auto; }
+        .kora-landing .problem .section-heading, .kora-landing .problem .section-body { max-width: 700px; margin-left: auto; margin-right: auto; }
         .kora-landing .meaning { background: var(--white); max-width: 100%; padding: 6rem 1.5rem 7rem; text-align: center; position: relative; overflow: hidden; }
-        .kora-landing .meaning-inner { max-width: 600px; margin: 0 auto; position: relative; z-index: 1; will-change: transform; }
+        .kora-landing .meaning-inner { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; will-change: transform; }
         .kora-landing .meaning-name { font-family: var(--serif); font-size: clamp(2.5rem, 7vw, 3.5rem); font-style: italic; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 1.25rem; }
         .kora-landing .meaning-origin { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--olive); margin-bottom: 1.75rem; }
-        .kora-landing .meaning-text { font-size: 1rem; color: var(--text-secondary); line-height: 1.8; max-width: 480px; margin: 0 auto 0.5rem; text-wrap: pretty; }
+        .kora-landing .meaning-text { font-size: 1rem; color: var(--text-secondary); line-height: 1.8; max-width: 580px; margin: 0 auto 0.5rem; text-wrap: pretty; }
         .kora-landing .cycle-arc { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
         .kora-landing .cycle-diagram { margin-top: 0.25rem; }
         .kora-landing .cycle-arc-svg { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; overflow: visible; }
@@ -241,7 +241,7 @@ const Landing = () => {
         .kora-landing .step-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; text-wrap: pretty; }
         .kora-landing .step-content em { color: var(--olive); font-style: italic; }
         .kora-landing .preview { background: var(--white); max-width: 100%; padding: 6rem 1.5rem; text-align: center; }
-        .kora-landing .preview-inner { max-width: 720px; margin: 0 auto; }
+        .kora-landing .preview-inner { max-width: 800px; margin: 0 auto; }
         .kora-landing .preview-card { margin-top: 3rem; background: var(--cream); border: 1px solid var(--card-border); border-radius: 4px; overflow: hidden; text-align: left; }
         .kora-landing .preview-header { padding: 1.75rem 1.5rem 0; display: flex; justify-content: space-between; align-items: baseline; }
         .kora-landing .preview-phase { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; color: var(--text-primary); letter-spacing: 0.04em; text-transform: uppercase; }
@@ -249,7 +249,7 @@ const Landing = () => {
         .kora-landing .preview-divider { height: 2px; background: var(--olive); margin: 1rem 1.5rem 0; opacity: 0.6; }
         .kora-landing .preview-subtitle { font-size: 0.95rem; color: var(--text-secondary); padding: 1.25rem 1.5rem 0; font-style: italic; }
         .kora-landing .pose-cards { padding: 1rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
-        .kora-landing .pose-card { background: var(--white); border: 1px solid var(--card-border); border-radius: 3px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start; transition: transform 0.25s ease; }
+        .kora-landing .pose-card { background: var(--white); border: 1px solid var(--card-border); border-radius: 3px; padding: 1.1rem; display: flex; gap: 0.85rem; align-items: flex-start; transition: transform 0.25s ease; }
         .kora-landing .pose-card:hover { transform: translateX(4px); }
         .kora-landing .preview-example-badge-row {
           display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
@@ -268,7 +268,7 @@ const Landing = () => {
         @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.06); opacity: 1; } }
         .kora-landing .pose-info { flex: 1; min-width: 0; }
         .kora-landing .pose-info h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.35rem; }
-        .kora-landing .pose-info h4 .english-aside { display: block; font-style: italic; font-weight: 400; font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.1rem; }
+        .kora-landing .pose-info h4 .english-aside { white-space: nowrap; font-style: italic; font-weight: 400; font-size: 0.82rem; color: var(--text-secondary); }
         .kora-landing .pose-meta { font-size: 0.8rem; color: var(--olive); font-weight: 500; margin-bottom: 0.25rem; }
         .kora-landing .pose-cue { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; font-style: italic; }
         .kora-landing .modify-tag { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.08em; color: var(--text-muted); flex-shrink: 0; align-self: flex-start; padding-top: 0.15rem; }
