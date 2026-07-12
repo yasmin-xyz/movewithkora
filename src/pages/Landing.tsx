@@ -302,14 +302,16 @@ const Landing = () => {
           .kora-landing .hero-badge { font-size: 0.72rem; padding: 0.6rem 1.4rem; }
         }
         @media (max-width: 640px) {
-          .kora-landing section { padding: 4rem 1.1rem; }
-          .kora-landing .problem { padding: 3.5rem 1.1rem; }
-          .kora-landing .preview { padding: 4rem 1.1rem; }
-          .kora-landing .cta-section { padding: 4rem 1.1rem; }
-          .kora-landing .meaning { padding: 4.5rem 1.1rem 5.5rem; }
+          .kora-landing section { padding: 4rem 0.9rem; }
+          .kora-landing .problem { padding: 3.5rem 0.9rem; }
+          .kora-landing .preview { padding: 4rem 0.75rem; }
+          .kora-landing .cta-section { padding: 4rem 0.9rem; }
+          .kora-landing .meaning { padding: 4.5rem 0.9rem 5.5rem; }
           .kora-landing .hero-description { max-width: 100%; }
-          .kora-landing .pose-card { padding: 1rem 0.85rem; gap: 0.75rem; }
-          .kora-landing .pose-icon { width: 48px; height: 48px; }
+          .kora-landing .pose-cards { padding-left: 0.75rem; padding-right: 0.75rem; }
+          .kora-landing .pose-card { padding: 0.75rem 0.65rem; gap: 0.6rem; }
+          .kora-landing .pose-icon { width: 42px; height: 42px; }
+          .kora-landing .modify-tag { display: none; }
           .kora-landing .step { gap: 1.1rem; }
           .kora-landing .step-indicator { width: 38px; height: 38px; }
           .kora-landing .step-indicator span { font-size: 0.95rem; }
