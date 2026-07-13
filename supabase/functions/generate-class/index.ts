@@ -130,6 +130,15 @@ YOGA STYLE PACING OVERRIDE (apply after the skill-level thresholds above, before
 - If yogaStyle is Yin or Restorative: suppress nearly all transitions regardless of skill_level or score — favor no transition at all, or at most a single simple grounding cue, prioritizing stillness and long holds over movement between shapes.
 - If yogaStyle is Hatha or unspecified: use the skill_level thresholds exactly as written above, no override.
 
+OPTIONAL EXTRA TRANSITIONS FOR VINYASA, POWER, AND ASHTANGA (critical): These three styles are meant to feel more physically challenging and continuously flowing than the baseline pacing rules alone produce. In addition to the mandatory transitions required by the thresholds above, add a small number of supplementary OPTIONAL transition entries between consecutive poses at natural moments — even where the standard transition_score wouldn't normally require one — so the instructor can offer students a choice between a fuller flow and a simpler path.
+- Format these exactly like a normal transition, but append " (Optional)" to the pose name, and write the cue to explicitly present the choice, e.g.:
+  Pose: Vinyasa (Optional)
+  Type: Transition
+  Cue: Optional here — flow through a full vinyasa (step back to Chaturanga, Upward Facing Dog, Downward Facing Dog) for extra challenge, or step directly into the next pose if you'd prefer to keep pace.
+- Use these judiciously — a handful of well-placed optional moments per class (not after every pose), typically where a student might reasonably want an extra round of movement between held shapes.
+- These optional transitions are supplementary only. They never replace or override a transition that's already mandatory under the thresholds, the STANDING CONTINUITY RULE, or the side-flow bracketing rule above — and they must never be placed immediately before the peak pose itself or used in place of the peak pose's own real lead-in.
+- Do not use this optional-transition pattern for any style other than Vinyasa, Power, or Ashtanga.
+
 TRANSITION FORMAT (critical — every transition pose must follow this exact structure):
 - Every transition gets its own "Pose:" line, immediately followed by "Type: Transition" on the next line.
 - The "Cue:" line for a transition must be a real, concise, embodied instruction describing the physical movement from the previous pose into this one — e.g. "Exhale, step your right foot back to meet the left, then press firmly into Down Dog to reset the spine before switching sides." Never write just the word "Transition" as the cue content — that word only belongs on the "Type:" line.
@@ -137,10 +146,10 @@ TRANSITION FORMAT (critical — every transition pose must follow this exact str
 - Do NOT include a "Modifications:" block for transitions.
 - "Type: Transition" is reserved EXCLUSIVELY for genuine connector/bridge movements (Down Dog Reset, Vinyasa, directional pivots like "Pivot to long edge"). It must NEVER be applied to a real, named, teachable pose from the library — and it must NEVER be applied to the peak pose under any circumstances, even when that pose is the final step of a lead-in sequence building toward it. A lead-in pose that leads into the peak is still a real pose with its own Breath/Cue/Modifications, not a transition, unless it is itself one of the genuine connector movements listed above.
 
-Transition rules:
-- Transitions are inserted WITHIN blocks as poses, NOT as separate timed entries.
-- Transition poses do NOT have their own duration — they share the block's duration.
-- Do NOT add transitions between blocks or between sections.
+NO BARE POSE ENTRIES — EVER (critical, applies everywhere in the output including immediately before "Right Side Flow:" begins):
+- Every single "Pose:" line in the entire output — with the sole exception of genuine "Type: Transition" connector movements — MUST be followed by its own Breath line, Cue line, and full 3-item Modifications block. There is no such thing as a bare pose name with no Breath/Cue.
+- This applies explicitly to any shared, neutral, bilateral version of the peak pose that you place before a Right Side Flow begins (e.g. a plain "Pose: Eagle Pose" used as a common centering moment before splitting into "Eagle Pose (Right)" and "Eagle Pose (Left)"). If you include such a shared lead-in pose, it must have its own full Breath, Cue, and Modifications exactly like every other pose.
+- If you do not have real content (a genuine breath cue and teaching cue) for a shared lead-in pose, do NOT output it at all — begin the block directly with "Right Side Flow:" instead. A missing pose is always better than an incomplete one.
 
 FLOW BLOCK STRUCTURE (critical):
 - Do NOT assign duration to individual poses. Group poses into flow blocks within each section.
@@ -270,8 +279,8 @@ ASYMMETRICAL POSE SIDE FLOW RULES (critical):
 - If a block contains asymmetrical poses (symmetry == "asymmetrical"), you MUST group them into a Side Flow.
 - Output ALL asymmetrical poses in the block for the right side first, then a Vinyasa separator line, then the SAME poses for the left side.
 - Do NOT use "Repeat: Left" for individual poses. Mirror the ENTIRE cluster, not pose-by-pose.
-- Only insert ONE vinyasa between the right and left side flows (not between each pose).
-- Bilateral poses in the same block go OUTSIDE the side flow (before or after it).
+- Insert a transition/vinyasa in TWO places around the side flow, matching how this is actually taught in a live class: (1) BEFORE Right Side Flow begins, bridging from whatever pose or block came immediately before it (see CROSS-BLOCK AND CROSS-SECTION TRANSITIONS above) — a side flow must never open with a cold cut straight into "Right Side Flow:" with no transition, and (2) BETWEEN the right and left side flows, exactly as before. Do not insert a vinyasa between each individual pose within one side — only at these two bracketing points. This applies in every section that contains a side flow (Build, Peak, Cool Down, etc.), not just Peak.
+- Bilateral poses in the same block go OUTSIDE the side flow (before or after it) — and, per NO BARE POSE ENTRIES above, still require their own full Breath/Cue/Modifications like any other pose.
 
 PEAK SEQUENCE FLOW (critical — applies specifically to the PEAK section when the peak pose is asymmetrical):
 - Never present the peak pose as the only, isolated entry in a Right/Left Side Flow. A peak pose must feel earned, not appear cold.
@@ -279,6 +288,7 @@ PEAK SEQUENCE FLOW (critical — applies specifically to the PEAK section when t
 - Within each side of the Peak's side flow, include 1-2 lead-in poses (sharing orientation, base, or family with the peak pose) BEFORE the peak pose itself, so the peak pose is the natural final entry of that side's sequence — not standing alone.
 - These lead-in poses should follow the same metadata continuity rules as everywhere else (orientation/base/family/intensity progression), building smoothly into the peak pose's shape and intensity.
 - The peak pose itself MUST be output as a normal full pose entry with its own Breath, Cue, and 3 Modifications — exactly like every other pose. Do NOT mark the peak pose as "Type: Transition" under any circumstances, even though it is the pose you are "flowing into." Only the lead-in poses before it (if genuinely a connector movement, not a named asana) may ever be transitions — the peak pose is always a real, fully-detailed pose entry, with its image and modifications intact.
+- If you want a shared, neutral centering moment in the pose itself (bilateral form) before the Right/Left split begins, see NO BARE POSE ENTRIES above — it must be a fully-detailed pose or omitted entirely, never a bare name.
 - Format:
 
 Right Side Flow:
