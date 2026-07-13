@@ -38,6 +38,27 @@ export type Database = {
         }
         Relationships: []
       }
+      function_rate_limits: {
+        Row: {
+          function_name: string
+          identifier: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          function_name: string
+          identifier: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          function_name?: string
+          identifier?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       pose_library: {
         Row: {
           base: string | null
