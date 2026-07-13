@@ -480,7 +480,7 @@ const ClassPDF = ({
           }, 0);
 
           return (
-            <View key={si} wrap={false}>
+            <View key={si}>
               <View style={styles.sectionHeaderRow}>
                 <Text style={styles.sectionTitle}>{section.title}</Text>
                 {sectionMinutes > 0 && <Text style={styles.sectionMinutes}>{sectionMinutes} MIN</Text>}
