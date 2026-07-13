@@ -562,13 +562,11 @@ const ClassPDF = ({
           );
         })}
 
-        <Link src={SITE_URL} style={{ textDecoration: "none" }}>
-          <Text
-            style={styles.footer}
-            render={({ pageNumber, totalPages }) => `Kora  ·  movewithkora.vercel.app  ·  Page ${pageNumber} of ${totalPages}`}
-            fixed
-          />
-        </Link>
+        <Text
+          style={styles.footer}
+          render={({ pageNumber, totalPages }) => `Kora  ·  movewithkora.vercel.app  ·  Page ${pageNumber} of ${totalPages}`}
+          fixed
+        />
       </Page>
     </Document>
   );
@@ -588,12 +586,28 @@ export async function downloadClassPDF(props: Omit<ClassPDFProps, "imageMap" | "
   const [, imageMap] = await Promise.all([ensureFontsLoaded(), preloadImages(imageUrls)]);
 
   const generatedDate = new Date();
-  const blob = await pdf(<ClassPDF {...props} imageMap={imageMap} generatedDate={generatedDate} />).toBlob();
+
+  let blob: Blob;
+  try {
+    blob = await pdf(<ClassPDF {...props} imageMap={imageMap} generatedDate={generatedDate} />).toBlob();
+  } catch (err) {
+    console.error("PDF generation failed:", err);
+    throw new Error("Couldn't generate the PDF. Please try again.");
+  }
+
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  const safeTitle = (props.title || "yoga-class").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-  a.download = `${safeTitle || "kora-class"}.pdf`;
+
+  // e.g. "kora-vinyasa-flow-2026-07-13.pdf". Falls back to "kora-flow-{date}"
+  // if no yoga style was set (e.g. a General Flow class).
+  const dateSlug = generatedDate.toISOString().slice(0, 10);
+  const styleSlug = props.yogaStyle
+    ? props.yogaStyle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+    : "";
+  const filename = styleSlug ? `kora-${styleSlug}-flow-${dateSlug}.pdf` : `kora-flow-${dateSlug}.pdf`;
+
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
