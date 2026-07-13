@@ -39,6 +39,24 @@ const FONT_FILES: { family: string; weight: number; url: string }[] = [
 
 Font.registerHyphenationCallback((word) => [word]); // avoid mid-word breaks
 
+// Converts fetched font bytes to a base64 data URI. react-pdf's browser font
+// loader only recognizes a string `src` (URL or data URI) or a real Node
+// `Buffer` — Buffer doesn't exist in the browser at all, and a raw
+// Uint8Array/ArrayBuffer gets silently stringified into a bogus "URL" (the
+// literal byte values joined by commas), which is exactly what caused the
+// 414 "URI too long" error. A data URI is a proper string, so it's handled
+// correctly, and it still resolves instantly/locally — no network round trip.
+function bufferToDataUri(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000; // process in chunks to avoid call-stack limits on large fonts
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return `data:font/ttf;base64,${btoa(binary)}`;
+}
+
 let fontsLoadedPromise: Promise<void> | null = null;
 
 function ensureFontsLoaded(): Promise<void> {
@@ -50,18 +68,18 @@ function ensureFontsLoaded(): Promise<void> {
           const res = await fetch(f.url);
           if (!res.ok) return null;
           const buffer = await res.arrayBuffer();
-          return { ...f, buffer };
+          return { ...f, dataUri: bufferToDataUri(buffer) };
         } catch {
           return null;
         }
       })
     );
 
-    const byFamily = new Map<string, { src: Uint8Array; fontWeight: number }[]>();
+    const byFamily = new Map<string, { src: string; fontWeight: number }[]>();
     for (const r of results) {
       if (!r) continue;
       const list = byFamily.get(r.family) ?? [];
-      list.push({ src: new Uint8Array(r.buffer), fontWeight: r.weight });
+      list.push({ src: r.dataUri, fontWeight: r.weight });
       byFamily.set(r.family, list);
     }
 
