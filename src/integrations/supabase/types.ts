@@ -109,7 +109,9 @@ export type Database = {
           created_at: string | null
           id: string
           inspiration: string | null
+          is_shared: boolean
           peak_pose: string | null
+          share_token: string | null
           skill_level: string | null
           user_id: string | null
           yoga_style: string | null
@@ -121,7 +123,9 @@ export type Database = {
           created_at?: string | null
           id?: string
           inspiration?: string | null
+          is_shared?: boolean
           peak_pose?: string | null
+          share_token?: string | null
           skill_level?: string | null
           user_id?: string | null
           yoga_style?: string | null
@@ -133,12 +137,61 @@ export type Database = {
           created_at?: string | null
           id?: string
           inspiration?: string | null
+          is_shared?: boolean
           peak_pose?: string | null
+          share_token?: string | null
           skill_level?: string | null
           user_id?: string | null
           yoga_style?: string | null
         }
         Relationships: []
+      }
+      shared_classes: {
+        Row: {
+          class_content: string
+          class_length: number | null
+          created_at: string
+          id: string
+          inspiration: string | null
+          peak_pose: string | null
+          saved_class_id: string | null
+          share_token: string
+          skill_level: string | null
+          yoga_style: string | null
+        }
+        Insert: {
+          class_content: string
+          class_length?: number | null
+          created_at?: string
+          id?: string
+          inspiration?: string | null
+          peak_pose?: string | null
+          saved_class_id?: string | null
+          share_token?: string
+          skill_level?: string | null
+          yoga_style?: string | null
+        }
+        Update: {
+          class_content?: string
+          class_length?: number | null
+          created_at?: string
+          id?: string
+          inspiration?: string | null
+          peak_pose?: string | null
+          saved_class_id?: string | null
+          share_token?: string
+          skill_level?: string | null
+          yoga_style?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_classes_saved_class_id_fkey"
+            columns: ["saved_class_id"]
+            isOneToOne: false
+            referencedRelation: "saved_classes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
