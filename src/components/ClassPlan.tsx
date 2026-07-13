@@ -3,9 +3,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Download, Share2, Check, Loader2 } from "lucide-react";
 import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
-
+import {
+  parsePlan,
+  serializeSections,
+  parseModification,
+  findPoseImage,
+  type PoseMedia,
+  type PoseEntry,
+  type Section,
+} from "@/lib/parseClassPlan";
+import { downloadClassPDF } from "@/components/ClassPDF";
 
 interface ClassPlanProps {
   content: string;
@@ -14,314 +23,29 @@ interface ClassPlanProps {
   onContentChange?: (content: string) => void;
   showSanskrit?: boolean;
   onToggleSanskrit?: (v: boolean) => void;
+  // New, all optional — export/share only need these when the caller has
+  // them. Export PDF works with just `content`; Share requires `classId`
+  // (i.e. the class must already be a row in saved_classes).
+  classId?: string | null;
+  classTitle?: string;
+  classLength?: number | null;
+  yogaStyle?: string | null;
+  inspiration?: string | null;
 }
 
-interface PoseMedia {
-  pose_name: string;
-  image_url: string;
-}
-
-interface PoseEntry {
-  name: string;
-  breath: string;
-  cue: string;
-  imageUrl?: string;
-  modifications: string[];
-  isSelected: boolean;
-  isTransition: boolean;
-  sideFlow?: 'right' | 'left';
-  isSideFlowVinyasa?: boolean;
-  sideFlowVinyasaLabel?: string;
-  originalName?: string;
-  originalCue?: string;
-  originalBreath?: string;
-}
-
-interface FlowBlock {
-  blockName: string;
-  duration: string;
-  poses: PoseEntry[];
-}
-
-interface Section {
-  title: string;
-  blocks: FlowBlock[];
-}
-
-const TYPO_CORRECTIONS: Record<string, string> = {
-  "linge": "Lunge",
-  "lunger": "Lunge",
-  "warrior 1": "Warrior I",
-  "warrior 2": "Warrior II",
-  "warrior 3": "Warrior III",
-  "downward dogg": "Downward Dog",
-  "downward-facing dogg": "Downward-Facing Dog",
-  "chatarunga": "Chaturanga",
-  "chataranga": "Chaturanga",
-  "chaturunga": "Chaturanga",
-  "savasanna": "Savasana",
-  "shavasana": "Savasana",
-  "triange": "Triangle",
-  "plank pose": "Plank",
-  "mountian": "Mountain",
-  "moutain": "Mountain",
-};
-
-function correctPoseName(name: string, media: PoseMedia[]): string {
-  const lower = name.toLowerCase().trim();
-
-  // 1. Static typo map
-  if (TYPO_CORRECTIONS[lower]) return TYPO_CORRECTIONS[lower];
-
-  // 2. Check if it already matches a known pose well
-  const normalizedLower = lower.replace(/[^a-z0-9\s]/g, "");
-  for (const m of media) {
-    if (m.pose_name.toLowerCase().replace(/[^a-z0-9\s]/g, "") === normalizedLower) {
-      return m.pose_name; // Use canonical casing from DB
-    }
-  }
-
-  // 3. Fuzzy: Levenshtein-based correction for close matches
-  let bestMedia: PoseMedia | undefined;
-  let bestDist = Infinity;
-  for (const m of media) {
-    const dist = levenshtein(normalizedLower, m.pose_name.toLowerCase().replace(/[^a-z0-9\s]/g, ""));
-    const maxLen = Math.max(normalizedLower.length, m.pose_name.length);
-    // Only correct if edit distance is ≤ 25% of the longer string and at most 3
-    if (dist <= Math.min(3, Math.floor(maxLen * 0.25)) && dist < bestDist) {
-      bestDist = dist;
-      bestMedia = m;
-    }
-  }
-  if (bestMedia) return bestMedia.pose_name;
-
-  return name; // No correction needed
-}
-
-function levenshtein(a: string, b: string): number {
-  const m = a.length, n = b.length;
-  const dp: number[] = Array.from({ length: n + 1 }, (_, i) => i);
-  for (let i = 1; i <= m; i++) {
-    let prev = i - 1;
-    dp[0] = i;
-    for (let j = 1; j <= n; j++) {
-      const temp = dp[j];
-      dp[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[j], dp[j - 1]);
-      prev = temp;
-    }
-  }
-  return dp[n];
-}
-
-function normalizeForMatch(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
-}
-
-function wordsOf(s: string): string[] {
-  return s.split(/\s+/).filter(Boolean);
-}
-
-function poseMatchScore(a: string, b: string): number {
-  const na = normalizeForMatch(a);
-  const nb = normalizeForMatch(b);
-  if (na === nb) return 3;
-  if (na.includes(nb) || nb.includes(na)) return 2;
-  const wa = wordsOf(na);
-  const wb = wordsOf(nb);
-  const shorter = wa.length <= wb.length ? wa : wb;
-  const longer = wa.length <= wb.length ? wb : wa;
-  const matched = shorter.filter((w) => longer.includes(w)).length;
-  if (matched >= shorter.length) return 2;
-  if (matched >= 2) return 1;
-  return 0;
-}
-
-function findPoseImage(name: string, media: PoseMedia[]): string | undefined {
-  const baseName = name.replace(/\s*\(.*\)/, "").trim();
-  let best: PoseMedia | undefined;
-  let bestScore = 0;
-  for (const m of media) {
-    const score = poseMatchScore(baseName, m.pose_name);
-    if (score > bestScore) {
-      bestScore = score;
-      best = m;
-    }
-  }
-  return best?.image_url;
-}
-
-function parsePlan(raw: string, media: PoseMedia[]): Section[] {
-  const sections: Section[] = [];
-  let current: Section | null = null;
-  let currentBlock: FlowBlock | null = null;
-  let currentSideFlow: 'right' | 'left' | undefined;
-
-  for (const line of raw.split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    const sectionMatch = trimmed.match(/^(WARM-UP|BUILD|PEAK|COOL DOWN):?$/i);
-    if (sectionMatch) {
-      current = { title: sectionMatch[1].toUpperCase(), blocks: [] };
-      sections.push(current);
-      currentBlock = null;
-      currentSideFlow = undefined;
-      continue;
-    }
-
-    if (!current) continue;
-
-    const blockMatch = trimmed.match(/^Block:\s*(.+)/i);
-    if (blockMatch) {
-      currentBlock = { blockName: blockMatch[1].trim(), duration: "", poses: [] };
-      current.blocks.push(currentBlock);
-      currentSideFlow = undefined;
-      continue;
-    }
-
-    // Duration at block level
-    const durMatch = trimmed.match(/^Duration:\s*(.+)/i);
-    if (durMatch && currentBlock && currentBlock.poses.length === 0) {
-      currentBlock.duration = durMatch[1].trim();
-      continue;
-    }
-
-    // If no block exists yet, create a default one
-    if (!currentBlock) {
-      currentBlock = { blockName: current.title, duration: "", poses: [] };
-      current.blocks.push(currentBlock);
-    }
-
-    const poseMatch = trimmed.match(/^Pose:\s*(.+)/i);
-    if (poseMatch) {
-      const rawName = poseMatch[1].trim();
-      const name = correctPoseName(rawName, media);
-      const imageUrl = findPoseImage(name, media);
-      const isTransition = /transition/i.test(rawName) || /vinyasa/i.test(rawName);
-      currentBlock.poses.push({ name, breath: "", cue: "", modifications: [], isSelected: false, isTransition, sideFlow: currentSideFlow, imageUrl });
-      continue;
-    }
-
-    // Explicit type marker (used for transitions with real descriptive cues)
-    const typeMatch = trimmed.match(/^Type:\s*(.+)/i);
-    if (typeMatch && currentBlock) {
-      const last = currentBlock.poses[currentBlock.poses.length - 1];
-      if (last && /transition/i.test(typeMatch[1])) {
-        last.isTransition = true;
-      }
-      continue;
-    }
-
-    // Side Flow markers
-    const rightFlowMatch = trimmed.match(/^Right Side Flow:?$/i);
-    if (rightFlowMatch) {
-      currentSideFlow = 'right';
-      continue;
-    }
-
-    const leftFlowMatch = trimmed.match(/^Left Side Flow:?$/i);
-    if (leftFlowMatch) {
-      currentSideFlow = 'left';
-      continue;
-    }
-
-    // Vinyasa between side flows
-    const vinyasaMatch = trimmed.match(/^Vinyasa:\s*(.+)/i);
-    if (vinyasaMatch && currentBlock) {
-      currentBlock.poses.push({
-        name: vinyasaMatch[1].trim(),
-        breath: "", cue: "", modifications: [], isSelected: false,
-        isTransition: true, isSideFlowVinyasa: true,
-        sideFlowVinyasaLabel: vinyasaMatch[1].trim(),
-        imageUrl: undefined,
-      });
-      currentSideFlow = undefined;
-      continue;
-    }
-
-    const last = currentBlock.poses[currentBlock.poses.length - 1];
-    if (!last) continue;
-
-    const breathMatch = trimmed.match(/^Breath:\s*(.+)/i);
-    if (breathMatch) { last.breath = breathMatch[1].trim(); continue; }
-
-    const cueMatch = trimmed.match(/^Cue:\s*(.+)/i);
-    if (cueMatch) {
-      last.cue = cueMatch[1].trim();
-      // Backward-compat: still catch the old literal placeholder if it ever appears
-      if (/^transition$/i.test(last.cue.trim())) {
-        last.isTransition = true;
-        last.cue = ""; // don't display the bare word as a cue
-      }
-      continue;
-    }
-
-    if (/^Modifications:\s*$/i.test(trimmed)) continue;
-
-    const modMatch = trimmed.match(/^-\s*(.+)/);
-    if (modMatch) { last.modifications.push(modMatch[1].trim()); continue; }
-  }
-
-  return sections;
-}
-
-function serializeSections(sections: Section[]): string {
-  const lines: string[] = [];
-  for (const section of sections) {
-    lines.push(`${section.title}:`);
-    for (const block of section.blocks) {
-      lines.push(`Block: ${block.blockName}`);
-      if (block.duration) lines.push(`Duration: ${block.duration}`);
-      let lastSideFlow: string | undefined;
-      for (const pose of block.poses) {
-        if (pose.sideFlow && pose.sideFlow !== lastSideFlow) {
-          lines.push(pose.sideFlow === 'right' ? 'Right Side Flow:' : 'Left Side Flow:');
-        }
-        lastSideFlow = pose.sideFlow;
-        if (pose.isSideFlowVinyasa) {
-          lines.push(`Vinyasa: ${pose.sideFlowVinyasaLabel || pose.name}`);
-          if (pose.cue) lines.push(`Cue: ${pose.cue}`);
-          continue;
-        }
-        lines.push(`Pose: ${pose.name}`);
-        if (pose.isTransition) lines.push(`Type: Transition`);
-        if (pose.breath) lines.push(`Breath: ${pose.breath}`);
-        if (pose.cue) lines.push(`Cue: ${pose.cue}`);
-        if (pose.modifications.length > 0) {
-          lines.push("Modifications:");
-          for (const mod of pose.modifications) {
-            lines.push(`- ${mod}`);
-          }
-        }
-        lines.push("");
-      }
-    }
-  }
-  return lines.join("\n");
-}
-
-function parseModification(mod: string): { name: string; breath?: string; description: string } {
-  // New format: "Name – Breath: cue – description"
-  const parts = mod.split("–").map((p) => p.trim());
-  if (parts.length >= 3 && /^breath:/i.test(parts[1])) {
-    return {
-      name: parts[0],
-      breath: parts[1].replace(/^breath:\s*/i, "").trim(),
-      description: parts.slice(2).join(" – ").trim(),
-    };
-  }
-  // Backward-compatible fallback: old 2-part format "Name – description", no breath data
-  if (parts.length >= 2) {
-    return { name: parts[0], description: parts.slice(1).join(" – ").trim() };
-  }
-  const hyphenIdx = mod.indexOf(" - ");
-  if (hyphenIdx !== -1) {
-    return { name: mod.slice(0, hyphenIdx).trim(), description: mod.slice(hyphenIdx + 3).trim() };
-  }
-  return { name: mod, description: "" };
-}
-
-const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, showSanskrit: showSanskritProp, onToggleSanskrit }: ClassPlanProps) => {
+const ClassPlan = ({
+  content,
+  isLoading,
+  readOnly = false,
+  onContentChange,
+  showSanskrit: showSanskritProp,
+  onToggleSanskrit,
+  classId,
+  classTitle,
+  classLength,
+  yogaStyle,
+  inspiration,
+}: ClassPlanProps) => {
   const [media, setMedia] = useState<PoseMedia[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const [openKeys, setOpenKeys] = useState<Set<string>>(new Set());
@@ -329,10 +53,10 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
     if (typeof window === "undefined") return false;
     return localStorage.getItem(SANSKRIT_STORAGE_KEY) === "true";
   });
+  const [isExporting, setIsExporting] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [justCopied, setJustCopied] = useState(false);
 
-  // Controlled (from parent) if showSanskrit prop is passed, otherwise falls
-  // back to its own localStorage-backed state (e.g. the read-only preview
-  // dialog in SavedClasses.tsx doesn't pass this prop).
   const showSanskrit = showSanskritProp ?? internalShowSanskrit;
   const setShowSanskrit = onToggleSanskrit ?? setInternalShowSanskrit;
 
@@ -356,7 +80,6 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
       });
   }, []);
 
-  // Only re-parse when content changes from outside (not from our own edits)
   const lastSerializedRef = useRef("");
   useEffect(() => {
     if (content !== lastSerializedRef.current) {
@@ -364,6 +87,57 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
       setOpenKeys(new Set());
     }
   }, [content, media]);
+
+  const resolvedTitle = classTitle || (sections.length > 0 ? "Yoga Class" : "Yoga Class");
+
+  const handleExportPDF = useCallback(async () => {
+    setIsExporting(true);
+    try {
+      await downloadClassPDF({
+        content,
+        media,
+        showSanskrit,
+        title: resolvedTitle,
+        classLength,
+        yogaStyle,
+        inspiration,
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  }, [content, media, showSanskrit, resolvedTitle, classLength, yogaStyle, inspiration]);
+
+  const handleShare = useCallback(async () => {
+    if (!classId) return;
+    setIsSharing(true);
+    try {
+      // Reuse an existing token if this class was already shared before,
+      // otherwise mint a new one and mark the row as shared.
+      const { data: existing } = await supabase
+        .from("saved_classes")
+        .select("share_token, is_shared")
+        .eq("id", classId)
+        .single();
+
+      let token = existing?.share_token;
+      if (!token) {
+        token = crypto.randomUUID();
+        await supabase
+          .from("saved_classes")
+          .update({ share_token: token, is_shared: true })
+          .eq("id", classId);
+      } else if (!existing?.is_shared) {
+        await supabase.from("saved_classes").update({ is_shared: true }).eq("id", classId);
+      }
+
+      const url = `${window.location.origin}/shared/${token}`;
+      await navigator.clipboard.writeText(url);
+      setJustCopied(true);
+      setTimeout(() => setJustCopied(false), 2000);
+    } finally {
+      setIsSharing(false);
+    }
+  }, [classId]);
 
   const handleModClick = useCallback((sectionIdx: number, blockIdx: number, poseIdx: number, mod: string) => {
     setSections((prev) => {
@@ -473,7 +247,6 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
 
   const [openBlocks, setOpenBlocks] = useState<Set<string>>(new Set());
 
-  // Default all blocks to expanded when sections change
   useEffect(() => {
     const allBlockKeys = new Set<string>();
     sections.forEach((s, si) => s.blocks.forEach((_, bi) => allBlockKeys.add(`block-${si}-${bi}`)));
@@ -491,9 +264,44 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
   return (
     <div className="mt-12 border-t border-border pt-10 space-y-12">
       {sections.length > 0 && (
-        <div className="flex items-center justify-end gap-2 -mt-4">
-          <span className="font-body text-xs font-medium" style={{ color: "#5C6B55" }}>Show Sanskrit Names</span>
-          <Switch checked={showSanskrit} onCheckedChange={setShowSanskrit} />
+        <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 -mt-4">
+          <div className="flex items-center gap-2">
+            <span className="font-body text-xs font-medium" style={{ color: "#5C6B55" }}>Show Sanskrit Names</span>
+            <Switch checked={showSanskrit} onCheckedChange={setShowSanskrit} />
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="font-body text-xs tracking-wide uppercase h-7 px-2.5"
+              onClick={handleExportPDF}
+              disabled={isExporting}
+            >
+              {isExporting ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Download className="h-3 w-3" />
+              )}
+              <span className="ml-1.5">Export PDF</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="font-body text-xs tracking-wide uppercase h-7 px-2.5"
+              onClick={handleShare}
+              disabled={!classId || isSharing}
+              title={!classId ? "Save this class first to share it" : undefined}
+            >
+              {justCopied ? (
+                <Check className="h-3 w-3" />
+              ) : isSharing ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Share2 className="h-3 w-3" />
+              )}
+              <span className="ml-1.5">{justCopied ? "Link Copied" : "Share"}</span>
+            </Button>
+          </div>
         </div>
       )}
       {sections.map((section, si) => {
@@ -544,7 +352,6 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                           block.poses.forEach((pose, pi) => {
                             const key = `${si}-${bi}-${pi}`;
 
-                            // Side flow header
                             if (pose.sideFlow && pose.sideFlow !== lastSideFlow) {
                               elements.push(
                                 <div key={`sf-header-${key}`} className="pt-2 pb-1">
@@ -556,7 +363,6 @@ const ClassPlan = ({ content, isLoading, readOnly = false, onContentChange, show
                             }
                             lastSideFlow = pose.sideFlow;
 
-                            // Side flow vinyasa
                             if (pose.isSideFlowVinyasa) {
                               elements.push(
                                 <div key={key} className="py-1.5 px-3">
