@@ -57,11 +57,11 @@ function ensureFontsLoaded(): Promise<void> {
       })
     );
 
-    const byFamily = new Map<string, { src: ArrayBuffer; fontWeight: number }[]>();
+    const byFamily = new Map<string, { src: Uint8Array; fontWeight: number }[]>();
     for (const r of results) {
       if (!r) continue;
       const list = byFamily.get(r.family) ?? [];
-      list.push({ src: r.buffer, fontWeight: r.weight });
+      list.push({ src: new Uint8Array(r.buffer), fontWeight: r.weight });
       byFamily.set(r.family, list);
     }
 
