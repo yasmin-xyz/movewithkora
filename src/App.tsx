@@ -7,10 +7,9 @@ import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import PoseLibrary from "./pages/PoseLibrary";
 import Feedback from "./pages/Feedback";
+import SharedClass from "./pages/SharedClass";
 import NotFound from "./pages/NotFound";
-
 const queryClient = new QueryClient();
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -22,6 +21,7 @@ const App = () => (
           <Route path="/planner" element={<Index />} />
           <Route path="/pose-library" element={<PoseLibrary />} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/shared/:token" element={<SharedClass />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -29,5 +29,4 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
 );
-
 export default App;
