@@ -23,13 +23,15 @@ interface ClassPlanProps {
   onContentChange?: (content: string) => void;
   showSanskrit?: boolean;
   onToggleSanskrit?: (v: boolean) => void;
-  // New, all optional — export/share only need these when the caller has
-  // them. Export PDF works with just `content`; Share requires `classId`
-  // (i.e. the class must already be a row in saved_classes).
+  // New, all optional. Export PDF only ever needs `content` + `media`.
+  // Share needs none of these to be *enabled* (it works for anyone,
+  // logged in or not) — they're used to label the shared page/PDF nicely.
   classId?: string | null;
   classTitle?: string;
+  peakMovement?: string;
   classLength?: number | null;
   yogaStyle?: string | null;
+  skillLevel?: string | null;
   inspiration?: string | null;
 }
 
@@ -42,8 +44,10 @@ const ClassPlan = ({
   onToggleSanskrit,
   classId,
   classTitle,
+  peakMovement,
   classLength,
   yogaStyle,
+  skillLevel,
   inspiration,
 }: ClassPlanProps) => {
   const [media, setMedia] = useState<PoseMedia[]>([]);
@@ -98,36 +102,48 @@ const ClassPlan = ({
         media,
         showSanskrit,
         title: resolvedTitle,
+        peakMovement,
         classLength,
         yogaStyle,
+        skillLevel,
         inspiration,
       });
     } finally {
       setIsExporting(false);
     }
-  }, [content, media, showSanskrit, resolvedTitle, classLength, yogaStyle, inspiration]);
+  }, [content, media, showSanskrit, resolvedTitle, peakMovement, classLength, yogaStyle, skillLevel, inspiration]);
+
+  // Tracks a share already created for the content currently on screen, so
+  // re-clicking Share re-copies the same link instead of minting a new row
+  // each time. If the content changes (e.g. a pose swap) after sharing, a
+  // fresh share is created on next click rather than reusing the stale one.
+  const sharedRef = useRef<{ content: string; token: string } | null>(null);
 
   const handleShare = useCallback(async () => {
-    if (!classId) return;
     setIsSharing(true);
     try {
-      // Reuse an existing token if this class was already shared before,
-      // otherwise mint a new one and mark the row as shared.
-      const { data: existing } = await supabase
-        .from("saved_classes")
-        .select("share_token, is_shared")
-        .eq("id", classId)
-        .single();
-
-      let token = existing?.share_token;
-      if (!token) {
-        token = crypto.randomUUID();
-        await supabase
-          .from("saved_classes")
-          .update({ share_token: token, is_shared: true })
-          .eq("id", classId);
-      } else if (!existing?.is_shared) {
-        await supabase.from("saved_classes").update({ is_shared: true }).eq("id", classId);
+      let token: string;
+      if (sharedRef.current && sharedRef.current.content === content) {
+        token = sharedRef.current.token;
+      } else {
+        // Public, no auth in either direction — anyone can create a share
+        // of whatever's currently on screen, saved or not, logged in or not.
+        const { data, error } = await supabase
+          .from("shared_classes")
+          .insert({
+            peak_pose: peakMovement || null,
+            class_length: classLength ?? null,
+            class_content: content,
+            yoga_style: yogaStyle || null,
+            inspiration: inspiration || null,
+            skill_level: skillLevel || null,
+            saved_class_id: classId || null,
+          })
+          .select("share_token")
+          .single();
+        if (error || !data) throw error || new Error("Failed to create share");
+        token = data.share_token;
+        sharedRef.current = { content, token };
       }
 
       const url = `${window.location.origin}/shared/${token}`;
@@ -137,7 +153,7 @@ const ClassPlan = ({
     } finally {
       setIsSharing(false);
     }
-  }, [classId]);
+  }, [content, peakMovement, classLength, yogaStyle, inspiration, skillLevel, classId]);
 
   const handleModClick = useCallback((sectionIdx: number, blockIdx: number, poseIdx: number, mod: string) => {
     setSections((prev) => {
@@ -289,8 +305,7 @@ const ClassPlan = ({
               size="sm"
               className="font-body text-xs tracking-wide uppercase h-7 px-2.5"
               onClick={handleShare}
-              disabled={!classId || isSharing}
-              title={!classId ? "Save this class first to share it" : undefined}
+              disabled={isSharing}
             >
               {justCopied ? (
                 <Check className="h-3 w-3" />
