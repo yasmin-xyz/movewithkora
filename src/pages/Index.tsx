@@ -83,7 +83,8 @@ const Index = () => {
     content: string,
     date: string | null,
     loadedYogaStyle?: string | null,
-    loadedInspiration?: string | null
+    loadedInspiration?: string | null,
+    loadedSkillLevel?: string | null
   ) => {
     setCurrentSavedClassId(id);
     setClassLength(String(length));
@@ -92,6 +93,7 @@ const Index = () => {
     setLoadedDate(date);
     setYogaStyle(loadedYogaStyle || "");
     setInspiration(loadedInspiration || "");
+    setSkillLevel(loadedSkillLevel || "Intermediate");
     setIsViewingLoaded(true);
     headerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -229,6 +231,7 @@ const Index = () => {
         user_id: user.id,
         yoga_style: yogaStyle || null,
         inspiration: inspiration.trim() || null,
+        skill_level: skillLevel || null,
       })
       .select("id")
       .single();
@@ -406,8 +409,10 @@ const Index = () => {
                 onToggleSanskrit={setShowSanskrit}
                 classId={currentSavedClassId}
                 classTitle={displayTitle}
+                peakMovement={peakMovement}
                 classLength={parseInt(classLength)}
                 yogaStyle={yogaStyle}
+                skillLevel={skillLevel}
                 inspiration={inspiration}
               />
             </>
@@ -443,8 +448,10 @@ const Index = () => {
                   onToggleSanskrit={setShowSanskrit}
                   classId={currentSavedClassId}
                   classTitle={displayTitle}
+                  peakMovement={peakMovement}
                   classLength={parseInt(classLength)}
                   yogaStyle={yogaStyle}
+                  skillLevel={skillLevel}
                   inspiration={inspiration}
                 />
               )}
