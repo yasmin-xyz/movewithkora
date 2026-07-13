@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Switch } from "@/components/ui/switch";
 import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
 import SiteNav from "@/components/SiteNav";
@@ -288,6 +288,12 @@ const Landing = () => {
         .kora-landing footer .footer-logo svg { width: 20px; height: 20px; }
         .kora-landing footer .footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--cream); opacity: 0.6; }
         .kora-landing footer p { font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); margin-top: 0.75rem; }
+        .kora-landing footer .footer-links { display: flex; align-items: center; justify-content: center; gap: 0.65rem; margin-top: 1.1rem; }
+        .kora-landing footer .footer-links a {
+          font-size: 0.7rem; color: rgba(255, 255, 255, 0.45); text-decoration: none; transition: color 0.2s ease;
+        }
+        .kora-landing footer .footer-links a:hover { color: var(--cream); }
+        .kora-landing footer .footer-links span { font-size: 0.7rem; color: rgba(255, 255, 255, 0.2); }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @media (min-width: 640px) {
           .kora-landing section { padding: 8rem 2rem; }
@@ -533,6 +539,11 @@ const Landing = () => {
             </g>
           </svg>
           <span>Kora</span>
+        </div>
+        <div className="footer-links">
+          <Link to="/privacy-policy">Privacy Policy</Link>
+          <span aria-hidden="true">·</span>
+          <Link to="/terms-of-service">Terms of Service</Link>
         </div>
         <p>&copy; 2026 Kora. Built for instructors.</p>
       </footer>
