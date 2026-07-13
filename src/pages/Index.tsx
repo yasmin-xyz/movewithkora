@@ -38,6 +38,11 @@ const Index = () => {
   const abortRef = useRef<AbortController | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
+  // Tracks which saved_classes row (if any) the plan currently on screen
+  // corresponds to. null means "not saved yet" — Share stays disabled on
+  // ClassPlan until this is set, since a share link needs a row to point at.
+  const [currentSavedClassId, setCurrentSavedClassId] = useState<string | null>(null);
+
   const [mounted, setMounted] = useState(false);
   const [blooming, setBlooming] = useState(false);
   const resultsAnchorRef = useRef<HTMLDivElement>(null);
@@ -72,6 +77,7 @@ const Index = () => {
   }, []);
 
   const handleLoadClass = (
+    id: string,
     peakPose: string,
     length: number,
     content: string,
@@ -79,6 +85,7 @@ const Index = () => {
     loadedYogaStyle?: string | null,
     loadedInspiration?: string | null
   ) => {
+    setCurrentSavedClassId(id);
     setClassLength(String(length));
     setPeakMovement(peakPose);
     setClassPlan(content);
@@ -93,6 +100,7 @@ const Index = () => {
     setIsViewingLoaded(false);
     setClassPlan("");
     setLoadedDate(null);
+    setCurrentSavedClassId(null);
   };
 
   const formatDate = (dateStr: string | null) => {
@@ -122,6 +130,9 @@ const Index = () => {
     setJustCompleted(false);
     setShowResult(false);
     setClassPlan("");
+    // A freshly generated class isn't saved yet, even if the previous one
+    // (now replaced) was — clear the stale id so Share doesn't point at it.
+    setCurrentSavedClassId(null);
     abortRef.current = new AbortController();
 
     try {
@@ -209,20 +220,26 @@ const Index = () => {
     }
 
     setIsSaving(true);
-    const { error } = await supabase.from("saved_classes").insert({
-      peak_pose: peakMovement.trim(),
-      class_length: parseInt(classLength),
-      class_content: classPlan,
-      user_id: user.id,
-      yoga_style: yogaStyle || null,
-      inspiration: inspiration.trim() || null,
-    });
+    const { data, error } = await supabase
+      .from("saved_classes")
+      .insert({
+        peak_pose: peakMovement.trim(),
+        class_length: parseInt(classLength),
+        class_content: classPlan,
+        user_id: user.id,
+        yoga_style: yogaStyle || null,
+        inspiration: inspiration.trim() || null,
+      })
+      .select("id")
+      .single();
     setIsSaving(false);
 
     if (error) {
       toast.error("Failed to save class.");
     } else {
       toast.success("Class saved successfully.");
+      // Now that the class has a row, Share becomes available on ClassPlan.
+      if (data?.id) setCurrentSavedClassId(data.id);
     }
   };
 
@@ -231,6 +248,7 @@ const Index = () => {
     handleBackToLibrary();
   };
 
+  const displayTitle = peakMovement === "None" ? "General Flow" : (peakMovement || "Untitled");
 
   return (
     <div className="kora-planner min-h-screen">
@@ -367,7 +385,7 @@ const Index = () => {
               </button>
               <div className="mb-8 space-y-1">
                 <h2 className="font-heading text-3xl tracking-tight text-foreground">
-                  {peakMovement === "None" ? "General Flow" : (peakMovement || "Untitled")}
+                  {displayTitle}
                 </h2>
                 <p className="font-body text-sm text-muted-foreground">
                   {classLength} min
@@ -380,7 +398,18 @@ const Index = () => {
                   </p>
                 )}
               </div>
-              <ClassPlan content={classPlan} isLoading={false} onContentChange={setClassPlan} showSanskrit={showSanskrit} onToggleSanskrit={setShowSanskrit} />
+              <ClassPlan
+                content={classPlan}
+                isLoading={false}
+                onContentChange={setClassPlan}
+                showSanskrit={showSanskrit}
+                onToggleSanskrit={setShowSanskrit}
+                classId={currentSavedClassId}
+                classTitle={displayTitle}
+                classLength={parseInt(classLength)}
+                yogaStyle={yogaStyle}
+                inspiration={inspiration}
+              />
             </>
           ) : (
             <>
@@ -405,7 +434,20 @@ const Index = () => {
 
               <div ref={resultsAnchorRef} />
 
-              {classPlan && showResult && <ClassPlan content={classPlan} isLoading={isLoading} onContentChange={setClassPlan} showSanskrit={showSanskrit} onToggleSanskrit={setShowSanskrit} />}
+              {classPlan && showResult && (
+                <ClassPlan
+                  content={classPlan}
+                  isLoading={isLoading}
+                  onContentChange={setClassPlan}
+                  showSanskrit={showSanskrit}
+                  onToggleSanskrit={setShowSanskrit}
+                  classId={currentSavedClassId}
+                  classTitle={displayTitle}
+                  classLength={parseInt(classLength)}
+                  yogaStyle={yogaStyle}
+                  inspiration={inspiration}
+                />
+              )}
 
               {classPlan && showResult && !isLoading && (
                 <div className="mt-8">
