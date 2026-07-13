@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://movewithkora.vercel.app",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
@@ -277,6 +277,7 @@ Modifications:
 
 ASYMMETRICAL POSE SIDE FLOW RULES (critical):
 - If a block contains asymmetrical poses (symmetry == "asymmetrical"), you MUST group them into a Side Flow.
+- This applies even when only ONE asymmetrical pose appears in a block. A single asymmetrical pose must still be split into a Right Side Flow entry and a Left Side Flow entry, exactly like a multi-pose cluster — never output a single unsided instance of an asymmetrical pose (e.g. a bare "Pose: Thread the Needle" with no "(Right)"/"(Left)" suffix, appearing only once) anywhere in the output, regardless of section, and regardless of whether other asymmetrical poses are nearby.
 - Output ALL asymmetrical poses in the block for the right side first, then a Vinyasa separator line, then the SAME poses for the left side.
 - Do NOT use "Repeat: Left" for individual poses. Mirror the ENTIRE cluster, not pose-by-pose.
 - Insert a transition/vinyasa in TWO places around the side flow, matching how this is actually taught in a live class: (1) BEFORE Right Side Flow begins, bridging from whatever pose or block came immediately before it (see CROSS-BLOCK AND CROSS-SECTION TRANSITIONS above) — a side flow must never open with a cold cut straight into "Right Side Flow:" with no transition, and (2) BETWEEN the right and left side flows, exactly as before. Do not insert a vinyasa between each individual pose within one side — only at these two bracketing points. This applies in every section that contains a side flow (Build, Peak, Cool Down, etc.), not just Peak.
