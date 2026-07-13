@@ -14,6 +14,7 @@ interface SavedClass {
   archived: boolean | null;
   yoga_style: string | null;
   inspiration: string | null;
+  skill_level: string | null;
 }
 
 interface SavedClassesProps {
@@ -24,7 +25,8 @@ interface SavedClassesProps {
     content: string,
     date: string | null,
     yogaStyle?: string | null,
-    inspiration?: string | null
+    inspiration?: string | null,
+    skillLevel?: string | null
   ) => void;
 }
 
@@ -139,7 +141,8 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                         cls.class_content || "",
                         cls.created_at,
                         cls.yoga_style,
-                        cls.inspiration
+                        cls.inspiration,
+                        cls.skill_level
                       )
                     }
                   >
@@ -196,8 +199,10 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                   readOnly
                   classId={viewedClass.id}
                   classTitle={viewedTitle}
+                  peakMovement={viewedClass.peak_pose || undefined}
                   classLength={viewedClass.class_length}
                   yogaStyle={viewedClass.yoga_style}
+                  skillLevel={viewedClass.skill_level}
                   inspiration={viewedClass.inspiration}
                 />
               )}
