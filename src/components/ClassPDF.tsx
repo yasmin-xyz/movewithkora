@@ -37,12 +37,7 @@ const FONT_FILES: { family: string; weight: number; url: string }[] = [
   { family: "Inter", weight: 600, url: "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.ttf" },
 ];
 
-// Baseline registration so the family is known to react-pdf even in the
-// worst case (buffer prefetch below fails outright, e.g. offline). Real
-// preloading happens in ensureFontsLoaded() and overrides this.
-Font.register({ family: "Cormorant Garamond", fonts: FONT_FILES.filter(f => f.family === "Cormorant Garamond").map(f => ({ src: f.url, fontWeight: f.weight })) });
-Font.register({ family: "Inter", fonts: FONT_FILES.filter(f => f.family === "Inter").map(f => ({ src: f.url, fontWeight: f.weight })) });
-Font.registerHyphenationCallback((word) => [word]);
+Font.registerHyphenationCallback((word) => [word]); // avoid mid-word breaks
 
 let fontsLoadedPromise: Promise<void> | null = null;
 
@@ -57,10 +52,11 @@ function ensureFontsLoaded(): Promise<void> {
           const buffer = await res.arrayBuffer();
           return { ...f, buffer };
         } catch {
-          return null; // this one font falls back to the URL-based registration above
+          return null;
         }
       })
     );
+
     const byFamily = new Map<string, { src: ArrayBuffer; fontWeight: number }[]>();
     for (const r of results) {
       if (!r) continue;
@@ -68,18 +64,38 @@ function ensureFontsLoaded(): Promise<void> {
       list.push({ src: r.buffer, fontWeight: r.weight });
       byFamily.set(r.family, list);
     }
-    for (const [family, fonts] of byFamily.entries()) {
-      if (fonts.length > 0) Font.register({ family, fonts });
+
+    // Single registration per family. If every fetch for a family failed
+    // (e.g. offline), fall back to URL-based registration for that family
+    // only — never register the same family twice, which is what caused
+    // the overlapping/ghosted text (conflicting font descriptors for the
+    // same weight confuse react-pdf's text measurement).
+    const allFamilies = new Set(FONT_FILES.map((f) => f.family));
+    for (const family of allFamilies) {
+      const buffered = byFamily.get(family);
+      if (buffered && buffered.length > 0) {
+        Font.register({ family, fonts: buffered });
+      } else {
+        Font.register({
+          family,
+          fonts: FONT_FILES.filter((f) => f.family === family).map((f) => ({ src: f.url, fontWeight: f.weight })),
+        });
+      }
     }
   })();
   return fontsLoadedPromise;
 }
 
+// Persists across calls so a second export in the same session (or
+// exporting after already viewing a class with the same poses) doesn't
+// re-fetch images it already has.
+const imageCache = new Map<string, string>();
+
 async function preloadImages(urls: string[]): Promise<Record<string, string>> {
   const unique = Array.from(new Set(urls.filter(Boolean)));
-  const map: Record<string, string> = {};
+  const toFetch = unique.filter((u) => !imageCache.has(u));
   await Promise.all(
-    unique.map(async (url) => {
+    toFetch.map(async (url) => {
       try {
         const res = await fetch(url);
         if (!res.ok) return;
@@ -90,12 +106,16 @@ async function preloadImages(urls: string[]): Promise<Record<string, string>> {
           reader.onerror = reject;
           reader.readAsDataURL(blob);
         });
-        map[url] = dataUri;
+        imageCache.set(url, dataUri);
       } catch {
         // Skip — component falls back to the remote URL for this one image.
       }
     })
   );
+  const map: Record<string, string> = {};
+  for (const u of unique) {
+    if (imageCache.has(u)) map[u] = imageCache.get(u)!;
+  }
   return map;
 }
 
@@ -284,21 +304,27 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     marginLeft: 6,
   },
-  // NOTE: no flexDirection here. This is applied to a <Text>, not a <View> —
-  // giving a Text node a row flex direction was the other half of the page-1
-  // corruption bug (react-pdf's text layout doesn't expect flex on inline
-  // text runs, and combined with the async font/image race it produced
-  // overlapping duplicate-looking text). Nested <Text> inside <Text> flows
-  // inline on its own; it doesn't need a flex container.
+  // Applied to a <View>, not a <Text> — two sibling Text children (label,
+  // value) laid out in a row. Nested Text-in-Text with differing font
+  // weights is a documented source of overlapping/duplicated-looking text
+  // in react-pdf; a View row sidesteps that ambiguity entirely.
   poseDetailRow: {
-    fontSize: 9,
-    color: COLORS.mutedForeground,
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginTop: 1,
   },
   poseDetailLabel: {
     fontFamily: "Inter",
     fontWeight: 500,
+    fontSize: 9,
     color: "#5C6B55",
+    marginRight: 3,
+  },
+  poseDetailValue: {
+    fontFamily: "Inter",
+    fontSize: 9,
+    color: COLORS.mutedForeground,
+    flex: 1,
   },
   transitionBlock: {
     borderTopWidth: 1,
@@ -513,16 +539,16 @@ const ClassPDF = ({
                                 {pose.isSelected && <Text style={styles.selectedBadge}>SELECTED</Text>}
                               </View>
                               {pose.breath && (
-                                <Text style={styles.poseDetailRow}>
-                                  <Text style={styles.poseDetailLabel}>Breath: </Text>
-                                  {pose.breath}
-                                </Text>
+                                <View style={styles.poseDetailRow}>
+                                  <Text style={styles.poseDetailLabel}>Breath:</Text>
+                                  <Text style={styles.poseDetailValue}>{pose.breath}</Text>
+                                </View>
                               )}
                               {pose.cue && (
-                                <Text style={styles.poseDetailRow}>
-                                  <Text style={styles.poseDetailLabel}>Cue: </Text>
-                                  {pose.cue}
-                                </Text>
+                                <View style={styles.poseDetailRow}>
+                                  <Text style={styles.poseDetailLabel}>Cue:</Text>
+                                  <Text style={styles.poseDetailValue}>{pose.cue}</Text>
+                                </View>
                               )}
                             </View>
                           </View>
