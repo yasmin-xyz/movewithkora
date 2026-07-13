@@ -13,6 +13,57 @@ serve(async (req) => {
   }
 
   try {
+    // Supabase client + rate-limit check come first, before parsing the
+    // request body or doing any real work — an abusive caller gets rejected
+    // as cheaply as possible, before we've spent anything on their request.
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const RATE_LIMIT_MAX = 10; // max requests per identifier per window
+    const RATE_LIMIT_WINDOW_SECONDS = 600; // 10 minutes
+
+    const identifier =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("cf-connecting-ip") ||
+      "unknown";
+
+    const nowMs = Date.now();
+    const { data: existingLimit } = await supabase
+      .from("function_rate_limits")
+      .select("window_start, request_count")
+      .eq("identifier", identifier)
+      .eq("function_name", "generate-class")
+      .maybeSingle();
+
+    const windowExpired =
+      !existingLimit ||
+      nowMs - new Date(existingLimit.window_start).getTime() > RATE_LIMIT_WINDOW_SECONDS * 1000;
+
+    if (windowExpired) {
+      // Start a fresh window for this identifier.
+      await supabase.from("function_rate_limits").upsert(
+        {
+          identifier,
+          function_name: "generate-class",
+          window_start: new Date().toISOString(),
+          request_count: 1,
+        },
+        { onConflict: "identifier,function_name" }
+      );
+    } else if (existingLimit.request_count >= RATE_LIMIT_MAX) {
+      return new Response(
+        JSON.stringify({ error: "Rate limit exceeded. Please try again in a few minutes." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    } else {
+      await supabase
+        .from("function_rate_limits")
+        .update({ request_count: existingLimit.request_count + 1 })
+        .eq("identifier", identifier)
+        .eq("function_name", "generate-class");
+    }
+
     const {
       classLength,
       peakMovement,
@@ -22,11 +73,6 @@ serve(async (req) => {
     } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
-
-    // Fetch pose library from database
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data: poses, error: posesError } = await supabase
       .from("pose_library")
