@@ -18,6 +18,7 @@ interface SavedClass {
 
 interface SavedClassesProps {
   onLoadClass?: (
+    id: string,
     peakPose: string,
     length: number,
     content: string,
@@ -71,6 +72,9 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
   };
 
   const viewedClass = viewingId ? classes.find((c) => c.id === viewingId) : null;
+  const viewedTitle = viewedClass
+    ? (viewedClass.peak_pose === "None" ? "General Flow" : (viewedClass.peak_pose || "Untitled"))
+    : "";
 
   return (
     <div>
@@ -129,6 +133,7 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                     className="font-body text-xs tracking-wide uppercase"
                     onClick={() =>
                       onLoadClass?.(
+                        cls.id,
                         cls.peak_pose || "",
                         cls.class_length || 60,
                         cls.class_content || "",
@@ -160,7 +165,7 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
               <div className="flex items-start justify-between mb-6">
                 <div className="space-y-1.5">
                   <h3 className="font-heading text-2xl tracking-tight text-foreground">
-                    {viewedClass.peak_pose === "None" ? "General Flow" : (viewedClass.peak_pose || "Untitled")}
+                    {viewedTitle}
                   </h3>
                   <p className="font-body text-sm text-foreground/80">
                     {viewedClass.class_length} minutes
@@ -185,7 +190,16 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
                 </div>
               </div>
               {viewedClass.class_content && (
-                <ClassPlan content={viewedClass.class_content} isLoading={false} readOnly />
+                <ClassPlan
+                  content={viewedClass.class_content}
+                  isLoading={false}
+                  readOnly
+                  classId={viewedClass.id}
+                  classTitle={viewedTitle}
+                  classLength={viewedClass.class_length}
+                  yogaStyle={viewedClass.yoga_style}
+                  inspiration={viewedClass.inspiration}
+                />
               )}
             </div>
           )}
