@@ -7,7 +7,7 @@ import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import PoseLibrary from "./pages/PoseLibrary";
 import Feedback from "./pages/Feedback";
-import SharedClass from "./pages/SharedClass";
+import SharedClass from "./components/SharedClass";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 const App = () => (
