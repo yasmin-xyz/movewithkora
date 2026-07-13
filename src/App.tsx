@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import PoseLibrary from "./pages/PoseLibrary";
 import Feedback from "./pages/Feedback";
 import SharedClass from "./components/SharedClass";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 const App = () => (
@@ -22,6 +24,8 @@ const App = () => (
           <Route path="/pose-library" element={<PoseLibrary />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/shared/:token" element={<SharedClass />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
