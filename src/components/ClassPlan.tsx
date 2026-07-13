@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
@@ -108,6 +109,8 @@ const ClassPlan = ({
         skillLevel,
         inspiration,
       });
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't export the PDF. Please try again.");
     } finally {
       setIsExporting(false);
     }
@@ -150,6 +153,8 @@ const ClassPlan = ({
       await navigator.clipboard.writeText(url);
       setJustCopied(true);
       setTimeout(() => setJustCopied(false), 2000);
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't create the share link. Please try again.");
     } finally {
       setIsSharing(false);
     }
