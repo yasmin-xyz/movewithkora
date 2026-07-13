@@ -11,6 +11,7 @@ interface SharedClassRow {
   class_content: string | null;
   yoga_style: string | null;
   inspiration: string | null;
+  skill_level: string | null;
   created_at: string | null;
 }
 
@@ -25,10 +26,9 @@ const SharedClass = () => {
       return;
     }
     supabase
-      .from("saved_classes")
-      .select("id, peak_pose, class_length, class_content, yoga_style, inspiration, created_at")
+      .from("shared_classes")
+      .select("id, peak_pose, class_length, class_content, yoga_style, inspiration, skill_level, created_at")
       .eq("share_token", token)
-      .eq("is_shared", true)
       .maybeSingle()
       .then(({ data, error }) => {
         if (error || !data) {
@@ -58,7 +58,7 @@ const SharedClass = () => {
               This link isn't available
             </h1>
             <p className="font-body text-sm text-muted-foreground">
-              The class may have been unshared, or the link is incorrect.
+              The link may be incorrect, or the class it pointed to no longer exists.
             </p>
             <Link
               to="/"
@@ -79,6 +79,7 @@ const SharedClass = () => {
                 <p className="font-body text-sm text-foreground/80">
                   {row.class_length ? `${row.class_length} minutes` : ""}
                   {row.yoga_style ? ` · ${row.yoga_style}` : ""}
+                  {row.skill_level ? ` · ${row.skill_level}` : ""}
                 </p>
                 {row.inspiration && (
                   <p className="font-body text-xs text-muted-foreground italic">
@@ -97,8 +98,10 @@ const SharedClass = () => {
                 isLoading={false}
                 readOnly
                 classTitle={title}
+                peakMovement={row.peak_pose || undefined}
                 classLength={row.class_length}
                 yogaStyle={row.yoga_style}
+                skillLevel={row.skill_level}
                 inspiration={row.inspiration}
               />
             )}
