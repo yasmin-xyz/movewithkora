@@ -489,7 +489,7 @@ const PoseLibrary = () => {
             </svg>
           </div>
           <h1>Pose Library</h1>
-          <p className="plib-tagline">Every pose Kora knows, ready to browse.</p>
+          <p className="plib-tagline">The poses behind every flow — how to teach them, and why they matter.</p>
         </div>
 
         <div className="controls-row">
