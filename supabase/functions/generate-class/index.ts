@@ -142,11 +142,14 @@ If BOTH the previous pose AND the next pose have base == "standing":
   - Do NOT insert Down Dog Reset.
   - Do NOT insert Full Vinyasa or any vinyasa variation.
   - IGNORE orientation changes when calculating the transition_score (subtract the +1 for orientation).
-  - If orientation changes within standing (e.g. front → long_edge), insert ONLY a directional bridge cue:
-    Pose: Pivot to front of mat   (or "Turn to long edge", depending on direction)
-    Cue: Transition
+  - If orientation changes within standing (e.g. front → long_edge), insert ONLY a directional pivot cue:
+    Pose: Pivot to Front of Mat   (or "Turn to Long Edge", depending on direction)
+    Type: Transition
+    Cue: A real, concise cue describing the pivot (e.g. "Inhale to lengthen, exhale to pivot the toes toward the front of the mat.")
+    Always use exactly this "Pivot to ___" / "Turn to ___" naming pattern for this connector — never invent an alternate label such as "Directional Bridge," which reads to an instructor like Bridge Pose (a backbend) and is confusing in context.
   - If no orientation change, insert NO transition at all.
   - Standing sequences must remain in the standing ecosystem unless the sequence intentionally descends to floor.
+  - CRITICAL — this entire rule, including the pivot-only cue, applies ONLY when the NEXT pose is also standing. If the next pose has any other base (kneeling, seated, prone, etc.) — for example transitioning from a standing forward fold into a floor-based lunge like Lizard Pose — this rule does NOT apply and must not be used to paper over a real base change with a bare pivot cue. Use the normal DOWN DOG RESET RULES / transition thresholds below instead, since a genuine descent to the floor needs a real transition, not a "turn to face a direction" cue.
 
 DOWN DOG RESET RULES:
 Down Dog Reset should ONLY be inserted when:
