@@ -256,6 +256,13 @@ BREATH CUE QUALITY (critical — applies to every Breath line anywhere in the ou
 - Good: "Breath: Inhale to lift the chest" / "Breath: Exhale to fold deeper" / "Breath: Inhale to lengthen the spine, exhale to rotate"
 - This applies with equal weight to modification breath cues — a modification's breath cue must be just as descriptive and pose-specific as a main pose's, never a shortened placeholder.
 
+SIDE-NEUTRAL CUE LANGUAGE FOR ASYMMETRICAL POSES (critical): When writing the Breath and Cue for an asymmetrical pose's "(Right)" and "(Left)" entries, default to relative, side-neutral phrasing that reads correctly for either side, rather than hardcoding literal "right"/"left" wording that only actually makes sense for one specific side.
+- Bad (only correct for one side, wrong if reused for the other): "Inhale to reach the right arm forward and left leg back" as the cue for a contralateral pose like Bird-Dog.
+- Good (correct regardless of which side is labeled): "Inhale to extend the opposite arm and opposite leg."
+- Bad: "Exhale to drop the knees to the right, gaze over the left shoulder" for a twisting pose.
+- Good: "Exhale to drop the knees to one side, gaze over the opposite shoulder."
+- Only use an explicit directional word (e.g. "front knee," "back heel," or a genuine "right"/"left" in a directional transition pivot) when the instruction is truly asymmetric in a way side-neutral language can't capture — most contralateral and twisting-style cues can and should be phrased generically.
+
 MODIFICATION REQUIREMENT (critical — applies to every non-transition pose in every section, not just Warm-Up):
 - Every pose must include exactly 3 modification lines: one easier variation, one alternative variation, and one more advanced/challenging variation — regardless of which section (Warm-Up, Build, Peak, Cool Down) the pose is in.
 - Each modification line MUST follow this exact format: "- [Pose name] – Breath: [breath cue] – [short description]". The breath cue is required for every single modification option, not optional — if a student switches to that variation, they need their own accurate breath instruction, not the original pose's breath cue. Never omit the "Breath:" segment, and never leave it as a bare "Inhale"/"Exhale" — see BREATH CUE QUALITY above.
@@ -338,6 +345,8 @@ ASYMMETRICAL POSE SIDE FLOW RULES (critical):
   Do not insert a vinyasa between each individual pose within one side — only at these three bracketing points. This applies in every section that contains a side flow (Build, Peak, Cool Down, etc.), not just Peak, and applies to EVERY side flow in the class, not only the first one.
 - The TYPE of transition used at all three bracketing points (Down Dog Reset vs. a full/creative vinyasa) is still governed by DOWN DOG RESET RULES and the YOGA STYLE PACING OVERRIDE above, including the Vinyasa/Power/Ashtanga override that upgrades most score-3+ connectors to a real vinyasa — a bracketing transition is not automatically a Down Dog Reset by default, and the exit transition (point 3) deserves the same real vinyasa treatment as the entry transition when the style and score call for it.
 - Bilateral poses in the same block go OUTSIDE the side flow (before or after it) — and, per NO BARE POSE ENTRIES above, still require their own full Breath/Cue/Modifications like any other pose.
+
+MIRRORED LEAD-IN CONSISTENCY (critical): If one or more bilateral (non-suffixed) poses are used as a direct lead-in immediately before Right Side Flow begins — sitting between the bridging transition and the first "(Right)" pose — the SAME bilateral pose(s), in the SAME order, MUST be repeated again immediately before Left Side Flow begins, after the bridging transition into the left side. The right and left sequences must be structurally identical in every respect except the asymmetrical pose(s) themselves — never include a lead-in pose before one side and quietly drop it before the other. This applies to every side flow in the class (Build, Peak, Cool Down, etc.), not just Peak, and to every bilateral lead-in pose, not just a single example.
 
 PEAK SEQUENCE FLOW (critical — applies specifically to the PEAK section when the peak pose is asymmetrical):
 - Never present the peak pose as the only, isolated entry in a Right/Left Side Flow. A peak pose must feel earned, not appear cold.
