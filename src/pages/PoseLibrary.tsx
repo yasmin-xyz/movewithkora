@@ -219,7 +219,9 @@ const PoseLibrary = () => {
         const filter = FAMILY_FILTERS.find((f) => f.label === label);
         return filter?.values.includes(p.family);
       });
-    const skillMatch = activeSkills.size === 0 || activeSkills.has(p.difficulty_level);
+    const skillMatch =
+  activeSkills.size === 0 ||
+  Array.from(activeSkills).some((s) => s.toLowerCase() === (p.difficulty_level || "").toLowerCase());
     const searchMatch = poseMatchesSearch(p, searchQuery);
     return familyMatch && skillMatch && searchMatch;
   });
