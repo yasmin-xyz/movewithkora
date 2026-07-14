@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import ClassForm from "@/components/ClassForm";
@@ -308,6 +308,21 @@ const Index = () => {
         }
         .kora-planner .planner-footer-nav button:hover { color: var(--olive); }
         .kora-planner .planner-footer-nav span { color: var(--text-secondary); font-size: 0.7rem; }
+        .kora-planner .planner-footer-brand {
+          display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+          padding-top: 1.25rem; margin-top: 1.25rem; border-top: 1px solid rgba(42, 42, 40, 0.06);
+        }
+        .kora-planner .planner-footer-logo { display: flex; align-items: center; gap: 0.4rem; }
+        .kora-planner .planner-footer-logo svg { width: 16px; height: 16px; }
+        .kora-planner .planner-footer-logo span {
+          font-family: var(--serif); font-size: 0.95rem; color: var(--text-secondary); opacity: 0.7;
+        }
+        .kora-planner .planner-footer-legal { display: flex; align-items: center; gap: 0.5rem; }
+        .kora-planner .planner-footer-legal a {
+          font-size: 0.68rem; color: var(--text-secondary); text-decoration: none; transition: color 0.2s ease;
+        }
+        .kora-planner .planner-footer-legal a:hover { color: var(--olive); }
+        .kora-planner .planner-footer-legal span { font-size: 0.68rem; color: var(--text-secondary); opacity: 0.4; }
         .kora-planner .planner-heading {
           font-family: var(--serif) !important;
         }
@@ -498,6 +513,29 @@ const Index = () => {
           <button onClick={() => navigate("/pose-library")}>Pose Library</button>
           <span aria-hidden="true">·</span>
           <button onClick={() => navigate("/feedback")}>Feedback</button>
+        </div>
+
+        <div className="mx-auto max-w-2xl px-6 pb-10 planner-footer-brand">
+          <div className="planner-footer-logo">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="100" r="100" fill="#5C6B55"/>
+              <g transform="translate(100,100) scale(0.95) translate(-100,-42)" fill="#FFFFFF" stroke="#5C6B55" strokeWidth="2" strokeLinejoin="round">
+                <path d="M100 78 C82 66, 32 52, 6 64 C4 72, 28 84, 60 86 C78 86, 94 82, 100 78Z"/>
+                <path d="M100 78 C118 66, 168 52, 194 64 C196 72, 172 84, 140 86 C122 86, 106 82, 100 78Z"/>
+                <path d="M100 76 C86 58, 50 24, 36 12 C30 16, 38 38, 56 56 C70 68, 88 76, 100 76Z"/>
+                <path d="M100 76 C114 58, 150 24, 164 12 C170 16, 162 38, 144 56 C130 68, 112 76, 100 76Z"/>
+                <path d="M100 74 C90 52, 74 18, 68 6 C64 10, 68 32, 78 50 C86 62, 96 72, 100 74Z"/>
+                <path d="M100 74 C110 52, 126 18, 132 6 C136 10, 132 32, 122 50 C114 62, 104 72, 100 74Z"/>
+                <path d="M100 72 C92 48, 86 16, 88 2 C92 -2, 97 10, 100 2 C103 10, 108 -2, 112 2 C114 16, 108 48, 100 72Z"/>
+              </g>
+            </svg>
+            <span>Kora</span>
+          </div>
+          <div className="planner-footer-legal">
+            <Link to="/privacy-policy">Privacy Policy</Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/terms-of-service">Terms of Service</Link>
+          </div>
         </div>
       </div>
 
