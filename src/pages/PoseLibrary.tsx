@@ -32,9 +32,6 @@ const FAMILY_FILTERS: { label: string; values: string[] }[] = [
 
 const SKILL_FILTERS = ["Beginner", "Intermediate", "Advanced"];
 
-// Well-known poses NOT currently in the curated library, tagged with the
-// family they'd belong to — lets us suggest genuinely similar poses even
-// when the exact searched pose isn't something we teach yet.
 const KNOWN_POSES_NOT_IN_LIBRARY: { name: string; family: string }[] = [
   { name: "Peacock Pose", family: "arm_balance" },
   { name: "Firefly Pose", family: "arm_balance" },
@@ -66,8 +63,6 @@ const KNOWN_POSES_NOT_IN_LIBRARY: { name: string; family: string }[] = [
   { name: "Yogic Sleep Pose", family: "rest" },
 ];
 
-// Recognizable category words mapped to a family value — lets a search like
-// "twist" or "backbend" surface relevant poses even with no specific pose name typed.
 const CATEGORY_KEYWORDS: { keywords: string[]; family: string }[] = [
   { keywords: ["hip opener", "hip", "groin"], family: "hip_opener" },
   { keywords: ["standing"], family: "standing_pose" },
@@ -106,8 +101,6 @@ const PoseLibrary = () => {
     localStorage.setItem(SANSKRIT_STORAGE_KEY, String(showSanskrit));
   }, [showSanskrit]);
 
-  // Only begin the entrance fade once poses have actually finished loading —
-  // ties the animation to real readiness instead of a fixed guess-timer.
   useEffect(() => {
     if (!loading) {
       const t1 = setTimeout(() => setMounted(true), 20);
@@ -142,7 +135,6 @@ const PoseLibrary = () => {
     load();
   }, []);
 
-  // Close the filter dropdown when clicking outside it
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (filterWrapRef.current && !filterWrapRef.current.contains(e.target as Node)) {
@@ -212,11 +204,9 @@ const PoseLibrary = () => {
     const nName = normalizeSearch(p.pose_name);
     const sanskrit = getSanskritName(p.pose_name);
     const nSanskrit = sanskrit ? normalizeSearch(sanskrit) : "";
-    // Direct substring match (covers partial typing, which is most searches)
     if (nName.includes(nq) || nq.includes(nName) || (nSanskrit && (nSanskrit.includes(nq) || nq.includes(nSanskrit)))) {
       return true;
     }
-    // Fuzzy fallback for typos / close spelling
     const dist = Math.min(levenshtein(nq, nName), nSanskrit ? levenshtein(nq, nSanskrit) : Infinity);
     const maxLen = Math.max(nq.length, nName.length);
     return dist <= Math.min(3, Math.floor(maxLen * 0.3));
@@ -234,8 +224,6 @@ const PoseLibrary = () => {
     return familyMatch && skillMatch && searchMatch;
   });
 
-  // When search comes up empty, suggest the closest-spelled poses anyway,
-  // regardless of the stricter match threshold used for the main results.
   const suggestedPoses = (() => {
     const nq = normalizeSearch(searchQuery);
     if (!nq || filteredPoses.length > 0) return [];
@@ -243,8 +231,6 @@ const PoseLibrary = () => {
     const posesInFamily = (family: string, limit: number) =>
       poses.filter((p) => p.family === family).slice(0, limit);
 
-    // Priority 1: does the search match a well-known pose we don't teach?
-    // If so, suggest our poses from that same family.
     let bestKnown: { name: string; family: string } | null = null;
     let bestKnownDist = Infinity;
     for (const known of KNOWN_POSES_NOT_IN_LIBRARY) {
@@ -261,7 +247,6 @@ const PoseLibrary = () => {
       if (matches.length > 0) return matches;
     }
 
-    // Priority 2: does the search contain a recognizable category keyword?
     for (const cat of CATEGORY_KEYWORDS) {
       if (cat.keywords.some((kw) => nq.includes(normalizeSearch(kw)))) {
         const matches = posesInFamily(cat.family, 3);
@@ -269,7 +254,6 @@ const PoseLibrary = () => {
       }
     }
 
-    // Priority 3: fall back to pure spelling-distance against our own library.
     return poses
       .map((p) => ({ pose: p, dist: levenshtein(nq, normalizeSearch(p.pose_name)) }))
       .sort((a, b) => a.dist - b.dist)
@@ -458,6 +442,12 @@ const PoseLibrary = () => {
         .kora-pose-library .plib-footer-logo svg { width: 20px; height: 20px; }
         .kora-pose-library .plib-footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--text-primary); opacity: 0.5; }
         .kora-pose-library .plib-footer p { font-size: 0.75rem; color: var(--text-secondary); opacity: 0.6; margin-top: 0.75rem; }
+        .kora-pose-library .plib-footer-links { display: flex; align-items: center; justify-content: center; gap: 0.65rem; margin-top: 1rem; }
+        .kora-pose-library .plib-footer-links a {
+          font-size: 0.75rem; color: var(--olive); text-decoration: none; transition: color 0.2s ease;
+        }
+        .kora-pose-library .plib-footer-links a:hover { color: var(--olive-light); text-decoration: underline; text-underline-offset: 2px; }
+        .kora-pose-library .plib-footer-links span { font-size: 0.75rem; color: var(--text-secondary); opacity: 0.5; }
         .kora-pose-library .back-to-top {
           position: fixed; bottom: 2rem; right: 2rem; z-index: 90;
           width: 44px; height: 44px; border-radius: 50%;
@@ -623,6 +613,11 @@ const PoseLibrary = () => {
             </g>
           </svg>
           <span>Kora</span>
+        </div>
+        <div className="plib-footer-links">
+          <Link to="/privacy-policy">Privacy Policy</Link>
+          <span aria-hidden="true">·</span>
+          <Link to="/terms-of-service">Terms of Service</Link>
         </div>
         <p>&copy; 2026 Kora. Built for instructors.</p>
       </footer>
