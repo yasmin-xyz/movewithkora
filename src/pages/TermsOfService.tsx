@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import SiteNav from "@/components/SiteNav";
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -8,6 +9,12 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 );
 
 const TermsOfService = () => {
+  // Client-side navigation doesn't reset scroll position the way a normal
+  // page load does — same fix already used in Index.tsx.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <SiteNav />
