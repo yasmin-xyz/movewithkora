@@ -70,6 +70,7 @@ export const SANSKRIT_NAMES: Record<string, string> = {
   "Upward Salute": "Urdhva Hastasana",
   "Wild Thing Pose": "Camatkarasana",
   "Puppy Pose": "Uttana Shishosana",
+  "Bird-Dog": "Dandayamana Bharmanasana",
 };
 
 function normalize(name: string): string {
