@@ -61,6 +61,7 @@ const ClassPlan = ({
   const [isExporting, setIsExporting] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [justCopied, setJustCopied] = useState(false);
+  const [manualShareUrl, setManualShareUrl] = useState<string | null>(null);
 
   const showSanskrit = showSanskritProp ?? internalShowSanskrit;
   const setShowSanskrit = onToggleSanskrit ?? setInternalShowSanskrit;
@@ -124,41 +125,90 @@ const ClassPlan = ({
 
   const handleShare = useCallback(async () => {
     setIsSharing(true);
+    setManualShareUrl(null);
     try {
-      let token: string;
-      if (sharedRef.current && sharedRef.current.content === content) {
-        token = sharedRef.current.token;
-      } else {
-        // Public, no auth in either direction — anyone can create a share
-        // of whatever's currently on screen, saved or not, logged in or not.
-        const { data, error } = await supabase
-          .from("shared_classes")
-          .insert({
-            peak_pose: peakMovement || null,
-            class_length: classLength ?? null,
-            class_content: content,
-            yoga_style: yogaStyle || null,
-            inspiration: inspiration || null,
-            skill_level: skillLevel || null,
-            saved_class_id: classId || null,
-          })
-          .select("share_token")
-          .single();
-        if (error || !data) throw error || new Error("Failed to create share");
-        token = data.share_token;
-        sharedRef.current = { content, token };
+      // Resolves the share URL — reuses a cached token if this exact content
+      // was already shared this session, otherwise creates a new public
+      // shared_classes row.
+      const getUrl = async () => {
+        let token: string;
+        if (sharedRef.current && sharedRef.current.content === content) {
+          token = sharedRef.current.token;
+        } else {
+          const { data, error } = await supabase
+            .from("shared_classes")
+            .insert({
+              peak_pose: peakMovement || null,
+              class_length: classLength ?? null,
+              class_content: content,
+              yoga_style: yogaStyle || null,
+              inspiration: inspiration || null,
+              skill_level: skillLevel || null,
+              saved_class_id: classId || null,
+            })
+            .select("share_token")
+            .single();
+          if (error || !data) throw error || new Error("Failed to create share");
+          token = data.share_token;
+          sharedRef.current = { content, token };
+        }
+        return `${window.location.origin}/shared/${token}`;
+      };
+
+      // Safari (and some mobile browsers) reject a clipboard write that
+      // happens after an `await` inside a click handler — the network call
+      // above breaks the "direct user gesture" Safari requires. The fix
+      // WebKit itself recommends: call clipboard.write() synchronously with
+      // a ClipboardItem whose data is a Promise, so the async work can
+      // finish *after* the write call has already been accepted as part of
+      // the original tap.
+      let copied = false;
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "text/plain": getUrl().then((url) => new Blob([url], { type: "text/plain" })),
+          }),
+        ]);
+        copied = true;
+      } catch {
+        // Falls through to a plain writeText attempt below.
       }
 
-      const url = `${window.location.origin}/shared/${token}`;
-      await navigator.clipboard.writeText(url);
-      setJustCopied(true);
-      setTimeout(() => setJustCopied(false), 2000);
+      if (!copied) {
+        const url = await getUrl();
+        try {
+          await navigator.clipboard.writeText(url);
+          copied = true;
+        } catch {
+          // Final fallback — this browser won't let us copy programmatically
+          // at all. Show the link so the user can copy it manually instead
+          // of hitting a dead end.
+          setManualShareUrl(url);
+        }
+      }
+
+      if (copied) {
+        setJustCopied(true);
+        setTimeout(() => setJustCopied(false), 2000);
+      }
     } catch (err: any) {
       toast.error(err?.message || "Couldn't create the share link. Please try again.");
     } finally {
       setIsSharing(false);
     }
   }, [content, peakMovement, classLength, yogaStyle, inspiration, skillLevel, classId]);
+
+  const handleManualCopy = useCallback(async () => {
+    if (!manualShareUrl) return;
+    try {
+      await navigator.clipboard.writeText(manualShareUrl);
+      setJustCopied(true);
+      setManualShareUrl(null);
+      setTimeout(() => setJustCopied(false), 2000);
+    } catch {
+      toast.error("Couldn't copy automatically — tap and hold the link above to copy it manually.");
+    }
+  }, [manualShareUrl]);
 
   const handleModClick = useCallback((sectionIdx: number, blockIdx: number, poseIdx: number, mod: string) => {
     setSections((prev) => {
@@ -322,6 +372,31 @@ const ClassPlan = ({
               <span className="ml-1.5">{justCopied ? "Link Copied" : "Share"}</span>
             </Button>
           </div>
+          {manualShareUrl && (
+            <div className="flex w-full items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-2 mt-1">
+              <input
+                readOnly
+                value={manualShareUrl}
+                onFocus={(e) => e.currentTarget.select()}
+                className="flex-1 min-w-0 bg-transparent font-body text-xs text-foreground outline-none"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-6 px-2 text-[11px] font-body flex-shrink-0"
+                onClick={handleManualCopy}
+              >
+                Copy
+              </Button>
+              <button
+                onClick={() => setManualShareUrl(null)}
+                className="text-muted-foreground/60 hover:text-foreground text-xs flex-shrink-0"
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+            </div>
+          )}
         </div>
       )}
       {sections.map((section, si) => {
