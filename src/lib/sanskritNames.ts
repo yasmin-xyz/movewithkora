@@ -77,6 +77,8 @@ export const SANSKRIT_NAMES: Record<string, string> = {
   "Reverse Plank Pose": "Purvottanasana",
   "Tiger Pose": "Vyaghrasana",
   "Pyramid Pose": "Parsvottanasana",
+  "Waterfall Pose": "Ardha Halasana",
+  "Standing Hand to Big Toe Pose": "Utthita Hasta Padangusthasana",
 };
 
 function normalize(name: string): string {
