@@ -71,6 +71,12 @@ export const SANSKRIT_NAMES: Record<string, string> = {
   "Wild Thing Pose": "Camatkarasana",
   "Puppy Pose": "Uttana Shishosana",
   "Bird-Dog": "Dandayamana Bharmanasana",
+  "Half Splits": "Ardha Hanumanasana",
+  "Hero Pose": "Virasana",
+  "Plow Pose": "Halasana",
+  "Reverse Plank Pose": "Purvottanasana",
+  "Tiger Pose": "Vyaghrasana",
+  "Pyramid Pose": "Parsvottanasana",
 };
 
 function normalize(name: string): string {
