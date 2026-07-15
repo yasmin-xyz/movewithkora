@@ -389,8 +389,9 @@ Modifications:
 - [Alternative pose name] – Breath: [breath cue] – [short description]
 - [Advanced pose name] – Breath: [breath cue] – [short description]
 
-Vinyasa: [vinyasa type]
-Cue: [a real, concise, embodied description of the movement carrying the student from the right side flow back through the vinyasa and into the left side flow — never just repeat the vinyasa type as the cue]
+Pose: [connector name — "Down Dog Reset", "Half Vinyasa", "Full Vinyasa", or "Switch Sides", chosen per DOWN DOG RESET RULES and TRANSITION TYPE MUST MATCH ACTUAL BODY POSITION above]
+Type: Transition
+Cue: [a real, concise, embodied description of the movement carrying the student from the right side flow into the left side flow — never just repeat the connector name as the cue]
 
 Left Side Flow:
 Pose: [pose name] (Left)
@@ -409,7 +410,7 @@ Modifications:
 - [Alternative pose name] – Breath: [breath cue] – [short description]
 - [Advanced pose name] – Breath: [breath cue] – [short description]
 
-- Vinyasa type between sides depends on skill level, adjusted by the YOGA STYLE PACING OVERRIDE rule above where applicable:
+- Connector type between sides depends on skill level, adjusted by the YOGA STYLE PACING OVERRIDE rule above where applicable — unless TRANSITION TYPE MUST MATCH ACTUAL BODY POSITION calls for "Switch Sides" instead (same base on both sides), which always takes priority over these skill-based defaults:
   - Beginner: "Down Dog Reset"
   - Intermediate: "Half Vinyasa"
   - Advanced: "Full Vinyasa"
