@@ -52,6 +52,9 @@ const PEAK_OPTIONS = [
   "Standing Split",
   "Eagle Pose",
   "Shoulder Stand",
+  "Standing Hand to Big Toe Pose",
+  "Tiger Pose",
+  "Plow Pose",
 ];
 
 const YOGA_STYLE_OPTIONS = [
