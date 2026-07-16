@@ -152,6 +152,12 @@ If BOTH the previous pose AND the next pose have base == "standing":
   - Standing sequences must remain in the standing ecosystem unless the sequence intentionally descends to floor.
   - CRITICAL — this entire rule, including the pivot-only cue, applies ONLY when the NEXT pose is also standing. If the next pose has any other base (kneeling, seated, prone, etc.) — for example transitioning from a standing forward fold into a floor-based lunge like Lizard Pose — this rule does NOT apply and must not be used to paper over a real base change with a bare pivot cue. Use the normal DOWN DOG RESET RULES / transition thresholds below instead, since a genuine descent to the floor needs a real transition, not a "turn to face a direction" cue.
 
+TRANSITIONING INTO A SUPINE POSE (critical — frequently missed): Whenever the next pose's base is "supine" (lying on the back) and the previous pose was kneeling, seated, or standing, a real transition is required — never cut directly from an upright or floor-kneeling pose straight into a supine pose's own Breath/Cue with nothing addressing how the student actually gets down onto their back. Use:
+  Pose: Lie Down
+  Type: Transition
+  Cue: [a real, brief, embodied instruction, e.g. "Slowly lower to a seat, then roll through the spine to lie down on your back."]
+This applies at every such transition in the class, not just between sections — e.g. moving from a kneeling Cat-Cow into a supine Reclined Butterfly needs this connector exactly as much as a section boundary would.
+
 DOWN DOG RESET RULES:
 Down Dog Reset should ONLY be inserted when:
   - base changes from standing → prone, OR prone → standing
@@ -251,9 +257,11 @@ SUN SALUTATION RULES (critical — apply automatically when yogaStyle is Vinyasa
 - After the Sun Salutation block(s), continue into the rest of WARM-UP and BUILD normally, using the standard metadata-driven sequencing rules from that point forward.
 - Do not repeat Sun Salutations later in the class — they belong only in the Warm-Up opening.
 
-HOLD AND REPETITION GUIDANCE (critical):
+HOLD AND REPETITION GUIDANCE (critical — applies broadly, not just to obvious holds): Since individual poses never get their own numeric duration field (only the enclosing block does — see FLOW BLOCK STRUCTURE), the Breath or Cue line is the ONLY place an instructor gets any sense of pacing within a block. Without it, a block like "10 minutes: Child's Pose, then Cat-Cow" gives no indication of how those 10 minutes actually split between the two poses — that gap must be closed on nearly every pose, not treated as optional detail.
 - For static holds — especially Peak poses, deep stretches, and balance poses — include a specific hold duration or breath count directly in the Breath or Cue line (e.g. "Breath: Hold for 5 breaths" or "Cue: Hold for 20-30 seconds, breathing steadily"). Do not leave hold length unspecified for poses meant to be held rather than flowed through.
-- Warm-up mobility poses (like Cat-Cow) should specify a repetition count where relevant (e.g. "Breath: Repeat for 5-8 rounds, inhaling to Cow, exhaling to Cat").
+- For repetition-based or mobility poses (like Cat-Cow) — always specify a rep or round count (e.g. "Breath: Repeat for 5-8 rounds, inhaling to Cow, exhaling to Cat"). Never leave a mobility pose's Breath line as just "inhale to X, exhale to Y" with no indication of how many times to repeat it.
+- For simpler grounding or single-breath poses (like Child's Pose as a brief arrival moment) — a hold length or breath count is still expected (e.g. "Cue: Rest here for 5-6 breaths before moving on"), even if brief, so the instructor knows roughly how long to hold space for it before moving to the next pose.
+- The only poses that can reasonably omit an explicit count are genuine transitions (Type: Transition), since those are inherently brief and don't need their own timing beyond the block's overall duration.
 
 BREATH CUE QUALITY (critical — applies to every Breath line anywhere in the output, including main poses AND every modification option):
 - A breath cue must always describe an action or movement paired with the breath — never output the bare word "Inhale" or "Exhale" alone with nothing else. Every breath cue needs a "to do what": what lifts, lengthens, presses, opens, or releases on that breath.
@@ -273,7 +281,7 @@ MODIFICATION REQUIREMENT (critical — applies to every non-transition pose in e
 - Each modification line MUST follow this exact format: "- [Pose name] – Breath: [breath cue] – [short description]". The breath cue is required for every single modification option, not optional — if a student switches to that variation, they need their own accurate breath instruction, not the original pose's breath cue. Never omit the "Breath:" segment, and never leave it as a bare "Inhale"/"Exhale" — see BREATH CUE QUALITY above.
 
 OPTIONAL WATER BREAK:
-- For classes 60 minutes or longer, insert exactly one "Pose: Water Break (Optional)" entry as the LAST entry of the BUILD section, immediately before the PEAK section begins. Do not place it inside Peak, after Peak, or between Peak and Cool Down — it must come before Peak so the cue text ("reset before the peak") is accurate. Give it a brief Breath/Cue (e.g. "Cue: Offer students a moment to drink water and reset before the peak.") and no Modifications block. Do not insert more than one water break per class, and skip it entirely for classes under 60 minutes.
+- For classes 60 minutes or longer, insert exactly one "Pose: Water Break (Optional)" entry as the LAST entry of the BUILD section, immediately before the PEAK section begins. Do not place it inside Peak, after Peak, or between Peak and Cool Down — it must come before Peak so the cue text ("reset before the peak") is accurate. Give it a brief Cue only (e.g. "Cue: Offer students a moment to drink water and reset before the peak.") — do NOT include a Breath line for Water Break, since there's no meaningful breath instruction for pausing to drink water. No Modifications block either. Do not insert more than one water break per class, and skip it entirely for classes under 60 minutes.
 - A Water Break does not exempt what comes after it from needing a real transition (see CROSS-BLOCK AND CROSS-SECTION TRANSITIONS above). Students are still in a real body position after a water pause — evaluate the transition into the next pose normally.
 
 Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
