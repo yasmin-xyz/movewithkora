@@ -158,6 +158,12 @@ TRANSITIONING INTO A SUPINE POSE (critical — frequently missed): Whenever the 
   Cue: [a real, brief, embodied instruction, e.g. "Slowly lower to a seat, then roll through the spine to lie down on your back."]
 This applies at every such transition in the class, not just between sections — e.g. moving from a kneeling Cat-Cow into a supine Reclined Butterfly needs this connector exactly as much as a section boundary would.
 
+TRANSITIONING INTO A SEATED POSE (critical — frequently missed, same principle as above): Whenever the next pose's base is "seated" and the previous pose was standing, kneeling, or prone (e.g. finishing a vinyasa in Downward Facing Dog and moving into a seated Cool Down pose like Butterfly Pose), use:
+  Pose: Come to Seated
+  Type: Transition
+  Cue: [a real, brief, embodied instruction, e.g. "Walk the feet toward the hands, then lower to sit on the mat."]
+Do NOT reuse "Switch Sides" for this or any other purpose. "Switch Sides" is reserved exclusively for the specific side-flow bracketing context described in ASYMMETRICAL POSE SIDE FLOW RULES (moving between or out of a Right/Left split where the two sides genuinely share the same base) — it must never be repurposed as a generic label for other kinds of transitions, including this seated-entry case, even when no other named connector seems to fit. If a moment doesn't match Down Dog Reset, a vinyasa, Switch Sides, Lie Down, or Come to Seated exactly, write a plain descriptive connector name instead of forcing it into one of these categories.
+
 DOWN DOG RESET RULES:
 Down Dog Reset should ONLY be inserted when:
   - base changes from standing → prone, OR prone → standing
