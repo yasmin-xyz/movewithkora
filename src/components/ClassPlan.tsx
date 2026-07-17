@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { ChevronDown, Download, Share2, Check, Loader2 } from "lucide-react";
+import { ChevronDown, Download, Share2, Check, Loader2, Pencil, X } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
 import {
   parsePlan,
@@ -316,6 +317,87 @@ const ClassPlan = ({
     });
   };
 
+  // --- Block duration editing ---
+  const [editingBlockKey, setEditingBlockKey] = useState<string | null>(null);
+  const [blockDurationDraft, setBlockDurationDraft] = useState("");
+
+  const startEditBlockDuration = (blockKey: string, currentDuration: string) => {
+    const match = currentDuration.match(/(\d+)/);
+    setBlockDurationDraft(match ? match[1] : "");
+    setEditingBlockKey(blockKey);
+  };
+
+  const cancelEditBlockDuration = () => {
+    setEditingBlockKey(null);
+    setBlockDurationDraft("");
+  };
+
+  const saveBlockDuration = useCallback((sectionIdx: number, blockIdx: number) => {
+    const minutes = parseInt(blockDurationDraft, 10);
+    if (!minutes || minutes <= 0) {
+      cancelEditBlockDuration();
+      return;
+    }
+    setSections((prev) => {
+      const next = prev.map((s, si) =>
+        si !== sectionIdx
+          ? s
+          : {
+              ...s,
+              blocks: s.blocks.map((b, bi) =>
+                bi !== blockIdx ? b : { ...b, duration: `${minutes} minutes` }
+              ),
+            }
+      );
+      const serialized = serializeSections(next);
+      lastSerializedRef.current = serialized;
+      onContentChange?.(serialized);
+      return next;
+    });
+    setEditingBlockKey(null);
+    setBlockDurationDraft("");
+  }, [blockDurationDraft, onContentChange]);
+
+  // --- Pose breath/cue editing ---
+  const [editingPoseKey, setEditingPoseKey] = useState<string | null>(null);
+  const [poseEditDraft, setPoseEditDraft] = useState<{ breath: string; cue: string }>({ breath: "", cue: "" });
+
+  const startEditPose = (key: string, pose: PoseEntry) => {
+    setPoseEditDraft({ breath: pose.breath, cue: pose.cue });
+    setEditingPoseKey(key);
+  };
+
+  const cancelEditPose = () => {
+    setEditingPoseKey(null);
+  };
+
+  const savePoseEdit = useCallback((sectionIdx: number, blockIdx: number, poseIdx: number) => {
+    setSections((prev) => {
+      const next = prev.map((s, si) =>
+        si !== sectionIdx
+          ? s
+          : {
+              ...s,
+              blocks: s.blocks.map((b, bi) =>
+                bi !== blockIdx
+                  ? b
+                  : {
+                      ...b,
+                      poses: b.poses.map((p, pi) =>
+                        pi !== poseIdx ? p : { ...p, breath: poseEditDraft.breath, cue: poseEditDraft.cue }
+                      ),
+                    }
+              ),
+            }
+      );
+      const serialized = serializeSections(next);
+      lastSerializedRef.current = serialized;
+      onContentChange?.(serialized);
+      return next;
+    });
+    setEditingPoseKey(null);
+  }, [poseEditDraft, onContentChange]);
+
   const [openBlocks, setOpenBlocks] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -422,22 +504,86 @@ const ClassPlan = ({
                 const isBlockOpen = openBlocks.has(blockKey);
                 return (
                   <div key={blockKey}>
-                    <button
-                      onClick={() => toggleBlock(blockKey)}
-                      className="w-full flex items-baseline justify-between mb-3 group cursor-pointer"
-                    >
-                      <h3 className="font-body text-base font-normal text-foreground/70 tracking-wide">
-                        {block.blockName}
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        {block.duration && (
-                          <span className="font-body text-xs font-normal text-muted-foreground">
-                            {block.duration}
-                          </span>
+                    <div className="w-full flex items-baseline justify-between mb-3 group">
+                      <button
+                        onClick={() => toggleBlock(blockKey)}
+                        className="flex-1 min-w-0 text-left cursor-pointer"
+                      >
+                        <h3 className="font-body text-base font-normal text-foreground/70 tracking-wide">
+                          {block.blockName}
+                        </h3>
+                      </button>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {editingBlockKey === blockKey ? (
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="number"
+                              min={1}
+                              value={blockDurationDraft}
+                              onChange={(e) => setBlockDurationDraft(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") saveBlockDuration(si, bi);
+                                if (e.key === "Escape") cancelEditBlockDuration();
+                              }}
+                              autoFocus
+                              className="w-14 h-7 rounded border border-border bg-background px-1.5 text-xs font-body text-foreground text-right"
+                            />
+                            <span className="font-body text-xs text-muted-foreground pr-0.5">min</span>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={() => saveBlockDuration(si, bi)}
+                                  className="h-6 w-6 flex items-center justify-center rounded text-muted-foreground hover:text-foreground transition-colors"
+                                  aria-label="Save duration"
+                                >
+                                  <Check className="h-3.5 w-3.5" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>Save</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={cancelEditBlockDuration}
+                                  className="h-6 w-6 flex items-center justify-center rounded text-muted-foreground hover:text-foreground transition-colors"
+                                  aria-label="Cancel"
+                                >
+                                  <X className="h-3.5 w-3.5" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>Cancel</TooltipContent>
+                            </Tooltip>
+                          </div>
+                        ) : (
+                          <>
+                            {block.duration && (
+                              <button onClick={() => toggleBlock(blockKey)} className="cursor-pointer">
+                                <span className="font-body text-xs font-normal text-muted-foreground">
+                                  {block.duration}
+                                </span>
+                              </button>
+                            )}
+                            {!readOnly && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    onClick={() => startEditBlockDuration(blockKey, block.duration)}
+                                    className="h-6 w-6 flex items-center justify-center rounded text-muted-foreground/50 hover:text-foreground transition-colors"
+                                    aria-label="Edit duration"
+                                  >
+                                    <Pencil className="h-3 w-3" />
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent>Edit duration</TooltipContent>
+                              </Tooltip>
+                            )}
+                            <button onClick={() => toggleBlock(blockKey)} className="h-6 w-6 flex items-center justify-center">
+                              <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${isBlockOpen ? "rotate-180" : ""}`} />
+                            </button>
+                          </>
                         )}
-                        <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${isBlockOpen ? "rotate-180" : ""}`} />
                       </div>
-                    </button>
+                    </div>
                     {isBlockOpen && (
                       <div className="space-y-3">
                         {(() => {
@@ -531,43 +677,115 @@ const ClassPlan = ({
                                               </span>
                                             )}
                                           </div>
-                                          {!readOnly && pose.modifications.length > 0 && (
-                                            <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
-                                              <CollapsibleTrigger asChild>
-                                                <Button
-                                                  variant="ghost"
-                                                  size="sm"
-                                                  className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
-                                                >
-                                                  Modify
-                                                </Button>
-                                              </CollapsibleTrigger>
-                                              {pose.isSelected && (
-                                                <button
-                                                  onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
-                                                  className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
-                                                >
-                                                  Reset
-                                                </button>
+                                          {!readOnly && (
+                                            <div className="hidden sm:flex items-center gap-1.5 flex-shrink-0">
+                                              <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                  <button
+                                                    onClick={(e) => { e.stopPropagation(); startEditPose(key, pose); }}
+                                                    className="h-6 w-6 flex items-center justify-center rounded text-muted-foreground hover:text-foreground transition-colors"
+                                                    aria-label="Edit breath and cue"
+                                                  >
+                                                    <Pencil className="h-3.5 w-3.5" />
+                                                  </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>Edit breath & cue</TooltipContent>
+                                              </Tooltip>
+                                              {pose.modifications.length > 0 && (
+                                                <>
+                                                  <CollapsibleTrigger asChild>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
+                                                    >
+                                                      Modify
+                                                    </Button>
+                                                  </CollapsibleTrigger>
+                                                  {pose.isSelected && (
+                                                    <button
+                                                      onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
+                                                      className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
+                                                    >
+                                                      Reset
+                                                    </button>
+                                                  )}
+                                                </>
                                               )}
                                             </div>
                                           )}
                                         </div>
-                                        {pose.breath && (
-                                          <p className="font-body text-sm text-muted-foreground">
-                                            <span className="font-medium text-foreground/70">Breath:</span>{" "}
-                                            {pose.breath}
-                                          </p>
+                                        {editingPoseKey === key ? (
+                                          <div className="space-y-2 mt-1" onClick={(e) => e.stopPropagation()}>
+                                            <div>
+                                              <label className="font-body text-[11px] font-medium text-foreground/70 uppercase tracking-wide">
+                                                Breath
+                                              </label>
+                                              <input
+                                                value={poseEditDraft.breath}
+                                                onChange={(e) => setPoseEditDraft((d) => ({ ...d, breath: e.target.value }))}
+                                                className="w-full mt-1 h-9 rounded-md border border-border bg-background px-2.5 text-sm font-body text-foreground"
+                                              />
+                                            </div>
+                                            <div>
+                                              <label className="font-body text-[11px] font-medium text-foreground/70 uppercase tracking-wide">
+                                                Cue
+                                              </label>
+                                              <textarea
+                                                value={poseEditDraft.cue}
+                                                onChange={(e) => setPoseEditDraft((d) => ({ ...d, cue: e.target.value }))}
+                                                rows={3}
+                                                className="w-full mt-1 rounded-md border border-border bg-background px-2.5 py-2 text-sm font-body text-foreground resize-none"
+                                              />
+                                            </div>
+                                            <div className="flex items-center gap-2 justify-end pt-0.5">
+                                              <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                  <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="h-8 px-3 text-xs font-body"
+                                                    onClick={() => savePoseEdit(si, bi, pi)}
+                                                  >
+                                                    <Check className="h-3.5 w-3.5 mr-1" /> Save
+                                                  </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>Save changes</TooltipContent>
+                                              </Tooltip>
+                                              <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                  <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="h-8 px-3 text-xs font-body text-muted-foreground"
+                                                    onClick={cancelEditPose}
+                                                  >
+                                                    <X className="h-3.5 w-3.5 mr-1" /> Cancel
+                                                  </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>Discard changes</TooltipContent>
+                                              </Tooltip>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          <>
+                                            {pose.breath && (
+                                              <p className="font-body text-sm text-muted-foreground">
+                                                <span className="font-medium text-foreground/70">Breath:</span>{" "}
+                                                {pose.breath}
+                                              </p>
+                                            )}
+                                            {pose.cue && (
+                                              <p className="font-body text-sm text-muted-foreground">
+                                                <span className="font-medium text-foreground/70">Cue:</span>{" "}
+                                                {pose.cue}
+                                              </p>
+                                            )}
+                                          </>
                                         )}
-                                        {pose.cue && (
-                                          <p className="font-body text-sm text-muted-foreground">
-                                            <span className="font-medium text-foreground/70">Cue:</span>{" "}
-                                            {pose.cue}
-                                          </p>
-                                        )}
-                                        {!readOnly && pose.modifications.length > 0 && (
+                                        {!readOnly && (
                                           <div className="flex sm:hidden items-center justify-end gap-3 pt-1">
-                                            {pose.isSelected && (
+                                            {pose.isSelected && pose.modifications.length > 0 && (
                                               <button
                                                 onClick={(e) => { e.stopPropagation(); handleReset(si, bi, pi); }}
                                                 className="font-body text-[10px] text-muted-foreground/60 hover:text-foreground/70 hover:underline underline-offset-2 transition-colors duration-150 whitespace-nowrap"
@@ -575,15 +793,29 @@ const ClassPlan = ({
                                                 Reset
                                               </button>
                                             )}
-                                            <CollapsibleTrigger asChild>
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-6 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
-                                              >
-                                                Modify
-                                              </Button>
-                                            </CollapsibleTrigger>
+                                            <Tooltip>
+                                              <TooltipTrigger asChild>
+                                                <button
+                                                  onClick={(e) => { e.stopPropagation(); startEditPose(key, pose); }}
+                                                  className="h-7 w-7 flex items-center justify-center rounded text-muted-foreground hover:text-foreground transition-colors"
+                                                  aria-label="Edit breath and cue"
+                                                >
+                                                  <Pencil className="h-3.5 w-3.5" />
+                                                </button>
+                                              </TooltipTrigger>
+                                              <TooltipContent>Edit breath & cue</TooltipContent>
+                                            </Tooltip>
+                                            {pose.modifications.length > 0 && (
+                                              <CollapsibleTrigger asChild>
+                                                <Button
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="h-7 px-2 text-[11px] font-body text-muted-foreground hover:text-foreground"
+                                                >
+                                                  Modify
+                                                </Button>
+                                              </CollapsibleTrigger>
+                                            )}
                                           </div>
                                         )}
                                       </div>
