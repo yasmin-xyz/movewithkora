@@ -53,15 +53,6 @@ const Index = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Scroll to the results area once generation begins. Tied to isLoading
-  // (rather than an arbitrary setTimeout) so it fires after React has
-  // actually committed the loading state to the DOM.
-  useEffect(() => {
-    if (isLoading) {
-      resultsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [isLoading]);
-
   // Once the user changes any input, the previous "class ready" state is stale.
   useEffect(() => {
     setJustCompleted(false);
