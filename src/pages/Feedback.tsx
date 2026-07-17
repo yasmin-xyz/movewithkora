@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SiteNav from "@/components/SiteNav";
@@ -126,6 +127,12 @@ const Feedback = () => {
         .kora-feedback .fb-footer-logo svg { width: 20px; height: 20px; }
         .kora-feedback .fb-footer-logo span { font-family: var(--serif); font-size: 1.25rem; color: var(--text-primary); opacity: 0.5; }
         .kora-feedback .fb-footer p { font-size: 0.75rem; color: var(--text-secondary); opacity: 0.6; margin-top: 0.75rem; }
+        .kora-feedback .fb-footer-links { display: flex; align-items: center; justify-content: center; gap: 0.65rem; margin-top: 1rem; }
+        .kora-feedback .fb-footer-links a {
+          font-size: 0.75rem; color: var(--olive); text-decoration: none; transition: color 0.2s ease;
+        }
+        .kora-feedback .fb-footer-links a:hover { color: var(--olive-light); text-decoration: underline; text-underline-offset: 2px; }
+        .kora-feedback .fb-footer-links span { font-size: 0.75rem; color: var(--text-secondary); opacity: 0.5; }
       `}</style>
 
       <SiteNav />
@@ -213,6 +220,11 @@ const Feedback = () => {
             </g>
           </svg>
           <span>Kora</span>
+        </div>
+        <div className="fb-footer-links">
+          <Link to="/privacy-policy">Privacy Policy</Link>
+          <span aria-hidden="true">·</span>
+          <Link to="/terms-of-service">Terms of Service</Link>
         </div>
         <p>&copy; 2026 Kora. Built for instructors.</p>
       </footer>
