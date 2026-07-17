@@ -82,6 +82,9 @@ const CATEGORY_KEYWORDS: { keywords: string[]; family: string }[] = [
 
 
 const PoseLibrary = () => {
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+  const markImageLoaded = (name: string) => setLoadedImages((prev) => new Set(prev).add(name));
+
   const [poses, setPoses] = useState<Pose[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -219,9 +222,7 @@ const PoseLibrary = () => {
         const filter = FAMILY_FILTERS.find((f) => f.label === label);
         return filter?.values.includes(p.family);
       });
-    const skillMatch =
-  activeSkills.size === 0 ||
-  Array.from(activeSkills).some((s) => s.toLowerCase() === (p.difficulty_level || "").toLowerCase());
+    const skillMatch = activeSkills.size === 0 || activeSkills.has(p.difficulty_level);
     const searchMatch = poseMatchesSearch(p, searchQuery);
     return familyMatch && skillMatch && searchMatch;
   });
@@ -389,6 +390,24 @@ const PoseLibrary = () => {
         .kora-pose-library .pose-card img {
           width: 100%; height: 160px; object-fit: contain; background: var(--white); border-radius: 4px;
         }
+        .kora-pose-library .pose-card-image-wrap {
+          position: relative; width: 100%; height: 160px; border-radius: 4px; overflow: hidden; background: var(--white);
+        }
+        .kora-pose-library .pose-card-image-skeleton {
+          position: absolute; inset: 0; border-radius: 4px;
+          background: linear-gradient(90deg, var(--cream) 25%, var(--card-border) 37%, var(--cream) 63%);
+          background-size: 400% 100%;
+          animation: pose-skeleton-shimmer 1.6s ease-in-out infinite;
+        }
+        @keyframes pose-skeleton-shimmer {
+          0% { background-position: 100% 0; }
+          100% { background-position: 0 0; }
+        }
+        .kora-pose-library .pose-card-img {
+          position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+          opacity: 0; transition: opacity 0.3s ease;
+        }
+        .kora-pose-library .pose-card-img.loaded { opacity: 1; }
         .kora-pose-library .pose-card-name {
           font-family: var(--serif); font-size: 1.25rem; color: var(--text-primary); margin: 0; line-height: 1.25;
         }
@@ -570,7 +589,19 @@ const PoseLibrary = () => {
             ) : (
               filteredPoses.map((pose) => (
                 <div className="pose-card" key={pose.pose_name}>
-                  {pose.image_url && <img src={pose.image_url} alt={pose.pose_name} />}
+                  {pose.image_url && (
+                    <div className="pose-card-image-wrap">
+                      {!loadedImages.has(pose.pose_name) && <div className="pose-card-image-skeleton" />}
+                      <img
+                        src={pose.image_url}
+                        alt={pose.pose_name}
+                        style={{ width: "100%", height: "100%", objectFit: "contain", position: "absolute", inset: 0 }}
+                        className={`pose-card-img ${loadedImages.has(pose.pose_name) ? "loaded" : ""}`}
+                        decoding="async"
+                        onLoad={() => markImageLoaded(pose.pose_name)}
+                      />
+                    </div>
+                  )}
                   <h3 className="pose-card-name">
                     {displayName(pose.pose_name)}
                     {showSanskrit && getSanskritName(pose.pose_name) && (
