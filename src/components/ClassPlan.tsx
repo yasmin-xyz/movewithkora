@@ -670,6 +670,9 @@ const ClassPlan = ({
                                                   {" "}({pose.name.replace(/\s*\((Right|Left)\)\s*$/i, "")})
                                                 </span>
                                               )}
+                                              {!showSanskrit && pose.name.replace(/\s*\((Right|Left)\)\s*$/i, "") === "Corpse Pose" && (
+                                                <span className="italic font-normal text-sm text-muted-foreground whitespace-nowrap"> (Savasana)</span>
+                                              )}
                                             </p>
                                             {pose.isSelected && (
                                               <span className="inline-flex items-center rounded-full bg-accent text-accent-foreground text-[10px] font-body font-medium px-2 py-0.5 shrink-0">
