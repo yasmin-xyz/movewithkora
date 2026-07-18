@@ -25,7 +25,7 @@ const PrivacyPolicy = () => {
 
         <Section title="Who operates Kora">
           <p>
-            Kora (movewithkora.vercel.app) is operated by PickMeLabs, a sole proprietorship based in
+            Kora (movewithkora.com) is operated by PickMeLabs, a sole proprietorship based in
             Ontario, Canada. Throughout this policy, "we," "us," and "our" refer to PickMeLabs. If you
             have questions about this policy or your data, contact us at{" "}
             <a href="mailto:hello@pickmelabs.com" className="text-primary underline underline-offset-2">
