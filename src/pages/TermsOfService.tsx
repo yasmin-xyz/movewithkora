@@ -25,7 +25,7 @@ const TermsOfService = () => {
 
         <Section title="Agreement to these terms">
           <p>
-            Kora (movewithkora.vercel.app) is operated by PickMeLabs, a sole proprietorship based in
+            Kora (movewithkora.com) is operated by PickMeLabs, a sole proprietorship based in
             Ontario, Canada. By using Kora, you agree to these terms. If you don't agree, please don't
             use the app. Questions: <a href="mailto:hello@pickmelabs.com" className="text-primary underline underline-offset-2">hello@pickmelabs.com</a>.
           </p>
