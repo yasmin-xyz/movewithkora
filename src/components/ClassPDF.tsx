@@ -535,6 +535,7 @@ const ClassPDF = ({
                       }
 
                       const sanskrit = showSanskrit ? getSanskritName(pose.name) : null;
+                      const isCorpsePose = pose.name.replace(/\s*\((Right|Left)\)\s*$/i, "") === "Corpse Pose";
                       const img = resolvedImage(pose.imageUrl);
 
                       return (
@@ -553,6 +554,9 @@ const ClassPDF = ({
                                   <Text style={styles.poseSanskrit}>
                                     {" "}({pose.name.replace(/\s*\((Right|Left)\)\s*$/i, "")})
                                   </Text>
+                                )}
+                                {!showSanskrit && isCorpsePose && (
+                                  <Text style={styles.poseSanskrit}> (Savasana)</Text>
                                 )}
                                 {pose.isSelected && <Text style={styles.selectedBadge}>SELECTED</Text>}
                               </View>
