@@ -584,6 +584,11 @@ const ClassPlan = ({
                         )}
                       </div>
                     </div>
+                    {block.note && (
+                      <p className="font-body text-xs text-muted-foreground/80 italic -mt-2 mb-3">
+                        {block.note}
+                      </p>
+                    )}
                     {isBlockOpen && (
                       <div className="space-y-3">
                         {(() => {
