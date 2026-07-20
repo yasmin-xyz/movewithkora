@@ -275,6 +275,14 @@ const styles = StyleSheet.create({
     fontSize: 8.5,
     color: COLORS.mutedForeground,
   },
+  blockNote: {
+    fontFamily: "Inter",
+    fontStyle: "italic",
+    fontSize: 8,
+    color: COLORS.mutedForeground,
+    marginTop: -3,
+    marginBottom: 6,
+  },
   poseCard: {
     flexDirection: "row",
     backgroundColor: COLORS.card,
@@ -494,6 +502,7 @@ const ClassPDF = ({
                       <Text style={styles.blockName}>{block.blockName}</Text>
                       {block.duration && <Text style={styles.blockDuration}>{block.duration}</Text>}
                     </View>
+                    {block.note && <Text style={styles.blockNote}>{block.note}</Text>}
 
                     {block.poses.map((pose, pi) => {
                       const showSideFlowHeader = pose.sideFlow && pose.sideFlow !== lastSideFlow;
