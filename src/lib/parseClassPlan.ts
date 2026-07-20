@@ -27,6 +27,7 @@ export interface PoseEntry {
 export interface FlowBlock {
   blockName: string;
   duration: string;
+  note?: string;
   poses: PoseEntry[];
 }
 
@@ -168,6 +169,12 @@ export function parsePlan(raw: string, media: PoseMedia[]): Section[] {
       continue;
     }
 
+    const noteMatch = trimmed.match(/^Note:\s*(.+)/i);
+    if (noteMatch && currentBlock && currentBlock.poses.length === 0) {
+      currentBlock.note = noteMatch[1].trim();
+      continue;
+    }
+
     if (!currentBlock) {
       currentBlock = { blockName: current.title, duration: "", poses: [] };
       current.blocks.push(currentBlock);
@@ -249,6 +256,7 @@ export function serializeSections(sections: Section[]): string {
     for (const block of section.blocks) {
       lines.push(`Block: ${block.blockName}`);
       if (block.duration) lines.push(`Duration: ${block.duration}`);
+      if (block.note) lines.push(`Note: ${block.note}`);
       let lastSideFlow: string | undefined;
       for (const pose of block.poses) {
         if (pose.sideFlow && pose.sideFlow !== lastSideFlow) {
