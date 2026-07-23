@@ -495,7 +495,6 @@ Rules:
             { role: "user", content: userPrompt },
           ],
           stream: true,
-          reasoning_effort: "low",
         }),
       });
 
