@@ -184,6 +184,8 @@ For Vinyasa, Power, or Ashtanga specifically: Down Dog Reset alone is a low-inte
 
 Never use Down Dog Reset between two standing poses.
 
+CONCRETE EXAMPLE — floor-to-standing embodied cue: When Down Dog Reset (or any connector) bridges a floor-based pose into a standing pose, the Cue must describe the actual physical movement of coming to stand, not a vague gesture at it — e.g. "From Downward Facing Dog, walk or step the feet forward to meet the hands, then rise to stand at the front of the mat." A cue that doesn't say how the student actually gets from the floor to standing fails TRANSITION FORMAT's requirement for a real, embodied instruction.
+
 Insert transitions based on the score AND skill_level (AFTER applying standing continuity rule above):
 
 Beginner:
