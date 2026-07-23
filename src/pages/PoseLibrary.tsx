@@ -8,6 +8,7 @@ import SiteNav from "@/components/SiteNav";
 interface Pose {
   pose_name: string;
   family: string;
+  secondary_tags?: string[] | null;
   difficulty_level: string;
   how_to_cue: string | null;
   purpose_value: string | null;
@@ -20,6 +21,7 @@ const FAMILY_FILTERS: { label: string; values: string[] }[] = [
   { label: "Backbends", values: ["backbend"] },
   { label: "Twists", values: ["twist"] },
   { label: "Arm Balances", values: ["arm_balance"] },
+  { label: "Balance", values: ["balance"] },
   { label: "Inversions", values: ["inversion"] },
   { label: "Core", values: ["core"] },
   { label: "Seated Poses", values: ["seated"] },
@@ -121,7 +123,7 @@ const PoseLibrary = () => {
       const [{ data: library }, { data: media }] = await Promise.all([
         supabase
           .from("pose_library")
-          .select("pose_name, family, difficulty_level, how_to_cue, purpose_value")
+          .select("pose_name, family, secondary_tags, difficulty_level, how_to_cue, purpose_value")
           .order("pose_name"),
         supabase.from("pose_media").select("pose_name, image_url"),
       ]);
@@ -220,9 +222,13 @@ const PoseLibrary = () => {
       activeFamilies.size === 0 ||
       Array.from(activeFamilies).some((label) => {
         const filter = FAMILY_FILTERS.find((f) => f.label === label);
-        return filter?.values.includes(p.family);
+        if (!filter) return false;
+        if (filter.values.includes(p.family)) return true;
+        return (p.secondary_tags || []).some((tag) => filter.values.includes(tag));
       });
-    const skillMatch = activeSkills.size === 0 || activeSkills.has(p.difficulty_level);
+    const skillMatch =
+      activeSkills.size === 0 ||
+      Array.from(activeSkills).some((s) => s.toLowerCase() === (p.difficulty_level || "").toLowerCase());
     const searchMatch = poseMatchesSearch(p, searchQuery);
     return familyMatch && skillMatch && searchMatch;
   });
