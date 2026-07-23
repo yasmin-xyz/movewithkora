@@ -79,6 +79,12 @@ export const SANSKRIT_NAMES: Record<string, string> = {
   "Pyramid Pose": "Parsvottanasana",
   "Waterfall Pose": "Ardha Halasana",
   "Standing Hand to Big Toe Pose": "Utthita Hasta Padangusthasana",
+  "Three-Legged Dog": "Tri Pada Adho Mukha Svanasana",
+  "Revolved Half Moon": "Parivrtta Ardha Chandrasana",
+  "Table Top": "Bharmanasana",
+  "Gorilla Pose": "Pada Hastasana",
+  "Twisted Monkey Pose": "Vakra Hanumanasana",
+  "Rabbit Pose": "Sasangasana",
 };
 
 function normalize(name: string): string {
