@@ -71,6 +71,7 @@ export type Database = {
           orientation: string | null
           pose_name: string
           purpose_value: string | null
+          secondary_tags: string[] | null
           symmetry: string | null
           weight_bearing: string | null
         }
@@ -85,6 +86,7 @@ export type Database = {
           orientation?: string | null
           pose_name: string
           purpose_value?: string | null
+          secondary_tags?: string[] | null
           symmetry?: string | null
           weight_bearing?: string | null
         }
@@ -99,6 +101,7 @@ export type Database = {
           orientation?: string | null
           pose_name?: string
           purpose_value?: string | null
+          secondary_tags?: string[] | null
           symmetry?: string | null
           weight_bearing?: string | null
         }
