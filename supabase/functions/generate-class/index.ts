@@ -477,16 +477,19 @@ Rules:
 
     userPrompt += ` Output only the structured format.`;
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-      {
+    // Free-tier Gemini has no uptime guarantee and can return 503 "high
+    // demand" errors under load. Retry the primary model a couple of times
+    // with a short backoff, then fall back to a separate model (its own
+    // capacity/quota) before giving up entirely.
+    const callGemini = async (model: string) =>
+      fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${GEMINI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gemini-3.5-flash",
+          model,
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
@@ -494,14 +497,38 @@ Rules:
           stream: true,
           reasoning_effort: "low",
         }),
-      }
-    );
+      });
+
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    let response: Response | null = null;
+    const PRIMARY_MODEL = "gemini-3.5-flash";
+    const FALLBACK_MODEL = "gemini-3.5-flash-lite";
+    const RETRY_DELAYS_MS = [800, 1800]; // two retries on the primary model before falling back
+
+    for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
+      response = await callGemini(PRIMARY_MODEL);
+      if (response.ok || response.status !== 503) break;
+      console.error(`Gemini 503 on ${PRIMARY_MODEL}, attempt ${attempt + 1}`);
+      if (attempt < RETRY_DELAYS_MS.length) await sleep(RETRY_DELAYS_MS[attempt]);
+    }
+
+    if (response && !response.ok && response.status === 503) {
+      console.error(`${PRIMARY_MODEL} still unavailable after retries — falling back to ${FALLBACK_MODEL}`);
+      response = await callGemini(FALLBACK_MODEL);
+    }
 
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit or daily quota reached. Please try again in a moment." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 503) {
+        return new Response(
+          JSON.stringify({ error: "The AI model is experiencing high demand right now. Please try again in a minute or two." }),
+          { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       const text = await response.text();
