@@ -27,7 +27,7 @@ const COLORS = {
 // dependency during the actual render pass.
 // ---------------------------------------------------------------------------
 
-const FONT_FILES: { family: string; weight: number; url: string }[] = [
+const FONT_FILES: { family: string; weight: number; style?: "italic"; url: string }[] = [
   { family: "Cormorant Garamond", weight: 400, url: "https://cdn.jsdelivr.net/fontsource/fonts/cormorant-garamond@latest/latin-400-normal.ttf" },
   { family: "Cormorant Garamond", weight: 500, url: "https://cdn.jsdelivr.net/fontsource/fonts/cormorant-garamond@latest/latin-500-normal.ttf" },
   { family: "Cormorant Garamond", weight: 600, url: "https://cdn.jsdelivr.net/fontsource/fonts/cormorant-garamond@latest/latin-600-normal.ttf" },
@@ -35,6 +35,11 @@ const FONT_FILES: { family: string; weight: number; url: string }[] = [
   { family: "Inter", weight: 400, url: "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf" },
   { family: "Inter", weight: 500, url: "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-500-normal.ttf" },
   { family: "Inter", weight: 600, url: "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.ttf" },
+  // inspiration/poseSanskrit/blockNote styles all use italic Inter at weight
+  // 400 — without this, react-pdf can't resolve that combination at all and
+  // the whole export throws ("Could not resolve font for Inter, fontWeight
+  // 400, fontStyle italic") the moment any of those three actually render.
+  { family: "Inter", weight: 400, style: "italic", url: "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-italic.ttf" },
 ];
 
 Font.registerHyphenationCallback((word) => [word]); // avoid mid-word breaks
@@ -75,11 +80,11 @@ function ensureFontsLoaded(): Promise<void> {
       })
     );
 
-    const byFamily = new Map<string, { src: string; fontWeight: number }[]>();
+    const byFamily = new Map<string, { src: string; fontWeight: number; fontStyle?: "italic" }[]>();
     for (const r of results) {
       if (!r) continue;
       const list = byFamily.get(r.family) ?? [];
-      list.push({ src: r.dataUri, fontWeight: r.weight });
+      list.push({ src: r.dataUri, fontWeight: r.weight, ...(r.style ? { fontStyle: r.style } : {}) });
       byFamily.set(r.family, list);
     }
 
@@ -96,7 +101,11 @@ function ensureFontsLoaded(): Promise<void> {
       } else {
         Font.register({
           family,
-          fonts: FONT_FILES.filter((f) => f.family === family).map((f) => ({ src: f.url, fontWeight: f.weight })),
+          fonts: FONT_FILES.filter((f) => f.family === family).map((f) => ({
+            src: f.url,
+            fontWeight: f.weight,
+            ...(f.style ? { fontStyle: f.style } : {}),
+          })),
         });
       }
     }
