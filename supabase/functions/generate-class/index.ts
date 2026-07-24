@@ -310,11 +310,12 @@ OPTIONAL WATER BREAK:
 
 Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
 
-A block may optionally include one "Note:" line immediately after its "Duration:" line, before any "Pose:" entries — this is for a genuine block-level instruction that doesn't belong to any single pose, most commonly the Sun Salutation repeat-count note (see SUN SALUTATION RULES above). Most blocks will NOT have a Note line — only include one when there's a real block-level instruction to convey.
+The class has exactly these four sections, each starting with its own header line (colon included): WARM-UP:, BUILD:, PEAK:, COOL DOWN:. Each section contains one or more blocks, and each block contains one or more poses. Every block and every pose in every section — regardless of which of the four sections it's in — follows this exact repeating structure, demonstrated once below with two poses to show how multiple poses repeat within one block:
 
 WARM-UP:
 Block: [block_name]
 Duration: [X] minutes
+Note: [OPTIONAL — only include this line for a genuine block-level instruction that doesn't belong to any single pose, most commonly the Sun Salutation repeat-count note (see SUN SALUTATION RULES). Most blocks omit this line entirely.]
 Pose: [pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue with light anatomical reasoning if relevant]
@@ -323,7 +324,7 @@ Modifications:
 - [Alternative pose name] – Breath: [breath cue] – [short description]
 - [Advanced pose name] – Breath: [breath cue] – [short description]
 
-Pose: [pose name]
+Pose: [next pose name]
 Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
@@ -332,45 +333,13 @@ Modifications:
 - [Advanced pose name] – Breath: [breath cue] – [short description]
 
 BUILD:
-Block: [block_name]
-Duration: [X] minutes
-Pose: [pose name]
-Breath: [one concise breath cue]
-Cue: [one concise teaching cue]
-Modifications:
-- [Easier pose name] – Breath: [breath cue] – [short description]
-- [Alternative pose name] – Breath: [breath cue] – [short description]
-- [Advanced pose name] – Breath: [breath cue] – [short description]
-
-Pose: [pose name]
-Breath: [one concise breath cue]
-Cue: [one concise teaching cue]
-Modifications:
-- [Easier pose name] – Breath: [breath cue] – [short description]
-- [Alternative pose name] – Breath: [breath cue] – [short description]
-- [Advanced pose name] – Breath: [breath cue] – [short description]
+[Same Block/Duration/optional-Note structure as WARM-UP above, with as many blocks and poses as the section needs — every pose still gets its own Breath/Cue/full 3-item Modifications, exactly as shown above.]
 
 PEAK:
-Block: [block_name]
-Duration: [X] minutes
-Pose: [pose name]
-Breath: [one concise breath cue]
-Cue: [one concise teaching cue]
-Modifications:
-- [Easier pose name] – Breath: [breath cue] – [short description]
-- [Alternative pose name] – Breath: [breath cue] – [short description]
-- [Advanced pose name] – Breath: [breath cue] – [short description]
+[Same structure as above.]
 
 COOL DOWN:
-Block: [block_name]
-Duration: [X] minutes
-Pose: [pose name]
-Breath: [one concise breath cue]
-Cue: [one concise teaching cue]
-Modifications:
-- [Easier pose name] – Breath: [breath cue] – [short description]
-- [Alternative pose name] – Breath: [breath cue] – [short description]
-- [Advanced pose name] – Breath: [breath cue] – [short description]
+[Same structure as above.]
 
 ASYMMETRICAL POSE SIDE FLOW RULES (critical):
 - If a block contains asymmetrical poses (symmetry == "asymmetrical"), you MUST group them into a Side Flow.
