@@ -228,7 +228,7 @@ TRANSITION FORMAT (critical — every transition pose must follow this exact str
 - "Type: Transition" is reserved EXCLUSIVELY for genuine connector/bridge movements (Down Dog Reset, Vinyasa, directional pivots like "Pivot to long edge"). It must NEVER be applied to a real, named, teachable pose from the library — and it must NEVER be applied to the peak pose under any circumstances, even when that pose is the final step of a lead-in sequence building toward it. A lead-in pose that leads into the peak is still a real pose with its own Breath/Cue/Modifications, not a transition, unless it is itself one of the genuine connector movements listed above.
 
 NO BARE POSE ENTRIES — EVER (critical, applies everywhere in the output including immediately before "Right Side Flow:" begins):
-- Every single "Pose:" line in the entire output — with the sole exception of genuine "Type: Transition" connector movements — MUST be followed by its own Breath line, Cue line, and full 3-item Modifications block. There is no such thing as a bare pose name with no Breath/Cue.
+- Every single "Pose:" line in the entire output — with the sole exception of genuine "Type: Transition" connector movements — MUST be followed by its own Breath line, Cue line, and full 2-item Modifications block. There is no such thing as a bare pose name with no Breath/Cue.
 - This applies explicitly to any shared, neutral, bilateral version of the peak pose that you place before a Right Side Flow begins (e.g. a plain "Pose: Eagle Pose" used as a common centering moment before splitting into "Eagle Pose (Right)" and "Eagle Pose (Left)"). If you include such a shared lead-in pose, it must have its own full Breath, Cue, and Modifications exactly like every other pose.
 - If you do not have real content (a genuine breath cue and teaching cue) for a shared lead-in pose, do NOT output it at all — begin the block directly with "Right Side Flow:" instead. A missing pose is always better than an incomplete one.
 
@@ -299,7 +299,7 @@ SIDE-NEUTRAL CUE LANGUAGE FOR ASYMMETRICAL POSES (critical): When writing the Br
 - Only use an explicit directional word (e.g. "front knee," "back heel," or a genuine "right"/"left" in a directional transition pivot) when the instruction is truly asymmetric in a way side-neutral language can't capture — most contralateral and twisting-style cues can and should be phrased generically.
 
 MODIFICATION REQUIREMENT (critical — applies to every non-transition pose in every section, not just Warm-Up):
-- Every pose must include exactly 3 modification lines: one easier variation, one alternative variation, and one more advanced/challenging variation — regardless of which section (Warm-Up, Build, Peak, Cool Down) the pose is in.
+- Every pose must include exactly 2 modification lines: one easier variation and one more advanced/challenging variation — regardless of which section (Warm-Up, Build, Peak, Cool Down) the pose is in.
 - Each modification line MUST follow this exact format: "- [Pose name] – Breath: [breath cue] – [short description]". The breath cue is required for every single modification option, not optional — if a student switches to that variation, they need their own accurate breath instruction, not the original pose's breath cue. Never omit the "Breath:" segment, and never leave it as a bare "Inhale"/"Exhale" — see BREATH CUE QUALITY above.
 
 SPECIAL CUE FOR CORPSE POSE (critical): Whenever Corpse Pose (Savasana) appears — always the final pose of Cool Down — its Cue must explicitly frame it as the most important pose of the class, e.g. "This is the most important pose of the class — allow the body to fully absorb and integrate everything you've just practiced." Do not give Corpse Pose a generic relaxation cue with no acknowledgment of its significance.
@@ -321,7 +321,6 @@ Breath: [one concise breath cue]
 Cue: [one concise teaching cue with light anatomical reasoning if relevant]
 Modifications:
 - [Easier pose name] – Breath: [breath cue] – [short description]
-- [Alternative pose name] – Breath: [breath cue] – [short description]
 - [Advanced pose name] – Breath: [breath cue] – [short description]
 
 Pose: [next pose name]
@@ -329,11 +328,10 @@ Breath: [one concise breath cue]
 Cue: [one concise teaching cue]
 Modifications:
 - [Easier pose name] – Breath: [breath cue] – [short description]
-- [Alternative pose name] – Breath: [breath cue] – [short description]
 - [Advanced pose name] – Breath: [breath cue] – [short description]
 
 BUILD:
-[Same Block/Duration/optional-Note structure as WARM-UP above, with as many blocks and poses as the section needs — every pose still gets its own Breath/Cue/full 3-item Modifications, exactly as shown above.]
+[Same Block/Duration/optional-Note structure as WARM-UP above, with as many blocks and poses as the section needs — every pose still gets its own Breath/Cue/full 2-item Modifications, exactly as shown above.]
 
 PEAK:
 [Same structure as above.]
@@ -387,7 +385,6 @@ Breath: [breath cue]
 Cue: [teaching cue]
 Modifications:
 - [Easier pose name] – Breath: [breath cue] – [short description]
-- [Alternative pose name] – Breath: [breath cue] – [short description]
 - [Advanced pose name] – Breath: [breath cue] – [short description]
 
 Pose: [next asymmetrical pose] (Right)
@@ -395,7 +392,6 @@ Breath: [breath cue]
 Cue: [teaching cue]
 Modifications:
 - [Easier pose name] – Breath: [breath cue] – [short description]
-- [Alternative pose name] – Breath: [breath cue] – [short description]
 - [Advanced pose name] – Breath: [breath cue] – [short description]
 
 Pose: [connector name — "Down Dog Reset", "Half Vinyasa", "Full Vinyasa", or "Switch Sides", chosen per DOWN DOG RESET RULES and TRANSITION TYPE MUST MATCH ACTUAL BODY POSITION above]
@@ -408,7 +404,6 @@ Breath: [breath cue]
 Cue: [teaching cue]
 Modifications:
 - [Easier pose name] – Breath: [breath cue] – [short description]
-- [Alternative pose name] – Breath: [breath cue] – [short description]
 - [Advanced pose name] – Breath: [breath cue] – [short description]
 
 Pose: [next asymmetrical pose] (Left)
@@ -416,7 +411,6 @@ Breath: [breath cue]
 Cue: [teaching cue]
 Modifications:
 - [Easier pose name] – Breath: [breath cue] – [short description]
-- [Alternative pose name] – Breath: [breath cue] – [short description]
 - [Advanced pose name] – Breath: [breath cue] – [short description]
 
 - Connector type between sides depends on skill level, adjusted by the YOGA STYLE PACING OVERRIDE rule above where applicable — unless TRANSITION TYPE MUST MATCH ACTUAL BODY POSITION calls for "Switch Sides" instead (same base on both sides), which always takes priority over these skill-based defaults:
