@@ -18,6 +18,7 @@ import {
 } from "@/lib/parseClassPlan";
 import { downloadClassPDF } from "@/components/ClassPDF";
 import PoseImage from "@/components/PoseImage";
+import { getPaddingRatioForPose } from "@/lib/imageCrop";
 
 interface ClassPlanProps {
   content: string;
@@ -664,6 +665,7 @@ const ClassPlan = ({
                                           src={pose.imageUrl}
                                           alt={displayName(pose.name)}
                                           className="w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-md object-contain bg-muted/20 flex-shrink-0"
+                                          paddingRatio={getPaddingRatioForPose(pose.name)}
                                         />
                                       )}
                                       <div className="space-y-1 min-w-0 flex-1">
