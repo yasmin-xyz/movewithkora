@@ -5,6 +5,7 @@ interface PoseImageProps {
   src?: string;
   alt: string;
   className?: string;
+  paddingRatio?: number;
 }
 
 /**
@@ -15,20 +16,20 @@ interface PoseImageProps {
  * image immediately, then swaps to the corrected crop once it's ready
  * (near-instant for cached images, no visible flash for most users).
  */
-const PoseImage = ({ src, alt, className }: PoseImageProps) => {
+const PoseImage = ({ src, alt, className, paddingRatio = 0.06 }: PoseImageProps) => {
   const [displaySrc, setDisplaySrc] = useState(src);
 
   useEffect(() => {
     setDisplaySrc(src);
     if (!src) return;
     let cancelled = false;
-    getCroppedImageUrl(src).then((cropped) => {
+    getCroppedImageUrl(src, paddingRatio).then((cropped) => {
       if (!cancelled) setDisplaySrc(cropped);
     });
     return () => {
       cancelled = true;
     };
-  }, [src]);
+  }, [src, paddingRatio]);
 
   if (!displaySrc) return null;
 
