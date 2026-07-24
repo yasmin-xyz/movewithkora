@@ -20,6 +20,8 @@ const cache = new Map<string, Promise<string>>();
 // underlying analysis for everything else.
 const PADDING_OVERRIDES: Record<string, number> = {
   "Bow Pose": 0.22,
+  "Standing Forward Fold": 0.18,
+  "Half Forward Fold": 0.18,
 };
 
 export function getPaddingRatioForPose(poseName: string): number {
