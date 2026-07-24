@@ -13,6 +13,20 @@
 
 const cache = new Map<string, Promise<string>>();
 
+// Most poses look consistent with the default padding, but a few shapes
+// (e.g. a tight curved arc like Bow Pose) fill a box more compactly than
+// others even at identical crop tightness — this lets specific poses get
+// extra padding to visually match their neighbors, without changing the
+// underlying analysis for everything else.
+const PADDING_OVERRIDES: Record<string, number> = {
+  "Bow Pose": 0.22,
+};
+
+export function getPaddingRatioForPose(poseName: string): number {
+  const base = poseName.replace(/\s*\((Right|Left)\)\s*$/i, "").trim();
+  return PADDING_OVERRIDES[base] ?? 0.06;
+}
+
 async function computeCrop(url: string, paddingRatio: number): Promise<string> {
   const res = await fetch(url);
   if (!res.ok) return url;
@@ -87,9 +101,10 @@ async function computeCrop(url: string, paddingRatio: number): Promise<string> {
  */
 export function getCroppedImageUrl(url: string, paddingRatio = 0.06): Promise<string> {
   if (!url) return Promise.resolve(url);
-  const cached = cache.get(url);
+  const key = `${url}::${paddingRatio}`;
+  const cached = cache.get(key);
   if (cached) return cached;
   const promise = computeCrop(url, paddingRatio).catch(() => url);
-  cache.set(url, promise);
+  cache.set(key, promise);
   return promise;
 }
