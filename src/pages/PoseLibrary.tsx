@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
+import { getCroppedImageUrl } from "@/lib/imageCrop";
 import SiteNav from "@/components/SiteNav";
 
 interface Pose {
@@ -86,6 +87,7 @@ const CATEGORY_KEYWORDS: { keywords: string[]; family: string }[] = [
 const PoseLibrary = () => {
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const markImageLoaded = (name: string) => setLoadedImages((prev) => new Set(prev).add(name));
+  const [croppedImages, setCroppedImages] = useState<Record<string, string>>({});
 
   const [poses, setPoses] = useState<Pose[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,6 +138,17 @@ const PoseLibrary = () => {
       }));
       setPoses(merged);
       setLoading(false);
+
+      // Analyze each pose image's real content bounding box and crop it
+      // client-side — fixes inconsistent internal padding without needing
+      // the source files re-uploaded. Results are cached in imageCrop.ts
+      // itself, so re-visiting the page doesn't re-analyze already-seen images.
+      merged.forEach((p: Pose) => {
+        if (!p.image_url) return;
+        getCroppedImageUrl(p.image_url).then((cropped) => {
+          setCroppedImages((prev) => (prev[p.pose_name] ? prev : { ...prev, [p.pose_name]: cropped }));
+        });
+      });
     };
     load();
   }, []);
@@ -599,7 +612,7 @@ const PoseLibrary = () => {
                     <div className="pose-card-image-wrap">
                       {!loadedImages.has(pose.pose_name) && <div className="pose-card-image-skeleton" />}
                       <img
-                        src={pose.image_url}
+                        src={croppedImages[pose.pose_name] || pose.image_url}
                         alt={pose.pose_name}
                         style={{ width: "100%", height: "100%", objectFit: "contain", position: "absolute", inset: 0 }}
                         className={`pose-card-img ${loadedImages.has(pose.pose_name) ? "loaded" : ""}`}
