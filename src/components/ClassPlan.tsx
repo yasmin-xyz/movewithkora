@@ -17,6 +17,7 @@ import {
   type Section,
 } from "@/lib/parseClassPlan";
 import { downloadClassPDF } from "@/components/ClassPDF";
+import PoseImage from "@/components/PoseImage";
 
 interface ClassPlanProps {
   content: string;
@@ -659,7 +660,7 @@ const ClassPlan = ({
                                   <div className={`rounded-lg border border-border overflow-hidden ${pose.modifications.length === 0 ? "bg-muted/20" : "bg-card"}`}>
                                     <div className="flex items-start gap-2.5 p-2.5 sm:gap-4 sm:p-3">
                                       {pose.imageUrl && (
-                                        <img
+                                        <PoseImage
                                           src={pose.imageUrl}
                                           alt={displayName(pose.name)}
                                           className="w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-md object-contain bg-muted/20 flex-shrink-0"
