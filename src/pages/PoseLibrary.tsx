@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
-import { getCroppedImageUrl } from "@/lib/imageCrop";
+import { getCroppedImageUrl, getPaddingRatioForPose } from "@/lib/imageCrop";
 import SiteNav from "@/components/SiteNav";
 
 interface Pose {
@@ -136,19 +136,36 @@ const PoseLibrary = () => {
         ...p,
         image_url: mediaMap.get(normalize(p.pose_name)),
       }));
+
+      // Analyze and crop every pose image's real content bounding box BEFORE
+      // revealing the page — this is what actually fixes the choppy/glitchy
+      // load, since the reveal-animation effect below only fires once
+      // `loading` flips false, and now that doesn't happen until images are
+      // genuinely ready. A per-image 5s timeout guard means one slow/broken
+      // image can't stall the whole page indefinitely — it just falls back
+      // to its uncropped original if it doesn't finish in time.
+      const withTimeout = <T,>(promise: Promise<T>, ms: number, fallback: T): Promise<T> =>
+        Promise.race([promise, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms))]);
+
+      const croppedEntries = await Promise.all(
+        merged.map(async (p: Pose) => {
+          if (!p.image_url) return [p.pose_name, undefined] as const;
+          const cropped = await withTimeout(
+            getCroppedImageUrl(p.image_url, getPaddingRatioForPose(p.pose_name)),
+            5000,
+            p.image_url
+          );
+          return [p.pose_name, cropped] as const;
+        })
+      );
+      const croppedMap: Record<string, string> = {};
+      for (const [name, url] of croppedEntries) {
+        if (url) croppedMap[name] = url;
+      }
+
+      setCroppedImages(croppedMap);
       setPoses(merged);
       setLoading(false);
-
-      // Analyze each pose image's real content bounding box and crop it
-      // client-side — fixes inconsistent internal padding without needing
-      // the source files re-uploaded. Results are cached in imageCrop.ts
-      // itself, so re-visiting the page doesn't re-analyze already-seen images.
-      merged.forEach((p: Pose) => {
-        if (!p.image_url) return;
-        getCroppedImageUrl(p.image_url).then((cropped) => {
-          setCroppedImages((prev) => (prev[p.pose_name] ? prev : { ...prev, [p.pose_name]: cropped }));
-        });
-      });
     };
     load();
   }, []);
@@ -303,7 +320,7 @@ const PoseLibrary = () => {
         .kora-pose-library .plib-content {
           opacity: 0;
           transform: translateY(35px);
-          transition: opacity 0.9s ease, transform 0.9s ease;
+          transition: opacity 1.3s ease, transform 1.3s ease;
         }
         .kora-pose-library .plib-content.mounted {
           opacity: 1;
