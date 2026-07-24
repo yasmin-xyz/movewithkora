@@ -500,24 +500,8 @@ Rules:
         }),
       });
 
-    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-    let response: Response | null = null;
     const PRIMARY_MODEL = "gemini-3.5-flash";
-    const FALLBACK_MODEL = "gemini-3.5-flash-lite";
-    const RETRY_DELAYS_MS = [800, 1800]; // two retries on the primary model before falling back
-
-    for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {
-      response = await callGemini(PRIMARY_MODEL);
-      if (response.ok || response.status !== 503) break;
-      console.error(`Gemini 503 on ${PRIMARY_MODEL}, attempt ${attempt + 1}`);
-      if (attempt < RETRY_DELAYS_MS.length) await sleep(RETRY_DELAYS_MS[attempt]);
-    }
-
-    if (response && !response.ok && response.status === 503) {
-      console.error(`${PRIMARY_MODEL} still unavailable after retries — falling back to ${FALLBACK_MODEL}`);
-      response = await callGemini(FALLBACK_MODEL);
-    }
+    const response = await callGemini(PRIMARY_MODEL);
 
     if (!response.ok) {
       if (response.status === 429) {
