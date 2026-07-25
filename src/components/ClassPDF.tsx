@@ -1,8 +1,9 @@
 import { Document, Page, View, Text, Image, StyleSheet, Font, Svg, Path, Link, pdf } from "@react-pdf/renderer";
 import { parsePlan, type PoseMedia, type Section } from "@/lib/parseClassPlan";
 import { getSanskritName } from "@/lib/sanskritNames";
+import { getCroppedImageUrl, getPaddingRatioForPose } from "@/lib/imageCrop";
 
-const SITE_URL = "https://movewithkora.vercel.app";
+const SITE_URL = "https://movewithkora.com";
 
 const COLORS = {
   background: "#F9F8F6",
@@ -115,34 +116,26 @@ function ensureFontsLoaded(): Promise<void> {
 
 // Persists across calls so a second export in the same session (or
 // exporting after already viewing a class with the same poses) doesn't
-// re-fetch images it already has.
-const imageCache = new Map<string, string>();
+// re-fetch images it already has. The shared imageCrop.ts utility does its
+// own caching internally, so this just needs to call it per image — no
+// separate cache required here anymore.
 
-async function preloadImages(urls: string[]): Promise<Record<string, string>> {
-  const unique = Array.from(new Set(urls.filter(Boolean)));
-  const toFetch = unique.filter((u) => !imageCache.has(u));
+async function preloadImages(entries: { url: string; poseName: string }[]): Promise<Record<string, string>> {
+  const seen = new Map<string, string>(); // url -> poseName, first occurrence wins
+  for (const e of entries) {
+    if (e.url && !seen.has(e.url)) seen.set(e.url, e.poseName);
+  }
+
+  const map: Record<string, string> = {};
   await Promise.all(
-    toFetch.map(async (url) => {
+    Array.from(seen.entries()).map(async ([url, poseName]) => {
       try {
-        const res = await fetch(url);
-        if (!res.ok) return;
-        const blob = await res.blob();
-        const dataUri = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        imageCache.set(url, dataUri);
+        map[url] = await getCroppedImageUrl(url, getPaddingRatioForPose(poseName));
       } catch {
         // Skip — component falls back to the remote URL for this one image.
       }
     })
   );
-  const map: Record<string, string> = {};
-  for (const u of unique) {
-    if (imageCache.has(u)) map[u] = imageCache.get(u)!;
-  }
   return map;
 }
 
@@ -298,14 +291,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 6,
-    padding: 8,
-    marginBottom: 6,
+    padding: 10,
+    marginBottom: 7,
   },
   poseImage: {
     width: 44,
     height: 44,
     borderRadius: 4,
-    marginRight: 9,
+    marginRight: 10,
     objectFit: "contain",
   },
   poseTextWrap: {
@@ -314,7 +307,7 @@ const styles = StyleSheet.create({
   poseNameRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 2,
+    marginBottom: 4,
   },
   poseName: {
     fontFamily: "Inter",
@@ -346,18 +339,19 @@ const styles = StyleSheet.create({
   poseDetailRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginTop: 1,
+    marginTop: 4,
   },
   poseDetailLabel: {
     fontFamily: "Inter",
     fontWeight: 500,
     fontSize: 9,
     color: "#5C6B55",
-    marginRight: 3,
+    width: 34,
   },
   poseDetailValue: {
     fontFamily: "Inter",
     fontSize: 9,
+    lineHeight: 1.45,
     color: COLORS.mutedForeground,
     flex: 1,
   },
@@ -604,7 +598,7 @@ const ClassPDF = ({
 
         <Text
           style={styles.footer}
-          render={({ pageNumber, totalPages }) => `Kora  ·  movewithkora.vercel.app  ·  Page ${pageNumber} of ${totalPages}`}
+          render={({ pageNumber, totalPages }) => `Kora  ·  movewithkora.com  ·  Page ${pageNumber} of ${totalPages}`}
           fixed
         />
       </Page>
@@ -621,9 +615,15 @@ export default ClassPDF;
  */
 export async function downloadClassPDF(props: Omit<ClassPDFProps, "imageMap" | "generatedDate">) {
   const sections = parsePlan(props.content, props.media);
-  const imageUrls = sections.flatMap((s) => s.blocks.flatMap((b) => b.poses.map((p) => p.imageUrl).filter(Boolean) as string[]));
+  const imageEntries = sections.flatMap((s) =>
+    s.blocks.flatMap((b) =>
+      b.poses
+        .filter((p) => p.imageUrl)
+        .map((p) => ({ url: p.imageUrl as string, poseName: p.name }))
+    )
+  );
 
-  const [, imageMap] = await Promise.all([ensureFontsLoaded(), preloadImages(imageUrls)]);
+  const [, imageMap] = await Promise.all([ensureFontsLoaded(), preloadImages(imageEntries)]);
 
   const generatedDate = new Date();
 
