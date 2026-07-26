@@ -249,7 +249,7 @@ TIMING REALISM (critical):
 - Every block's assigned Duration must realistically reflect the actual time needed to move through everything listed inside it — never an arbitrary round number disconnected from the content.
 - A single pass through a short flowing sequence (like one round of Sun Salutation A) takes roughly 45-75 seconds, not several minutes. A block with only 2-3 poses and no specified holds should be brief (often 2-4 minutes at most), not padded out to fill a larger number.
 - A block containing a pose with a specified multi-minute hold (e.g. "Hold for 3 breaths" is short; "Hold for 2 minutes" is long) must have its Duration reflect that hold time realistically, not understate it.
-- If a block's realistic content time doesn't match the section's target percentage from SECTION TIME ALLOCATION, adjust the number of poses or rounds in that block until the content and the stated duration genuinely agree — do not just write a duration that "sounds right" for the section without the content to back it up.
+- If a block's realistic content time doesn't match the section's target percentage from SECTION TIME ALLOCATION, the fix is almost always to ADD real poses (or a legitimate lead-in, per LEAD-IN POSES FOR DEMANDING POSES OUTSIDE PEAK above) until the content genuinely fills that time — not to inflate the stated Duration number while leaving the pose count thin. A block that's supposed to represent a meaningful chunk of a 60+ minute class needs enough real poses to actually occupy that time when taught at a realistic pace; if the section feels short even after checking hold/rep counts, that's a sign more poses are needed, not that the duration should just be written larger than the content supports.
 
 YOGA STYLE ADAPTATION (apply if a style is specified in the user prompt):
 - Vinyasa: favor more frequent vinyasa/transition poses between blocks, brisk pacing, breath-linked movement.
@@ -301,12 +301,14 @@ SIDE-NEUTRAL CUE LANGUAGE FOR ASYMMETRICAL POSES (critical): When writing the Br
 MODIFICATION REQUIREMENT (critical — applies to every non-transition pose in every section, not just Warm-Up):
 - Every pose must include exactly 2 modification lines: one easier variation and one more advanced/challenging variation — regardless of which section (Warm-Up, Build, Peak, Cool Down) the pose is in.
 - Each modification line MUST follow this exact format: "- [Pose name] – Breath: [breath cue] – [short description]". The breath cue is required for every single modification option, not optional — if a student switches to that variation, they need their own accurate breath instruction, not the original pose's breath cue. Never omit the "Breath:" segment, and never leave it as a bare "Inhale"/"Exhale" — see BREATH CUE QUALITY above.
+- Keep modification lines genuinely brief — this is a quick-reference swap option, not a full teaching cue. Target roughly 4-6 words for the breath cue and one short phrase (not a full sentence) for the description — e.g. "- Half Camel Pose – Breath: Inhale to lift the chest – hands stay on the lower back" rather than a longer, more elaborate version. This brevity applies ONLY to modification lines — the main pose's own Breath and Cue lines should stay at their normal, fuller descriptive quality; modifications are intentionally more compact by comparison.
 
 SPECIAL CUE FOR CORPSE POSE (critical): Whenever Corpse Pose (Savasana) appears — always the final pose of Cool Down — its Cue must explicitly frame it as the most important pose of the class, e.g. "This is the most important pose of the class — allow the body to fully absorb and integrate everything you've just practiced." Do not give Corpse Pose a generic relaxation cue with no acknowledgment of its significance.
 
 OPTIONAL WATER BREAK:
 - For classes 60 minutes or longer, insert exactly one "Pose: Water Break (Optional)" entry as the LAST entry of the BUILD section, immediately before the PEAK section begins. Do not place it inside Peak, after Peak, or between Peak and Cool Down — it must come before Peak so the cue text ("reset before the peak") is accurate. Give it a brief Cue only — its content might be "Offer students a moment to drink water and reset before the peak," without repeating "Cue:" a second time inside it — do NOT include a Breath line for Water Break, since there's no meaningful breath instruction for pausing to drink water. No Modifications block either. Do not insert more than one water break per class, and skip it entirely for classes under 60 minutes.
 - A Water Break does not exempt what comes after it from needing a real transition (see CROSS-BLOCK AND CROSS-SECTION TRANSITIONS above). Students are still in a real body position after a water pause — evaluate the transition into the next pose normally.
+- Water Break is a pause, not a body position or location — the transition immediately following it must NEVER reference "your water break" as if it were something to move from (e.g. never write "From your water break, lift your hips..."). Instead, reference the actual physical position the student was last in — whatever real pose came before the Water Break — since that's the body shape the transition is actually starting from.
 
 Output ONLY the structured plan in this exact format. No introductions, no summaries, no extra text.
 
@@ -375,7 +377,9 @@ PEAK SEQUENCE FLOW (critical — applies specifically to the PEAK section when t
 - The FIRST pose of the Right Side Flow (whether that's a lead-in pose or the peak pose itself) must be connected to whatever came immediately before it — the last pose of Build, or a Water Break — via a real transition, following CROSS-BLOCK AND CROSS-SECTION TRANSITIONS above. Do not let Peak begin with a cold cut.
 - Within each side of the Peak's side flow, include 1-2 lead-in poses (sharing orientation, base, or family with the peak pose) BEFORE the peak pose itself, so the peak pose is the natural final entry of that side's sequence — not standing alone.
 - These lead-in poses should follow the same metadata continuity rules as everywhere else (orientation/base/family/intensity progression), building smoothly into the peak pose's shape and intensity.
-- The peak pose itself MUST be output as a normal full pose entry with its own Breath, Cue, and 3 Modifications — exactly like every other pose. Do NOT mark the peak pose as "Type: Transition" under any circumstances, even though it is the pose you are "flowing into." Only the lead-in poses before it (if genuinely a connector movement, not a named asana) may ever be transitions — the peak pose is always a real, fully-detailed pose entry, with its image and modifications intact.
+- The peak pose itself MUST be output as a normal full pose entry with its own Breath, Cue, and 2 Modifications — exactly like every other pose. Do NOT mark the peak pose as "Type: Transition" under any circumstances, even though it is the pose you are "flowing into." Only the lead-in poses before it (if genuinely a connector movement, not a named asana) may ever be transitions — the peak pose is always a real, fully-detailed pose entry, with its image and modifications intact.
+
+LEAD-IN POSES FOR DEMANDING POSES OUTSIDE PEAK TOO (critical): The same earned-progression principle above doesn't only apply to the literal peak pose — it applies anywhere a noticeably more demanding pose appears, including in BUILD. Never place an advanced backbend, arm balance, or deep-opening pose directly after a plain transition with nothing preparing the body for it. Precede it with exactly ONE lead-in pose that shares family/base with it and is a genuine easier variation or precursor shape — not the 1-2 poses Peak gets, just one, to keep this from meaningfully growing the class's overall length. Concrete examples: Wheel Pose should typically be preceded by Bridge Pose (same backbend family, primes the same muscles at a gentler depth) rather than appearing cold; Tiger Pose should typically be preceded by Bird-Dog (same base shape — hands and knees, opposite arm/leg — before adding the backbend and foot-grab). Only skip this lead-in when there's a genuinely better-fitting pose already earlier in the same block serving the same preparatory purpose — don't force a redundant lead-in if one's already there.
 - If you want a shared, neutral centering moment in the pose itself (bilateral form) before the Right/Left split begins, see NO BARE POSE ENTRIES above — it must be a fully-detailed pose or omitted entirely, never a bare name.
 - Format:
 
@@ -461,6 +465,7 @@ Rules:
             { role: "user", content: userPrompt },
           ],
           stream: true,
+          stream_options: { include_usage: true },
         }),
       });
 
@@ -488,7 +493,45 @@ Rules:
       );
     }
 
-    return new Response(response.body, {
+    // Split the stream into two identical copies: one goes to the client
+    // exactly as before (no change to how classes generate or display), the
+    // other is read quietly in the background just to capture whatever
+    // usage data Gemini includes in the final chunk, so we can see real
+    // token costs in the logs instead of estimating them.
+    const [clientStream, loggingStream] = response.body!.tee();
+
+    (async () => {
+      try {
+        const reader = loggingStream.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let newlineIndex: number;
+          while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+            const line = buffer.slice(0, newlineIndex).replace(/\r$/, "");
+            buffer = buffer.slice(newlineIndex + 1);
+            if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (jsonStr === "[DONE]") continue;
+            try {
+              const parsed = JSON.parse(jsonStr);
+              if (parsed.usage) {
+                console.log(`Gemini token usage (${PRIMARY_MODEL}):`, JSON.stringify(parsed.usage));
+              }
+            } catch {
+              // Ignore lines that aren't valid JSON (partial chunks, etc.)
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Token usage logging failed (non-fatal, class generation unaffected):", e);
+      }
+    })();
+
+    return new Response(clientStream, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
