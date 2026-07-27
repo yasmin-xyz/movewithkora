@@ -83,6 +83,9 @@ interface ClassFormProps {
   onScrollToResult?: () => void;
   showSanskrit?: boolean;
   onToggleSanskrit?: (v: boolean) => void;
+  notifyWhenReady?: boolean;
+  onToggleNotify?: (v: boolean) => void;
+  notifySupported?: boolean;
 }
 
 const ClassForm = ({
@@ -102,6 +105,9 @@ const ClassForm = ({
   onScrollToResult,
   showSanskrit = false,
   onToggleSanskrit,
+  notifyWhenReady = false,
+  onToggleNotify,
+  notifySupported = false,
 }: ClassFormProps) => {
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const loadingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -236,6 +242,24 @@ const ClassForm = ({
           animation: classFormMsgFadeIn 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
       `}</style>
+
+      {notifySupported && onToggleNotify ? (
+        <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-card/50 px-3.5 py-3">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-body text-xs font-medium text-foreground">
+              Notify me when ready
+            </span>
+            <span className="font-body text-[11px] leading-snug text-muted-foreground">
+              A fully sequenced class can take 1–3 minutes — get notified if you switch tabs while you wait.
+            </span>
+          </div>
+          <Switch checked={notifyWhenReady} onCheckedChange={onToggleNotify} />
+        </div>
+      ) : (
+        <p className="font-body text-xs text-muted-foreground text-center">
+          A fully sequenced class can take 1–3 minutes to generate.
+        </p>
+      )}
 
       <Button
         className="w-full h-12 font-body text-sm font-medium tracking-wide uppercase overflow-hidden"
