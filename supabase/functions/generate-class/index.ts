@@ -470,7 +470,18 @@ Rules:
       });
 
     const PRIMARY_MODEL = "gemini-3.5-flash";
-    const response = await callGemini(PRIMARY_MODEL);
+    let response = await callGemini(PRIMARY_MODEL);
+
+    // Exactly one quick retry on a 503 "high demand" response — these
+    // rejections are near-instant (Gemini says "no capacity" immediately,
+    // it doesn't spend time processing before rejecting), so a single retry
+    // adds well under a second of real delay, unlike the old multi-attempt
+    // backoff chain that risked compounding toward Supabase's 150s timeout.
+    if (!response.ok && response.status === 503) {
+      console.error(`Gemini 503 on ${PRIMARY_MODEL}, retrying once`);
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      response = await callGemini(PRIMARY_MODEL);
+    }
 
     if (!response.ok) {
       if (response.status === 429) {
