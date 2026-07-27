@@ -20,6 +20,32 @@ const Index = () => {
   const [classPlan, setClassPlan] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [justCompleted, setJustCompleted] = useState(false);
+  const [notifyWhenReady, setNotifyWhenReady] = useState(false);
+  const notifySupported = typeof window !== "undefined" && "Notification" in window;
+
+  const handleToggleNotify = async (enabled: boolean) => {
+    if (!notifySupported) return;
+    if (!enabled) {
+      setNotifyWhenReady(false);
+      return;
+    }
+    if (Notification.permission === "granted") {
+      setNotifyWhenReady(true);
+      return;
+    }
+    if (Notification.permission === "denied") {
+      toast.error("Notifications are blocked for this site — check your browser settings to enable them.");
+      setNotifyWhenReady(false);
+      return;
+    }
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      setNotifyWhenReady(true);
+      toast.success("You'll be notified when your class is ready.");
+    } else {
+      setNotifyWhenReady(false);
+    }
+  };
   const [showResult, setShowResult] = useState(false);
   const [showSanskrit, setShowSanskrit] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -194,6 +220,16 @@ const Index = () => {
             break;
           }
         }
+      }
+
+      if (notifyWhenReady && notifySupported && Notification.permission === "granted") {
+        const notification = new Notification("Your class is ready 🧘", {
+          body: "Tap to view your flow in Kora.",
+        });
+        notification.onclick = () => {
+          window.focus();
+          notification.close();
+        };
       }
     } catch (e: any) {
       if (e.name !== "AbortError") {
@@ -441,6 +477,9 @@ const Index = () => {
                 onScrollToResult={handleReveal}
                 showSanskrit={showSanskrit}
                 onToggleSanskrit={setShowSanskrit}
+                notifyWhenReady={notifyWhenReady}
+                onToggleNotify={handleToggleNotify}
+                notifySupported={notifySupported}
               />
 
               <div ref={resultsAnchorRef} />
