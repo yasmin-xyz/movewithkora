@@ -86,7 +86,6 @@ interface ClassFormProps {
   notifyWhenReady?: boolean;
   onToggleNotify?: (v: boolean) => void;
   notifySupported?: boolean;
-  showIOSInstallHint?: boolean;
 }
 
 const ClassForm = ({
@@ -109,7 +108,6 @@ const ClassForm = ({
   notifyWhenReady = false,
   onToggleNotify,
   notifySupported = false,
-  showIOSInstallHint = false,
 }: ClassFormProps) => {
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const loadingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -256,13 +254,6 @@ const ClassForm = ({
             </span>
           </div>
           <Switch checked={notifyWhenReady} onCheckedChange={onToggleNotify} />
-        </div>
-      ) : showIOSInstallHint ? (
-        <div className="rounded-md border border-border bg-card/50 px-3.5 py-3">
-          <p className="font-body text-[11px] leading-snug text-muted-foreground">
-            A fully sequenced class can take 1–3 minutes to generate. On iPhone/iPad, add Kora to your Home Screen{" "}
-            <span className="italic">(Safari → Share → Add to Home Screen)</span> to get notified when it's ready.
-          </p>
         </div>
       ) : (
         <p className="font-body text-xs text-muted-foreground text-center">
