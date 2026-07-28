@@ -252,7 +252,7 @@ const ClassForm = ({
               Notify me when ready
             </span>
             <span className="font-body text-[11px] leading-snug text-muted-foreground">
-              A fully sequenced class can take 1–3 minutes — get notified if you switch tabs while you wait.
+              A fully sequenced class can take 1–3 minutes — get notified if you switch away while you wait.
             </span>
           </div>
           <Switch checked={notifyWhenReady} onCheckedChange={onToggleNotify} />
@@ -260,7 +260,8 @@ const ClassForm = ({
       ) : showIOSInstallHint ? (
         <div className="rounded-md border border-border bg-card/50 px-3.5 py-3">
           <p className="font-body text-[11px] leading-snug text-muted-foreground">
-            A fully sequenced class can take 1–3 minutes. On iPhone/iPad, add Kora to your Home Screen (Safari → Share → Add to Home Screen) to get notified when it's ready.
+            A fully sequenced class can take 1–3 minutes to generate. On iPhone/iPad, add Kora to your Home Screen{" "}
+            <span className="italic">(Safari → Share → Add to Home Screen)</span> to get notified when it's ready.
           </p>
         </div>
       ) : (
