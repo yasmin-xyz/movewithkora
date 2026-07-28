@@ -38,8 +38,13 @@ const Index = () => {
   // On iOS, Notification exists in the browser's API surface but silently
   // does nothing from a regular Safari tab — it only works once the site is
   // installed to the Home Screen. Treat "supported" as "will actually work."
-  const notifySupported = notificationApiExists && (!isIOSDevice || isStandalone);
-  const showIOSInstallHint = notificationApiExists && isIOSDevice && !isStandalone;
+  // On iOS in a regular (non-installed) tab, Notification may not even
+  // exist on window at all — so this can't gate on notificationApiExists
+  // the way the non-iOS case does. isIOSDevice + !isStandalone is a
+  // reliable, deterministic signal on its own: it's never functional there
+  // regardless of what feature detection reports.
+  const notifySupported = isIOSDevice ? isStandalone && notificationApiExists : notificationApiExists;
+  const showIOSInstallHint = isIOSDevice && !isStandalone;
 
   const handleToggleNotify = async (enabled: boolean) => {
     if (!notifySupported) return;
