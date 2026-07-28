@@ -455,8 +455,10 @@ const ClassPDF = ({
   if (skillLevel) params.push({ label: "Skill Level", value: skillLevel });
   if (yogaStyle) params.push({ label: "Style", value: yogaStyle });
 
+  const pdfMetaTitle = yogaStyle ? `Kora — ${yogaStyle} Flow` : "Kora — Class Flow";
+
   return (
-    <Document title={title}>
+    <Document title={pdfMetaTitle}>
       <Page size="LETTER" style={styles.page} wrap>
         <View style={styles.mastheadRow}>
           <Link src={SITE_URL} style={{ textDecoration: "none" }}>
@@ -494,20 +496,35 @@ const ClassPDF = ({
 
           return (
             <View key={si}>
-              <View style={styles.sectionHeaderRow}>
-                <Text style={styles.sectionTitle}>{section.title}</Text>
-                {sectionMinutes > 0 && <Text style={styles.sectionMinutes}>{sectionMinutes} MIN</Text>}
-              </View>
-
+              {/* Section header is grouped with the first block's header in one
+                  non-breakable unit below — never rendered standalone — so a
+                  page break can never strand "WARM-UP" etc. alone with blank
+                  space beneath it while the first block jumps to the next page. */}
               {section.blocks.map((block, bi) => {
                 let lastSideFlow: string | undefined;
                 return (
                   <View key={bi} style={styles.blockWrap}>
-                    <View style={styles.blockHeaderRow}>
-                      <Text style={styles.blockName}>{block.blockName}</Text>
-                      {block.duration && <Text style={styles.blockDuration}>{block.duration}</Text>}
-                    </View>
-                    {block.note && <Text style={styles.blockNote}>{block.note}</Text>}
+                    {bi === 0 ? (
+                      <View wrap={false}>
+                        <View style={styles.sectionHeaderRow}>
+                          <Text style={styles.sectionTitle}>{section.title}</Text>
+                          {sectionMinutes > 0 && <Text style={styles.sectionMinutes}>{sectionMinutes} MIN</Text>}
+                        </View>
+                        <View style={styles.blockHeaderRow}>
+                          <Text style={styles.blockName}>{block.blockName}</Text>
+                          {block.duration && <Text style={styles.blockDuration}>{block.duration}</Text>}
+                        </View>
+                        {block.note && <Text style={styles.blockNote}>{block.note}</Text>}
+                      </View>
+                    ) : (
+                      <>
+                        <View style={styles.blockHeaderRow}>
+                          <Text style={styles.blockName}>{block.blockName}</Text>
+                          {block.duration && <Text style={styles.blockDuration}>{block.duration}</Text>}
+                        </View>
+                        {block.note && <Text style={styles.blockNote}>{block.note}</Text>}
+                      </>
+                    )}
 
                     {block.poses.map((pose, pi) => {
                       const showSideFlowHeader = pose.sideFlow && pose.sideFlow !== lastSideFlow;
