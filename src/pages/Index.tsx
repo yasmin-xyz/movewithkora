@@ -21,7 +21,25 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [justCompleted, setJustCompleted] = useState(false);
   const [notifyWhenReady, setNotifyWhenReady] = useState(false);
-  const notifySupported = typeof window !== "undefined" && "Notification" in window;
+  const notifyWhenReadyRef = useRef(false);
+  useEffect(() => {
+    notifyWhenReadyRef.current = notifyWhenReady;
+  }, [notifyWhenReady]);
+
+  const notificationApiExists = typeof window !== "undefined" && "Notification" in window;
+  const isIOSDevice =
+    typeof navigator !== "undefined" &&
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+  const isStandalone =
+    typeof window !== "undefined" &&
+    ((window.navigator as any).standalone === true ||
+      window.matchMedia?.("(display-mode: standalone)").matches);
+  // On iOS, Notification exists in the browser's API surface but silently
+  // does nothing from a regular Safari tab — it only works once the site is
+  // installed to the Home Screen. Treat "supported" as "will actually work."
+  const notifySupported = notificationApiExists && (!isIOSDevice || isStandalone);
+  const showIOSInstallHint = notificationApiExists && isIOSDevice && !isStandalone;
 
   const handleToggleNotify = async (enabled: boolean) => {
     if (!notifySupported) return;
@@ -222,7 +240,7 @@ const Index = () => {
         }
       }
 
-      if (notifyWhenReady && notifySupported && Notification.permission === "granted") {
+      if (notifyWhenReadyRef.current && notifySupported && Notification.permission === "granted") {
         const notification = new Notification("Your class is ready 🧘", {
           body: "Tap to view your flow in Kora.",
         });
@@ -480,6 +498,7 @@ const Index = () => {
                 notifyWhenReady={notifyWhenReady}
                 onToggleNotify={handleToggleNotify}
                 notifySupported={notifySupported}
+                showIOSInstallHint={showIOSInstallHint}
               />
 
               <div ref={resultsAnchorRef} />
