@@ -347,6 +347,8 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: "#5C6B55",
     width: 34,
+    textAlign: "right",
+    marginRight: 5,
   },
   poseDetailValue: {
     fontFamily: "Inter",
@@ -513,7 +515,7 @@ const ClassPDF = ({
 
                       if (pose.isSideFlowVinyasa) {
                         return (
-                          <View key={pi}>
+                          <View key={pi} wrap={false}>
                             {showSideFlowHeader && (
                               <Text style={styles.sideFlowLabel}>
                                 {pose.sideFlow === "right" ? "Right Side Flow" : "Left Side Flow"}
@@ -531,7 +533,7 @@ const ClassPDF = ({
 
                       if (pose.isTransition) {
                         return (
-                          <View key={pi}>
+                          <View key={pi} wrap={false}>
                             {showSideFlowHeader && (
                               <Text style={styles.sideFlowLabel}>
                                 {pose.sideFlow === "right" ? "Right Side Flow" : "Left Side Flow"}
@@ -551,13 +553,13 @@ const ClassPDF = ({
                       const img = resolvedImage(pose.imageUrl);
 
                       return (
-                        <View key={pi}>
+                        <View key={pi} wrap={false}>
                           {showSideFlowHeader && (
                             <Text style={styles.sideFlowLabel}>
                               {pose.sideFlow === "right" ? "Right Side Flow" : "Left Side Flow"}
                             </Text>
                           )}
-                          <View style={styles.poseCard} wrap={false}>
+                          <View style={styles.poseCard}>
                             {img && <Image src={img} style={styles.poseImage} />}
                             <View style={styles.poseTextWrap}>
                               <View style={styles.poseNameRow}>
