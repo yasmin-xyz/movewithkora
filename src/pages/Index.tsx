@@ -27,24 +27,15 @@ const Index = () => {
   }, [notifyWhenReady]);
 
   const notificationApiExists = typeof window !== "undefined" && "Notification" in window;
-  const isIOSDevice =
-    typeof navigator !== "undefined" &&
-    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
-  const isStandalone =
-    typeof window !== "undefined" &&
-    ((window.navigator as any).standalone === true ||
-      window.matchMedia?.("(display-mode: standalone)").matches);
-  // On iOS, Notification exists in the browser's API surface but silently
-  // does nothing from a regular Safari tab — it only works once the site is
-  // installed to the Home Screen. Treat "supported" as "will actually work."
-  // On iOS in a regular (non-installed) tab, Notification may not even
-  // exist on window at all — so this can't gate on notificationApiExists
-  // the way the non-iOS case does. isIOSDevice + !isStandalone is a
-  // reliable, deterministic signal on its own: it's never functional there
-  // regardless of what feature detection reports.
-  const notifySupported = isIOSDevice ? isStandalone && notificationApiExists : notificationApiExists;
-  const showIOSInstallHint = isIOSDevice && !isStandalone;
+  // Notifications during a 1-3 minute generation are unreliable on mobile —
+  // iOS in particular kills the in-progress network request when the tab is
+  // backgrounded, so the notification (which only fires on a successful
+  // completion) often never has anything to fire for. Rather than offer a
+  // feature that silently fails much of the time, mobile gets a plain
+  // heads-up message instead; desktop keeps the working toggle.
+  const isMobileDevice =
+    typeof navigator !== "undefined" && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  const notifySupported = !isMobileDevice && notificationApiExists;
 
   const handleToggleNotify = async (enabled: boolean) => {
     if (!notifySupported) return;
@@ -503,7 +494,6 @@ const Index = () => {
                 notifyWhenReady={notifyWhenReady}
                 onToggleNotify={handleToggleNotify}
                 notifySupported={notifySupported}
-                showIOSInstallHint={showIOSInstallHint}
               />
 
               <div ref={resultsAnchorRef} />
