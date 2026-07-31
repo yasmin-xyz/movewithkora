@@ -16,6 +16,19 @@ function getCorsHeaders(origin: string | null) {
   };
 }
 
+// Sums every "Duration: N minutes" line in a class plan's raw text. Used to
+// compute exactly how much time is left for Peak + Cool Down after Warm-Up
+// and Build are already finalized, rather than asking the model to do that
+// subtraction itself from raw text — LLM arithmetic on its own output isn't
+// reliable enough to trust for this.
+function sumDurations(text: string): number {
+  let total = 0;
+  for (const match of text.matchAll(/Duration:\s*(\d+)/gi)) {
+    total += parseInt(match[1], 10);
+  }
+  return total;
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("origin"));
 
@@ -346,6 +359,7 @@ COOL DOWN:
 ASYMMETRICAL POSE SIDE FLOW RULES (critical):
 - If a block contains asymmetrical poses (symmetry == "asymmetrical"), you MUST group them into a Side Flow.
 - This applies even when only ONE asymmetrical pose appears in a block. A single asymmetrical pose must still be split into a Right Side Flow entry and a Left Side Flow entry, exactly like a multi-pose cluster — never output a single unsided instance of an asymmetrical pose (e.g. a bare "Pose: Thread the Needle" with no "(Right)"/"(Left)" suffix, appearing only once) anywhere in the output, regardless of section, and regardless of whether other asymmetrical poses are nearby.
+- This applies just as much when SEVERAL DIFFERENT named asymmetrical poses are taught together as one flowing combo on a side (e.g. Warrior I into Warrior II into Extended Side Angle, all on the same standing leg) — different pose names does NOT mean they're exempt from Side Flow grouping. Concrete example of the WRONG pattern to avoid: a bare "Pose: Warrior I" followed directly by "Pose: Warrior II" with no "(Right)"/"(Left)" suffix and no "Right Side Flow:"/"Left Side Flow:" labels anywhere — this is wrong even though each pose name only appears once. The CORRECT pattern: "Right Side Flow: / Pose: Warrior I (Right) / ... / Pose: Warrior II (Right) / ... / [bracketing vinyasa] / Left Side Flow: / Pose: Warrior I (Left) / ... / Pose: Warrior II (Left) / ...". The whole combo is one cluster — every pose in it gets a Right entry and a Left entry, with no vinyasa inserted between poses on the same side (per STANDING CONTINUITY RULE), only at the three bracketing points.
 - Output ALL asymmetrical poses in the block for the right side first, then a Vinyasa separator line, then the SAME poses for the left side.
 - Do NOT use "Repeat: Left" for individual poses. Mirror the ENTIRE cluster, not pose-by-pose.
 - Insert a transition/vinyasa in THREE places around every side flow, matching how this is actually taught in a live class — a side flow is a self-contained unit that must be bracketed on both ends, every single time one occurs, not just the first time in a class:
@@ -457,11 +471,13 @@ Rules:
     if (phase === "warmupBuild") {
       userPrompt += ` For this request, generate ONLY the WARM-UP and BUILD sections — do not generate PEAK or COOL DOWN yet. Size Warm-Up and Build normally within the full ${classLength}-minute class exactly as SECTION TIME ALLOCATION above specifies, as if the remaining sections will be generated afterward. Output only the WARM-UP: and BUILD: sections, in the exact format above.`;
     } else if (phase === "peakCooldown") {
+      const usedMinutes = sumDurations(priorContent || "");
+      const remainingMinutes = Math.max(1, (classLength || 0) - usedMinutes);
       userPrompt += ` The WARM-UP and BUILD sections of this class have already been finalized exactly as follows — treat them as fixed, and do not regenerate, alter, or repeat them in your output:
 
 ${priorContent}
 
-Now generate ONLY the PEAK and COOL DOWN sections that continue naturally from here, following every rule above — including making sure the peak pose has the highest intensity_level of any pose across the entire class (both what's shown above and what you generate now), and providing a real transition bridging from the actual last pose shown above into the start of PEAK, per CROSS-BLOCK AND CROSS-SECTION TRANSITIONS. Peak and Cool Down together must account for whatever time remains in the ${classLength}-minute class after the Warm-Up and Build durations already used above — sum their Duration lines to determine how much time is left. Output only the PEAK: and COOL DOWN: sections, in the exact format above — do not include WARM-UP or BUILD in your response.`;
+Now generate ONLY the PEAK and COOL DOWN sections that continue naturally from here, following every rule above — including making sure the peak pose has the highest intensity_level of any pose across the entire class (both what's shown above and what you generate now), and providing a real transition bridging from the actual last pose shown above into the start of PEAK, per CROSS-BLOCK AND CROSS-SECTION TRANSITIONS. Warm-Up and Build shown above already used exactly ${usedMinutes} of the ${classLength}-minute class — Peak and Cool Down together must fill exactly the remaining ${remainingMinutes} minutes. Size their Duration lines so they sum to ${remainingMinutes}, splitting that time between Peak and Cool Down following the relative proportions in SECTION TIME ALLOCATION above. Output only the PEAK: and COOL DOWN: sections, in the exact format above — do not include WARM-UP or BUILD in your response.`;
     }
 
     userPrompt += ` Output only the structured format.`;
