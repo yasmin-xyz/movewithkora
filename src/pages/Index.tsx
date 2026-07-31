@@ -10,6 +10,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { LoginDialog } from "@/components/Auth";
 import { SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
 
+// Ashtanga/Power/Vinyasa classes at longer lengths generate enough content
+// (a vinyasa between every pose, per the generate-class system prompt) to
+// run close to or past Supabase's ~150s edge function timeout in one call.
+// Only these specific combinations get split into two chained requests —
+// everything else stays a single call, exactly as fast as it is today.
+const RISKY_STYLES = ["Ashtanga", "Power", "Vinyasa"];
+const RISKY_LENGTH_THRESHOLD = 60; // minutes
+
 const Index = () => {
   const navigate = useNavigate();
   const [classLength, setClassLength] = useState("60");
@@ -153,6 +161,83 @@ const Index = () => {
     }, 50);
   };
 
+  // Streams one generate-class call, appending its content onto baseText,
+  // and returns the final accumulated text. Used directly for a normal
+  // single-call generation, and twice in sequence (once per phase) when a
+  // class is split to stay under Supabase's execution timeout.
+  const streamGenerationPhase = async (
+    body: Record<string, unknown>,
+    baseText: string
+  ): Promise<string> => {
+    const resp = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-class`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify(body),
+        signal: abortRef.current!.signal,
+      }
+    );
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error || "Failed to generate class plan");
+    }
+
+    if (!resp.body) throw new Error("No response body");
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let fullText = baseText;
+
+    const markContentReceived = () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = setTimeout(() => {
+        setIsLoading(false);
+        setJustCompleted(true);
+      }, 1200);
+    };
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      let newlineIndex: number;
+      while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+        let line = buffer.slice(0, newlineIndex);
+        buffer = buffer.slice(newlineIndex + 1);
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (!line.startsWith("data: ")) continue;
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === "[DONE]") break;
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) {
+            fullText += content;
+            setClassPlan(fullText);
+            markContentReceived();
+          }
+        } catch {
+          buffer = line + "\n" + buffer;
+          break;
+        }
+      }
+    }
+
+    // Clear the idle timer here so a stale "content settled" timeout can't
+    // fire — and prematurely reveal an incomplete class — during the gap
+    // before the next phase's request starts.
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+
+    return fullText;
+  };
+
   const handleGenerate = async () => {
     if (!peakMovement.trim()) {
       toast.error("Please enter a peak movement or focus");
@@ -168,72 +253,29 @@ const Index = () => {
     setCurrentSavedClassId(null);
     abortRef.current = new AbortController();
 
+    const baseParams = {
+      classLength: parseInt(classLength),
+      peakMovement: peakMovement.trim(),
+      skillLevel,
+      yogaStyle: yogaStyle || null,
+      inspiration: inspiration.trim() || null,
+    };
+
+    const shouldSplit =
+      RISKY_STYLES.includes(yogaStyle) && parseInt(classLength) >= RISKY_LENGTH_THRESHOLD;
+
     try {
-      const resp = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-class`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            classLength: parseInt(classLength),
-            peakMovement: peakMovement.trim(),
-            skillLevel,
-            yogaStyle: yogaStyle || null,
-            inspiration: inspiration.trim() || null,
-          }),
-          signal: abortRef.current.signal,
-        }
-      );
-
-      if (!resp.ok) {
-        const err = await resp.json();
-        throw new Error(err.error || "Failed to generate class plan");
-      }
-
-      if (!resp.body) throw new Error("No response body");
-
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let fullText = "";
-
-      const markContentReceived = () => {
-        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-        idleTimerRef.current = setTimeout(() => {
-          setIsLoading(false);
-          setJustCompleted(true);
-        }, 1200);
-      };
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        let newlineIndex: number;
-        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
-          let line = buffer.slice(0, newlineIndex);
-          buffer = buffer.slice(newlineIndex + 1);
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (!line.startsWith("data: ")) continue;
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") break;
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content;
-            if (content) {
-              fullText += content;
-              setClassPlan(fullText);
-              markContentReceived();
-            }
-          } catch {
-            buffer = line + "\n" + buffer;
-            break;
-          }
-        }
+      if (!shouldSplit) {
+        await streamGenerationPhase(baseParams, "");
+      } else {
+        const warmupBuildText = await streamGenerationPhase(
+          { ...baseParams, phase: "warmupBuild" },
+          ""
+        );
+        await streamGenerationPhase(
+          { ...baseParams, phase: "peakCooldown", priorContent: warmupBuildText },
+          warmupBuildText
+        );
       }
 
       if (notifyWhenReadyRef.current && notifySupported && Notification.permission === "granted") {

@@ -81,6 +81,8 @@ serve(async (req) => {
       skillLevel = "Intermediate",
       yogaStyle,
       inspiration,
+      phase,
+      priorContent,
     } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not configured");
@@ -445,6 +447,23 @@ Rules:
       userPrompt += ` Let the following theme, philosophy, or influence guide the pose choices and the language used in cues throughout (while only using poses from the provided library): "${inspiration}".`;
     }
 
+    // Some style/length combinations (Ashtanga, Power, or Vinyasa at longer
+    // lengths especially) generate enough content to risk running past
+    // Supabase's edge function execution timeout in one call. For those,
+    // the client splits generation into two chained requests — this one
+    // covers just Warm-Up + Build, and a second covers Peak + Cool Down,
+    // continuing from the first's actual final output (including any
+    // instructor edits made in between, when that becomes possible).
+    if (phase === "warmupBuild") {
+      userPrompt += ` For this request, generate ONLY the WARM-UP and BUILD sections — do not generate PEAK or COOL DOWN yet. Size Warm-Up and Build normally within the full ${classLength}-minute class exactly as SECTION TIME ALLOCATION above specifies, as if the remaining sections will be generated afterward. Output only the WARM-UP: and BUILD: sections, in the exact format above.`;
+    } else if (phase === "peakCooldown") {
+      userPrompt += ` The WARM-UP and BUILD sections of this class have already been finalized exactly as follows — treat them as fixed, and do not regenerate, alter, or repeat them in your output:
+
+${priorContent}
+
+Now generate ONLY the PEAK and COOL DOWN sections that continue naturally from here, following every rule above — including making sure the peak pose has the highest intensity_level of any pose across the entire class (both what's shown above and what you generate now), and providing a real transition bridging from the actual last pose shown above into the start of PEAK, per CROSS-BLOCK AND CROSS-SECTION TRANSITIONS. Peak and Cool Down together must account for whatever time remains in the ${classLength}-minute class after the Warm-Up and Build durations already used above — sum their Duration lines to determine how much time is left. Output only the PEAK: and COOL DOWN: sections, in the exact format above — do not include WARM-UP or BUILD in your response.`;
+    }
+
     userPrompt += ` Output only the structured format.`;
 
     // Free-tier Gemini has no uptime guarantee and can return 503 "high
@@ -470,6 +489,7 @@ Rules:
       });
 
     const PRIMARY_MODEL = "gemini-3.5-flash";
+    const FALLBACK_MODEL = "gemini-3.5-flash-lite";
     let response = await callGemini(PRIMARY_MODEL);
 
     // Exactly one quick retry on a 503 "high demand" response — these
@@ -481,6 +501,16 @@ Rules:
       console.error(`Gemini 503 on ${PRIMARY_MODEL}, retrying once`);
       await new Promise((resolve) => setTimeout(resolve, 400));
       response = await callGemini(PRIMARY_MODEL);
+    }
+
+    // Still no capacity on the primary model — fall back to a separate
+    // model with its own quota, straight away with no extra backoff, so
+    // this doesn't compound toward Supabase's 150s execution timeout.
+    let usedModel = PRIMARY_MODEL;
+    if (!response.ok && response.status === 503) {
+      console.error(`${PRIMARY_MODEL} still unavailable after retry — falling back to ${FALLBACK_MODEL}`);
+      response = await callGemini(FALLBACK_MODEL);
+      usedModel = FALLBACK_MODEL;
     }
 
     if (!response.ok) {
@@ -530,7 +560,7 @@ Rules:
             try {
               const parsed = JSON.parse(jsonStr);
               if (parsed.usage) {
-                console.log(`Gemini token usage (${PRIMARY_MODEL}):`, JSON.stringify(parsed.usage));
+                console.log(`Gemini token usage (${usedModel}):`, JSON.stringify(parsed.usage));
               }
             } catch {
               // Ignore lines that aren't valid JSON (partial chunks, etc.)
