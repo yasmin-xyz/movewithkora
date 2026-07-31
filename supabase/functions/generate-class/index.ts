@@ -590,7 +590,15 @@ Now generate ONLY the PEAK and COOL DOWN sections that continue naturally from h
     })();
 
     return new Response(clientStream, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "text/event-stream",
+        // Lets us confirm, per request, which model actually served a
+        // generation (primary vs. the 503 fallback) instead of guessing
+        // from the aggregated usage dashboard.
+        "X-Model-Used": usedModel,
+        "Access-Control-Expose-Headers": "X-Model-Used",
+      },
     });
   } catch (e) {
     console.error("generate-class error:", e);
