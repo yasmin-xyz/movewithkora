@@ -36,6 +36,10 @@ const FAMILY_FILTERS: { label: string; pillLabel: string; values: string[] }[] =
 
 const SKILL_FILTERS = ["Beginner", "Intermediate", "Advanced"];
 
+// Roughly how many cards fit in the initial viewport across common layouts
+// — these load eagerly at high priority, and the page reveal waits for them.
+const PRIORITY_IMAGE_COUNT = 8;
+
 const KNOWN_POSES_NOT_IN_LIBRARY: { name: string; family: string }[] = [
   { name: "Peacock Pose", family: "arm_balance" },
   { name: "Firefly Pose", family: "arm_balance" },
@@ -88,7 +92,6 @@ const CATEGORY_KEYWORDS: { keywords: string[]; family: string }[] = [
 const PoseLibrary = () => {
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const markImageLoaded = (name: string) => setLoadedImages((prev) => new Set(prev).add(name));
-  const [revealedCards, setRevealedCards] = useState<Set<string>>(new Set());
 
   const [poses, setPoses] = useState<Pose[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,15 +112,32 @@ const PoseLibrary = () => {
     localStorage.setItem(SANSKRIT_STORAGE_KEY, String(showSanskrit));
   }, [showSanskrit]);
 
+  // Reveal the whole page in one smooth fade once the initial-viewport
+  // images are actually ready, rather than as soon as the (much faster)
+  // pose data query resolves — so cards are already loaded by the time the
+  // user sees the page, instead of popping in as they scroll to them.
   useEffect(() => {
-    if (!loading) {
-      const t1 = setTimeout(() => setMounted(true), 20);
-      const t2 = setTimeout(() => setBlooming(true), 250);
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
-    }
+    if (loading) return;
+    const priorityNames = poses.slice(0, PRIORITY_IMAGE_COUNT).filter((p) => p.image_url).map((p) => p.pose_name);
+    const ready = priorityNames.every((name) => loadedImages.has(name));
+    if (!ready) return;
+    const t1 = setTimeout(() => setMounted(true), 20);
+    const t2 = setTimeout(() => setBlooming(true), 250);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [loading, poses, loadedImages]);
+
+  // Safety net: don't leave the page blank forever if an image is slow or
+  // broken and never fires load/error.
+  useEffect(() => {
+    if (loading) return;
+    const t = setTimeout(() => {
+      setMounted(true);
+      setBlooming(true);
+    }, 1500);
+    return () => clearTimeout(t);
   }, [loading]);
 
   useEffect(() => {
@@ -163,36 +183,6 @@ const PoseLibrary = () => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Scroll reveal for pose cards — same pattern as the landing page. Cards
-  // stay hidden until they're actually in view AND their image has loaded,
-  // so images never pop in mid-view; visible cards get a small stagger (see
-  // isCardReady/pose-card-delay below) so a page full of cards settles in
-  // as one smooth top-to-bottom wave instead of scattered, out-of-sync pops.
-  useEffect(() => {
-    if (loading) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const name = entry.target.getAttribute("data-pose-card-id");
-            if (name) {
-              setRevealedCards((prev) => (prev.has(name) ? prev : new Set(prev).add(name)));
-              // Safety net: if this card's image never fires load/error (a
-              // stuck request), don't leave the card invisible forever.
-              setTimeout(() => markImageLoaded(name), 4000);
-            }
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" }
-    );
-    document.querySelectorAll("[data-pose-card-id]").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [loading, poses, activeFamilies, activeSkills, searchQuery]);
-
-  const isCardReady = (pose: Pose) =>
-    revealedCards.has(pose.pose_name) && (!pose.image_url || loadedImages.has(pose.pose_name));
 
   // Human-readable, singular label for a raw family/tag value (e.g.
   // "balance" -> "Balancing Pose") — deliberately singular since a pill
@@ -437,9 +427,7 @@ const PoseLibrary = () => {
         .kora-pose-library .pose-card {
           background: var(--cream); border: 1px solid var(--card-border); border-radius: 6px;
           padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;
-          opacity: 0; transform: translateY(18px); transition: opacity 0.5s ease, transform 0.5s ease;
         }
-        .kora-pose-library .pose-card.pose-card-ready { opacity: 1; transform: translateY(0); }
         @media (max-width: 480px) {
           .kora-pose-library .pose-card { padding: 1.1rem; }
         }
@@ -642,12 +630,7 @@ const PoseLibrary = () => {
               <div className="plib-empty">No poses match these filters.</div>
             ) : (
               filteredPoses.map((pose, index) => (
-                <div
-                  className={`pose-card ${isCardReady(pose) ? "pose-card-ready" : ""}`}
-                  data-pose-card-id={pose.pose_name}
-                  style={{ transitionDelay: isCardReady(pose) ? `${(index % 6) * 40}ms` : "0ms" }}
-                  key={pose.pose_name}
-                >
+                <div className="pose-card" key={pose.pose_name}>
                   {pose.image_url && (
                     <div className="pose-card-image-wrap">
                       {!loadedImages.has(pose.pose_name) && <div className="pose-card-image-skeleton" />}
@@ -655,7 +638,7 @@ const PoseLibrary = () => {
                         src={pose.image_url}
                         alt={pose.pose_name}
                         className="pose-card-img"
-                        priority={index < 8}
+                        priority={index < PRIORITY_IMAGE_COUNT}
                         paddingRatio={getPaddingRatioForPose(pose.pose_name)}
                         onLoad={() => markImageLoaded(pose.pose_name)}
                         onError={() => markImageLoaded(pose.pose_name)}
