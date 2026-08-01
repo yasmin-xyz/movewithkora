@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { getSanskritName, SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
-import { getCroppedImageUrl, getPaddingRatioForPose } from "@/lib/imageCrop";
+import { getPaddingRatioForPose } from "@/lib/imageCrop";
 import SiteNav from "@/components/SiteNav";
+import PoseImage from "@/components/PoseImage";
 
 interface Pose {
   pose_name: string;
@@ -87,7 +88,6 @@ const CATEGORY_KEYWORDS: { keywords: string[]; family: string }[] = [
 const PoseLibrary = () => {
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const markImageLoaded = (name: string) => setLoadedImages((prev) => new Set(prev).add(name));
-  const [croppedImages, setCroppedImages] = useState<Record<string, string>>({});
 
   const [poses, setPoses] = useState<Pose[]>([]);
   const [loading, setLoading] = useState(true);
@@ -137,33 +137,10 @@ const PoseLibrary = () => {
         image_url: mediaMap.get(normalize(p.pose_name)),
       }));
 
-      // Analyze and crop every pose image's real content bounding box BEFORE
-      // revealing the page — this is what actually fixes the choppy/glitchy
-      // load, since the reveal-animation effect below only fires once
-      // `loading` flips false, and now that doesn't happen until images are
-      // genuinely ready. A per-image 5s timeout guard means one slow/broken
-      // image can't stall the whole page indefinitely — it just falls back
-      // to its uncropped original if it doesn't finish in time.
-      const withTimeout = <T,>(promise: Promise<T>, ms: number, fallback: T): Promise<T> =>
-        Promise.race([promise, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms))]);
-
-      const croppedEntries = await Promise.all(
-        merged.map(async (p: Pose) => {
-          if (!p.image_url) return [p.pose_name, undefined] as const;
-          const cropped = await withTimeout(
-            getCroppedImageUrl(p.image_url, getPaddingRatioForPose(p.pose_name)),
-            5000,
-            p.image_url
-          );
-          return [p.pose_name, cropped] as const;
-        })
-      );
-      const croppedMap: Record<string, string> = {};
-      for (const [name, url] of croppedEntries) {
-        if (url) croppedMap[name] = url;
-      }
-
-      setCroppedImages(croppedMap);
+      // Reveal the page as soon as the (fast) pose data query resolves —
+      // each pose's image crop is computed lazily by PoseImage itself once
+      // its card actually renders, instead of blocking the whole page on
+      // every image in the library finishing first.
       setPoses(merged);
       setLoading(false);
     };
@@ -441,9 +418,7 @@ const PoseLibrary = () => {
         }
         .kora-pose-library .pose-card-img {
           position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
-          opacity: 0; transition: opacity 0.3s ease;
         }
-        .kora-pose-library .pose-card-img.loaded { opacity: 1; }
         .kora-pose-library .pose-card-name {
           font-family: var(--serif); font-size: 1.25rem; color: var(--text-primary); margin: 0; line-height: 1.25;
         }
@@ -628,12 +603,11 @@ const PoseLibrary = () => {
                   {pose.image_url && (
                     <div className="pose-card-image-wrap">
                       {!loadedImages.has(pose.pose_name) && <div className="pose-card-image-skeleton" />}
-                      <img
-                        src={croppedImages[pose.pose_name] || pose.image_url}
+                      <PoseImage
+                        src={pose.image_url}
                         alt={pose.pose_name}
-                        style={{ width: "100%", height: "100%", objectFit: "contain", position: "absolute", inset: 0 }}
-                        className={`pose-card-img ${loadedImages.has(pose.pose_name) ? "loaded" : ""}`}
-                        decoding="async"
+                        className="pose-card-img"
+                        paddingRatio={getPaddingRatioForPose(pose.pose_name)}
                         onLoad={() => markImageLoaded(pose.pose_name)}
                       />
                     </div>
