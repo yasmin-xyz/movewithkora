@@ -7,6 +7,9 @@ interface PoseImageProps {
   className?: string;
   paddingRatio?: number;
   onLoad?: () => void;
+  onError?: () => void;
+  /** Loads eagerly at high priority — use for images visible on first paint. */
+  priority?: boolean;
 }
 
 /**
@@ -22,7 +25,7 @@ interface PoseImageProps {
  * network image loads are inherently slower than the surrounding text, so
  * without this the page reads as glitchy as images arrive out of sync.
  */
-const PoseImage = ({ src, alt, className, paddingRatio = 0.06, onLoad }: PoseImageProps) => {
+const PoseImage = ({ src, alt, className, paddingRatio = 0.06, onLoad, onError, priority }: PoseImageProps) => {
   const [displaySrc, setDisplaySrc] = useState(src);
   const [loaded, setLoaded] = useState(false);
 
@@ -41,15 +44,26 @@ const PoseImage = ({ src, alt, className, paddingRatio = 0.06, onLoad }: PoseIma
 
   if (!displaySrc) return null;
 
+  const settle = () => setLoaded(true);
+
   return (
     <img
       src={displaySrc}
       alt={alt}
       className={className}
       decoding="async"
+      loading={priority ? "eager" : "lazy"}
+      // @ts-expect-error fetchPriority isn't in this TS lib's JSX types yet
+      fetchpriority={priority ? "high" : undefined}
       onLoad={() => {
-        setLoaded(true);
+        settle();
         onLoad?.();
+      }}
+      onError={() => {
+        // A broken image shouldn't leave the caller's own fade-in (or a
+        // parent card gated on this component's load state) stuck forever.
+        settle();
+        onError?.();
       }}
       style={{
         opacity: loaded ? 1 : 0,

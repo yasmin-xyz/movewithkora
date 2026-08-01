@@ -88,6 +88,7 @@ const CATEGORY_KEYWORDS: { keywords: string[]; family: string }[] = [
 const PoseLibrary = () => {
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const markImageLoaded = (name: string) => setLoadedImages((prev) => new Set(prev).add(name));
+  const [revealedCards, setRevealedCards] = useState<Set<string>>(new Set());
 
   const [poses, setPoses] = useState<Pose[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,6 +163,36 @@ const PoseLibrary = () => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Scroll reveal for pose cards — same pattern as the landing page. Cards
+  // stay hidden until they're actually in view AND their image has loaded,
+  // so images never pop in mid-view; visible cards get a small stagger (see
+  // isCardReady/pose-card-delay below) so a page full of cards settles in
+  // as one smooth top-to-bottom wave instead of scattered, out-of-sync pops.
+  useEffect(() => {
+    if (loading) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const name = entry.target.getAttribute("data-pose-card-id");
+            if (name) {
+              setRevealedCards((prev) => (prev.has(name) ? prev : new Set(prev).add(name)));
+              // Safety net: if this card's image never fires load/error (a
+              // stuck request), don't leave the card invisible forever.
+              setTimeout(() => markImageLoaded(name), 4000);
+            }
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" }
+    );
+    document.querySelectorAll("[data-pose-card-id]").forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [loading, poses, activeFamilies, activeSkills, searchQuery]);
+
+  const isCardReady = (pose: Pose) =>
+    revealedCards.has(pose.pose_name) && (!pose.image_url || loadedImages.has(pose.pose_name));
 
   const displayName = (name: string) => {
     if (!showSanskrit) return name;
@@ -396,7 +427,9 @@ const PoseLibrary = () => {
         .kora-pose-library .pose-card {
           background: var(--cream); border: 1px solid var(--card-border); border-radius: 6px;
           padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;
+          opacity: 0; transform: translateY(18px); transition: opacity 0.5s ease, transform 0.5s ease;
         }
+        .kora-pose-library .pose-card.pose-card-ready { opacity: 1; transform: translateY(0); }
         @media (max-width: 480px) {
           .kora-pose-library .pose-card { padding: 1.1rem; }
         }
@@ -598,8 +631,13 @@ const PoseLibrary = () => {
             ) : filteredPoses.length === 0 ? (
               <div className="plib-empty">No poses match these filters.</div>
             ) : (
-              filteredPoses.map((pose) => (
-                <div className="pose-card" key={pose.pose_name}>
+              filteredPoses.map((pose, index) => (
+                <div
+                  className={`pose-card ${isCardReady(pose) ? "pose-card-ready" : ""}`}
+                  data-pose-card-id={pose.pose_name}
+                  style={{ transitionDelay: isCardReady(pose) ? `${(index % 6) * 40}ms` : "0ms" }}
+                  key={pose.pose_name}
+                >
                   {pose.image_url && (
                     <div className="pose-card-image-wrap">
                       {!loadedImages.has(pose.pose_name) && <div className="pose-card-image-skeleton" />}
@@ -607,8 +645,10 @@ const PoseLibrary = () => {
                         src={pose.image_url}
                         alt={pose.pose_name}
                         className="pose-card-img"
+                        priority={index < 8}
                         paddingRatio={getPaddingRatioForPose(pose.pose_name)}
                         onLoad={() => markImageLoaded(pose.pose_name)}
+                        onError={() => markImageLoaded(pose.pose_name)}
                       />
                     </div>
                   )}
