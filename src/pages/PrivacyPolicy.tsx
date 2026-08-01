@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SiteNav from "@/components/SiteNav";
 
@@ -10,18 +10,26 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 );
 
 const PrivacyPolicy = () => {
+  const [mounted, setMounted] = useState(false);
+
   // Client-side navigation doesn't reset scroll position the way a normal
   // page load does — same fix already used in Index.tsx.
   useEffect(() => {
     window.scrollTo(0, 0);
+    const t = setTimeout(() => setMounted(true), 20);
+    return () => clearTimeout(t);
   }, []);
 
   return (
     <div className="min-h-screen bg-background">
       <SiteNav />
-      <div className="max-w-3xl mx-auto px-6 pt-28 pb-16">
+      <div
+        className={`max-w-3xl mx-auto px-6 pt-28 pb-16 transition-all duration-700 ease-out ${
+          mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+        }`}
+      >
         <h1 className="font-heading text-3xl tracking-tight text-foreground mb-1">Privacy Policy</h1>
-        <p className="font-body text-xs text-muted-foreground mb-10">Last updated July 13, 2026</p>
+        <p className="font-body text-xs text-muted-foreground mb-10">Last updated July 31, 2026</p>
 
         <Section title="Who operates Kora">
           <p>
@@ -100,13 +108,21 @@ const PrivacyPolicy = () => {
             <li><strong>Supabase</strong> — our database, authentication, and file storage provider.</li>
             <li><strong>Vercel</strong> — our hosting provider.</li>
             <li>
-              An AI provider, accessed through Lovable's AI gateway — used only to generate the text of
-              your class plan based on the parameters you provide (peak pose, length, style, etc.). We
-              do not send your account email or saved-class history to this provider — only the
-              parameters for the specific class being generated in that moment.
+              <strong>Google (Gemini API)</strong> — used only to generate the text of your class plan
+              based on the parameters you provide (peak pose, length, style, etc.). We do not send your
+              account email or saved-class history to this provider — only the parameters for the
+              specific class being generated in that moment.
             </li>
           </ul>
           <p>We do not otherwise share your personal information with third parties.</p>
+        </Section>
+
+        <Section title="Local storage">
+          <p>
+            Kora stores a small amount of information directly in your browser (via localStorage) to
+            remember your preferences between visits — for example, whether you'd like pose names shown
+            in Sanskrit. This stays on your device, isn't sent to us, and isn't used for tracking.
+          </p>
         </Section>
 
         <Section title="Data retention and deletion">

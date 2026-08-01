@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SiteNav from "@/components/SiteNav";
 
@@ -10,16 +10,24 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 );
 
 const TermsOfService = () => {
+  const [mounted, setMounted] = useState(false);
+
   // Client-side navigation doesn't reset scroll position the way a normal
   // page load does — same fix already used in Index.tsx.
   useEffect(() => {
     window.scrollTo(0, 0);
+    const t = setTimeout(() => setMounted(true), 20);
+    return () => clearTimeout(t);
   }, []);
 
   return (
     <div className="min-h-screen bg-background">
       <SiteNav />
-      <div className="max-w-3xl mx-auto px-6 pt-28 pb-16">
+      <div
+        className={`max-w-3xl mx-auto px-6 pt-28 pb-16 transition-all duration-700 ease-out ${
+          mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+        }`}
+      >
         <h1 className="font-heading text-3xl tracking-tight text-foreground mb-1">Terms of Service</h1>
         <p className="font-body text-xs text-muted-foreground mb-10">Last updated July 13, 2026</p>
 
