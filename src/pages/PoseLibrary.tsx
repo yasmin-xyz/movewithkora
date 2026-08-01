@@ -17,21 +17,21 @@ interface Pose {
   image_url?: string;
 }
 
-const FAMILY_FILTERS: { label: string; values: string[] }[] = [
-  { label: "Hip Openers", values: ["hip_opener"] },
-  { label: "Standing Poses", values: ["standing_pose"] },
-  { label: "Backbends", values: ["backbend"] },
-  { label: "Twists", values: ["twist"] },
-  { label: "Arm Balances", values: ["arm_balance"] },
-  { label: "Balance", values: ["balance"] },
-  { label: "Inversions", values: ["inversion"] },
-  { label: "Core", values: ["core"] },
-  { label: "Seated Poses", values: ["seated"] },
-  { label: "Forward Folds", values: ["fold"] },
-  { label: "Lunges", values: ["lunge"] },
-  { label: "Binds", values: ["bind"] },
-  { label: "Side Bends", values: ["side_bend"] },
-  { label: "Rest & Restorative", values: ["rest", "restorative"] },
+const FAMILY_FILTERS: { label: string; pillLabel: string; values: string[] }[] = [
+  { label: "Hip Openers", pillLabel: "Hip Opener", values: ["hip_opener"] },
+  { label: "Standing Poses", pillLabel: "Standing Pose", values: ["standing_pose"] },
+  { label: "Backbends", pillLabel: "Backbend", values: ["backbend"] },
+  { label: "Twists", pillLabel: "Twist", values: ["twist"] },
+  { label: "Arm Balances", pillLabel: "Arm Balance", values: ["arm_balance"] },
+  { label: "Balancing Poses", pillLabel: "Balancing Pose", values: ["balance"] },
+  { label: "Inversions", pillLabel: "Inversion", values: ["inversion"] },
+  { label: "Core", pillLabel: "Core", values: ["core"] },
+  { label: "Seated Poses", pillLabel: "Seated Pose", values: ["seated"] },
+  { label: "Forward Folds", pillLabel: "Forward Fold", values: ["fold"] },
+  { label: "Lunges", pillLabel: "Lunge", values: ["lunge"] },
+  { label: "Binds", pillLabel: "Bind", values: ["bind"] },
+  { label: "Side Bends", pillLabel: "Side Bend", values: ["side_bend"] },
+  { label: "Rest & Restorative", pillLabel: "Rest & Restorative", values: ["rest", "restorative"] },
 ];
 
 const SKILL_FILTERS = ["Beginner", "Intermediate", "Advanced"];
@@ -194,6 +194,16 @@ const PoseLibrary = () => {
   const isCardReady = (pose: Pose) =>
     revealedCards.has(pose.pose_name) && (!pose.image_url || loadedImages.has(pose.pose_name));
 
+  // Human-readable, singular label for a raw family/tag value (e.g.
+  // "balance" -> "Balancing Pose") — deliberately singular since a pill
+  // describes the one pose it's attached to, unlike the plural filter-list
+  // wording ("Balancing Poses"). Falls back to a title-cased version of the
+  // raw value for anything not covered by FAMILY_FILTERS.
+  const tagLabel = (value: string) => {
+    const filter = FAMILY_FILTERS.find((f) => f.values.includes(value));
+    return filter ? filter.pillLabel : value.replace(/_/g, " ");
+  };
+
   const displayName = (name: string) => {
     if (!showSanskrit) return name;
     return getSanskritName(name) || name;
@@ -258,7 +268,7 @@ const PoseLibrary = () => {
   const filteredPoses = poses.filter((p) => {
     const familyMatch =
       activeFamilies.size === 0 ||
-      Array.from(activeFamilies).some((label) => {
+      Array.from(activeFamilies).every((label) => {
         const filter = FAMILY_FILTERS.find((f) => f.label === label);
         if (!filter) return false;
         if (filter.values.includes(p.family)) return true;
@@ -659,7 +669,10 @@ const PoseLibrary = () => {
                     )}
                   </h3>
                   <div className="pose-card-tags">
-                    <span className="pose-card-tag">{pose.family.replace(/_/g, " ")}</span>
+                    <span className="pose-card-tag">{tagLabel(pose.family)}</span>
+                    {(pose.secondary_tags || []).map((tag) => (
+                      <span className="pose-card-tag" key={tag}>{tagLabel(tag)}</span>
+                    ))}
                     <span className="pose-card-tag">{pose.difficulty_level}</span>
                   </div>
                   {pose.how_to_cue && (
