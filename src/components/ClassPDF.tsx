@@ -558,8 +558,8 @@ const ClassPDF = ({
                             )}
                             <View style={styles.transitionBlock}>
                               <Text style={styles.transitionLabel}>Transition: {displayName(pose.name)}</Text>
-                              {pose.breath && <Text style={styles.transitionDetail}>Breath: {pose.breath}</Text>}
                               {pose.cue && <Text style={styles.transitionDetail}>{pose.cue}</Text>}
+                              {pose.breath && <Text style={styles.transitionDetail}>Breath: {pose.breath}</Text>}
                             </View>
                           </View>
                         );
@@ -591,16 +591,16 @@ const ClassPDF = ({
                                 )}
                                 {pose.isSelected && <Text style={styles.selectedBadge}>SELECTED</Text>}
                               </View>
-                              {pose.breath && (
-                                <View style={styles.poseDetailRow}>
-                                  <Text style={styles.poseDetailLabel}>Breath:</Text>
-                                  <Text style={styles.poseDetailValue}>{pose.breath}</Text>
-                                </View>
-                              )}
                               {pose.cue && (
                                 <View style={styles.poseDetailRow}>
                                   <Text style={styles.poseDetailLabel}>Cue:</Text>
                                   <Text style={styles.poseDetailValue}>{pose.cue}</Text>
+                                </View>
+                              )}
+                              {pose.breath && (
+                                <View style={styles.poseDetailRow}>
+                                  <Text style={styles.poseDetailLabel}>Breath:</Text>
+                                  <Text style={styles.poseDetailValue}>{pose.breath}</Text>
                                 </View>
                               )}
                             </View>

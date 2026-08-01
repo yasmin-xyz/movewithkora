@@ -636,14 +636,14 @@ const ClassPlan = ({
                                   <p className="font-body text-[12px] font-medium text-muted-foreground/70">
                                     Transition: {displayName(pose.name)}
                                   </p>
-                                  {pose.breath && (
-                                    <p className="font-body text-[11px] text-muted-foreground/60 mt-0.5">
-                                      Breath: {pose.breath}
-                                    </p>
-                                  )}
                                   {pose.cue && (
                                     <p className="font-body text-[11px] text-muted-foreground/60 mt-0.5">
                                       {pose.cue}
+                                    </p>
+                                  )}
+                                  {pose.breath && (
+                                    <p className="font-body text-[11px] text-muted-foreground/60 mt-0.5">
+                                      Breath: {pose.breath}
                                     </p>
                                   )}
                                   <div className="border-b border-border/40 mt-1.5" />
@@ -730,16 +730,6 @@ const ClassPlan = ({
                                           <div className="space-y-2 mt-1" onClick={(e) => e.stopPropagation()}>
                                             <div>
                                               <label className="font-body text-[11px] font-medium text-foreground/70 uppercase tracking-wide">
-                                                Breath
-                                              </label>
-                                              <input
-                                                value={poseEditDraft.breath}
-                                                onChange={(e) => setPoseEditDraft((d) => ({ ...d, breath: e.target.value }))}
-                                                className="w-full mt-1 h-9 rounded-md border border-border bg-background px-2.5 text-sm font-body text-foreground"
-                                              />
-                                            </div>
-                                            <div>
-                                              <label className="font-body text-[11px] font-medium text-foreground/70 uppercase tracking-wide">
                                                 Cue
                                               </label>
                                               <textarea
@@ -747,6 +737,16 @@ const ClassPlan = ({
                                                 onChange={(e) => setPoseEditDraft((d) => ({ ...d, cue: e.target.value }))}
                                                 rows={3}
                                                 className="w-full mt-1 rounded-md border border-border bg-background px-2.5 py-2 text-sm font-body text-foreground resize-none"
+                                              />
+                                            </div>
+                                            <div>
+                                              <label className="font-body text-[11px] font-medium text-foreground/70 uppercase tracking-wide">
+                                                Breath
+                                              </label>
+                                              <input
+                                                value={poseEditDraft.breath}
+                                                onChange={(e) => setPoseEditDraft((d) => ({ ...d, breath: e.target.value }))}
+                                                className="w-full mt-1 h-9 rounded-md border border-border bg-background px-2.5 text-sm font-body text-foreground"
                                               />
                                             </div>
                                             <div className="flex items-center gap-2 justify-end pt-0.5">
@@ -780,16 +780,16 @@ const ClassPlan = ({
                                           </div>
                                         ) : (
                                           <>
-                                            {pose.breath && (
-                                              <p className="font-body text-sm text-muted-foreground">
-                                                <span className="font-medium text-foreground/70">Breath:</span>{" "}
-                                                {pose.breath}
-                                              </p>
-                                            )}
                                             {pose.cue && (
                                               <p className="font-body text-sm text-muted-foreground">
                                                 <span className="font-medium text-foreground/70">Cue:</span>{" "}
                                                 {pose.cue}
+                                              </p>
+                                            )}
+                                            {pose.breath && (
+                                              <p className="font-body text-sm text-muted-foreground">
+                                                <span className="font-medium text-foreground/70">Breath:</span>{" "}
+                                                {pose.breath}
                                               </p>
                                             )}
                                           </>
