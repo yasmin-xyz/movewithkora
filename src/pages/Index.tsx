@@ -272,9 +272,13 @@ const Index = () => {
           { ...baseParams, phase: "warmupBuild" },
           ""
         );
+        // Phase 1's text doesn't reliably end with a newline — without this,
+        // Phase 2's first chunk (e.g. "PEAK:") gets glued directly onto it
+        // with no separator (e.g. "...before the peak.PEAK:").
+        const warmupBuildTextWithSeparator = warmupBuildText.trimEnd() + "\n\n";
         await streamGenerationPhase(
           { ...baseParams, phase: "peakCooldown", priorContent: warmupBuildText },
-          warmupBuildText
+          warmupBuildTextWithSeparator
         );
       }
 
