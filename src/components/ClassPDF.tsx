@@ -332,30 +332,22 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     marginLeft: 6,
   },
-  // Applied to a <View>, not a <Text> — two sibling Text children (label,
-  // value) laid out in a row. Nested Text-in-Text with differing font
-  // weights is a documented source of overlapping/duplicated-looking text
-  // in react-pdf; a View row sidesteps that ambiguity entirely.
-  poseDetailRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 4,
-  },
-  poseDetailLabel: {
-    fontFamily: "Inter",
-    fontWeight: 500,
-    fontSize: 9,
-    color: "#5C6B55",
-    width: 34,
-    textAlign: "right",
-    marginRight: 5,
-  },
-  poseDetailValue: {
+  // A single wrapped paragraph (label run-in, not a separate column) to
+  // match the site's layout, where wrapped lines return to the left margin
+  // instead of hanging-indenting under the value. The label is distinguished
+  // by color only, not font weight — nested Text-in-Text with DIFFERING font
+  // weights is a documented source of overlapping/duplicated-looking text in
+  // react-pdf, so the inline label keeps the same weight as the surrounding
+  // text and relies on color alone for contrast.
+  poseDetailLine: {
     fontFamily: "Inter",
     fontSize: 9,
     lineHeight: 1.45,
     color: COLORS.mutedForeground,
-    flex: 1,
+    marginTop: 4,
+  },
+  poseDetailLabelInline: {
+    color: "#5C6B55",
   },
   transitionBlock: {
     borderTopWidth: 1,
@@ -592,16 +584,16 @@ const ClassPDF = ({
                                 {pose.isSelected && <Text style={styles.selectedBadge}>SELECTED</Text>}
                               </View>
                               {pose.cue && (
-                                <View style={styles.poseDetailRow}>
-                                  <Text style={styles.poseDetailLabel}>Cue:</Text>
-                                  <Text style={styles.poseDetailValue}>{pose.cue}</Text>
-                                </View>
+                                <Text style={styles.poseDetailLine}>
+                                  <Text style={styles.poseDetailLabelInline}>Cue: </Text>
+                                  {pose.cue}
+                                </Text>
                               )}
                               {pose.breath && (
-                                <View style={styles.poseDetailRow}>
-                                  <Text style={styles.poseDetailLabel}>Breath:</Text>
-                                  <Text style={styles.poseDetailValue}>{pose.breath}</Text>
-                                </View>
+                                <Text style={styles.poseDetailLine}>
+                                  <Text style={styles.poseDetailLabelInline}>Breath: </Text>
+                                  {pose.breath}
+                                </Text>
                               )}
                             </View>
                           </View>
