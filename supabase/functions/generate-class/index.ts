@@ -510,23 +510,32 @@ Now generate ONLY the PEAK and COOL DOWN sections that continue naturally from h
     const FALLBACK_MODEL = "gemini-3.5-flash-lite";
     let response = await callGemini(PRIMARY_MODEL);
 
-    // Exactly one quick retry on a 503 "high demand" response — these
-    // rejections are near-instant (Gemini says "no capacity" immediately,
-    // it doesn't spend time processing before rejecting), so a single retry
-    // adds well under a second of real delay, unlike the old multi-attempt
-    // backoff chain that risked compounding toward Supabase's 150s timeout.
-    if (!response.ok && response.status === 503) {
-      console.error(`Gemini 503 on ${PRIMARY_MODEL}, retrying once`);
+    // Gemini's 503 "high demand" rejections are near-instant — it says "no
+    // capacity" immediately without spending time processing, so several
+    // quick retries on the primary model cost well under a couple of
+    // seconds total, nowhere near Supabase's 150s execution timeout. The
+    // fallback model is noticeably weaker at reliably following a prompt
+    // this dense (e.g. asymmetrical-pose side-flow splitting), so it's
+    // worth retrying meaningfully harder before giving up on the primary
+    // model rather than falling back after a single attempt.
+    const MAX_PRIMARY_RETRIES = 4;
+    for (
+      let attempt = 1;
+      attempt <= MAX_PRIMARY_RETRIES && !response.ok && response.status === 503;
+      attempt++
+    ) {
+      console.error(`Gemini 503 on ${PRIMARY_MODEL}, retry ${attempt}/${MAX_PRIMARY_RETRIES}`);
       await new Promise((resolve) => setTimeout(resolve, 400));
       response = await callGemini(PRIMARY_MODEL);
     }
 
-    // Still no capacity on the primary model — fall back to a separate
-    // model with its own quota, straight away with no extra backoff, so
-    // this doesn't compound toward Supabase's 150s execution timeout.
+    // Still no capacity on the primary model after every retry — fall back
+    // to a separate model with its own quota as a last resort.
     let usedModel = PRIMARY_MODEL;
     if (!response.ok && response.status === 503) {
-      console.error(`${PRIMARY_MODEL} still unavailable after retry — falling back to ${FALLBACK_MODEL}`);
+      console.error(
+        `${PRIMARY_MODEL} still unavailable after ${MAX_PRIMARY_RETRIES} retries — falling back to ${FALLBACK_MODEL}`
+      );
       response = await callGemini(FALLBACK_MODEL);
       usedModel = FALLBACK_MODEL;
     }
