@@ -10,13 +10,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { LoginDialog } from "@/components/Auth";
 import { SANSKRIT_STORAGE_KEY } from "@/lib/sanskritNames";
 
-// Ashtanga/Power/Vinyasa classes at longer lengths generate enough content
-// (a vinyasa between every pose, per the generate-class system prompt) to
-// run close to or past Supabase's ~150s edge function timeout in one call.
-// Only these specific combinations get split into two chained requests —
-// everything else stays a single call, exactly as fast as it is today.
-const RISKY_STYLES = ["Ashtanga", "Power", "Vinyasa"];
-const RISKY_LENGTH_THRESHOLD = 60; // minutes
+// Every generation is split into two chained requests (Warm-Up+Build, then
+// Peak+Cool Down) rather than only specific style/length combinations. A
+// single call generating a full class can run close to or past Supabase's
+// ~150s edge function timeout — a 45-minute Vinyasa class alone hit this
+// even with a shorter, non-split call, and retrying harder on the primary
+// model (see generate-class's retry logic) means more requests ride out
+// its full, slower generation time instead of quickly failing over to the
+// faster fallback model. Splitting keeps every individual call small
+// regardless of style or length, which is worth the modest added latency
+// (a bit of duplicated prompt-prefill time) in exchange for reliably
+// avoiding timeouts and consistently getting the primary model's better
+// rule-following (e.g. asymmetrical-pose side-flow splitting).
 
 const Index = () => {
   const navigate = useNavigate();
@@ -261,26 +266,19 @@ const Index = () => {
       inspiration: inspiration.trim() || null,
     };
 
-    const shouldSplit =
-      RISKY_STYLES.includes(yogaStyle) && parseInt(classLength) >= RISKY_LENGTH_THRESHOLD;
-
     try {
-      if (!shouldSplit) {
-        await streamGenerationPhase(baseParams, "");
-      } else {
-        const warmupBuildText = await streamGenerationPhase(
-          { ...baseParams, phase: "warmupBuild" },
-          ""
-        );
-        // Phase 1's text doesn't reliably end with a newline — without this,
-        // Phase 2's first chunk (e.g. "PEAK:") gets glued directly onto it
-        // with no separator (e.g. "...before the peak.PEAK:").
-        const warmupBuildTextWithSeparator = warmupBuildText.trimEnd() + "\n\n";
-        await streamGenerationPhase(
-          { ...baseParams, phase: "peakCooldown", priorContent: warmupBuildText },
-          warmupBuildTextWithSeparator
-        );
-      }
+      const warmupBuildText = await streamGenerationPhase(
+        { ...baseParams, phase: "warmupBuild" },
+        ""
+      );
+      // Phase 1's text doesn't reliably end with a newline — without this,
+      // Phase 2's first chunk (e.g. "PEAK:") gets glued directly onto it
+      // with no separator (e.g. "...before the peak.PEAK:").
+      const warmupBuildTextWithSeparator = warmupBuildText.trimEnd() + "\n\n";
+      await streamGenerationPhase(
+        { ...baseParams, phase: "peakCooldown", priorContent: warmupBuildText },
+        warmupBuildTextWithSeparator
+      );
 
       if (notifyWhenReadyRef.current && notifySupported && Notification.permission === "granted") {
         const notification = new Notification("Your class is ready 🧘", {
