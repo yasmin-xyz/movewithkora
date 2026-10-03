@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -18,6 +19,8 @@ interface SavedClass {
 }
 
 interface SavedClassesProps {
+  /** Bump this to make the list re-fetch (e.g. right after a class is saved). */
+  refreshToken?: number;
   onLoadClass?: (
     id: string,
     peakPose: string,
@@ -30,7 +33,7 @@ interface SavedClassesProps {
   ) => void;
 }
 
-const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
+const SavedClasses = ({ onLoadClass, refreshToken = 0 }: SavedClassesProps) => {
   const [classes, setClasses] = useState<SavedClass[]>([]);
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
@@ -41,14 +44,22 @@ const SavedClasses = ({ onLoadClass }: SavedClassesProps) => {
       .select("*")
       .eq("archived", archived)
       .order("created_at", { ascending: false })
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Failed to load saved classes:", error);
+          toast.error("Couldn't load your saved classes.");
+          return;
+        }
         if (data) setClasses(data as SavedClass[]);
       });
   };
 
+  // Loads on mount, when toggling archived, and whenever the parent bumps
+  // refreshToken (after a successful save) — without that last trigger a
+  // freshly saved class wouldn't appear until the page was reloaded.
   useEffect(() => {
     fetchClasses(showArchived);
-  }, [showArchived]);
+  }, [showArchived, refreshToken]);
 
   const handleArchive = async (id: string) => {
     setClasses((prev) => prev.filter((c) => c.id !== id));

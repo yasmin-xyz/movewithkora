@@ -84,6 +84,7 @@ const Index = () => {
     localStorage.setItem(SANSKRIT_STORAGE_KEY, String(showSanskrit));
   }, [showSanskrit]);
   const [isSaving, setIsSaving] = useState(false);
+  const [savedListVersion, setSavedListVersion] = useState(0);
   const [isViewingLoaded, setIsViewingLoaded] = useState(false);
   const [loadedDate, setLoadedDate] = useState<string | null>(null);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -323,9 +324,12 @@ const Index = () => {
     setIsSaving(false);
 
     if (error) {
+      console.error("Failed to save class:", error);
       toast.error("Failed to save class.");
     } else {
       toast.success("Class saved successfully.");
+      // Tell the Saved Classes list to re-fetch so the new class shows up.
+      setSavedListVersion((v) => v + 1);
       // Now that the class has a row, Share becomes available on ClassPlan.
       if (data?.id) setCurrentSavedClassId(data.id);
     }
@@ -588,7 +592,7 @@ const Index = () => {
                       Log out
                     </Button>
                   </div>
-                  <SavedClasses onLoadClass={handleLoadClass} />
+                  <SavedClasses onLoadClass={handleLoadClass} refreshToken={savedListVersion} />
                 </div>
               )}
             </>
